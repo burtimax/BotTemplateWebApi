@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using BotFramework.Models;
 using Telegram.Bot.Types;
 
 namespace BotFramework.Db.Entity
@@ -20,6 +22,45 @@ namespace BotFramework.Db.Entity
         public string? TelegramUsername { get; set; }
 
         /// <summary>
+        /// Внешний ключ на пользователя
+        /// </summary>
+        public long BotUserId { get; set; }
+        public BotUser BotUser { get; set; }
+
+        /// <summary>
+        /// Состояние чата 
+        /// </summary>
+        /// <remarks>
+        /// Не переименовывать свойство, потому что оно в модели БД <seealso cref="BotDbContext.OnModelCreating"/>
+        /// </remarks>
+        private List<string> _states = new ();
+
+        /// <summary>
+        /// Хранилище данных чата.
+        /// </summary>
+        /// <remarks>
+        /// Не переименовывать свойство, потому что оно в модели БД <seealso cref="BotDbContext.OnModelCreating"/>
+        /// </remarks>
+        private Dictionary<string, string> _data = new ();
+    
+        #region NotMappedData
+        
+        private ChatData? _chatData = null;
+
+        /// <summary>
+        /// Свойство для работы с временными данными чата.
+        /// </summary>
+        [NotMapped] public ChatData Data =>  _chatData ??= new ChatData(_data);
+
+        private ChatStates? _chatStates;
+        
+        /// <summary>
+        /// Свойство для работы с состояниями чата.
+        /// </summary>
+        [NotMapped] public ChatStates States => _chatStates ??= new ChatStates(_states);
+        
+
+        /// <summary>
         /// Получить Telegram идентификатор чата (Id или Username)
         /// </summary>
         /// <remarks>NotMapped свойство</remarks>
@@ -32,21 +73,7 @@ namespace BotFramework.Db.Entity
                     new ChatId(TelegramUsername ?? "");
             }
         }
-
-        /// <summary>
-        /// Внешний ключ на пользователя
-        /// </summary>
-        public long BotUserId { get; set; }
-        public BotUser BotUser { get; set; }
-
-        /// <summary>
-        /// Состояние чата 
-        /// </summary>
-        public string State { get; set; }
-
-        /// <summary>
-        /// Хранилище данных чата
-        /// </summary>
-        public string DataStore { get; set; }
+        
+        #endregion
     }
 }

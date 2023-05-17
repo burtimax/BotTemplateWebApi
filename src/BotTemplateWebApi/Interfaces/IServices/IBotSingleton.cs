@@ -11,6 +11,6 @@ namespace BotTemplateWebApi.Interfaces.IServices
         /// Получить экземпляр бота.
         /// </summary>
         /// <returns></returns>
-        ValueTask<Bot> GetInstance();
+        Bot GetInstance();
     }
 }

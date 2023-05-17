@@ -26,17 +26,12 @@ namespace BotFramework.Implementation
             };
         }
         
-        public static BotChat ToBotChatEntity(this Chat chat, 
-            long botUserId,
-            string state = null, 
-            string dataStore = null)
+        public static BotChat ToBotChatEntity(this Chat chat, long botUserId)
         {
             return new BotChat()
             {
                 TelegramId = chat.Id,
                 TelegramUsername = chat.Username,
-                State = state,
-                DataStore = dataStore,
                 BotUserId = botUserId,
             };
         }

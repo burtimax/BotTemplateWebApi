@@ -6,5 +6,7 @@
         {
             public const string User = "user";
         }
+
+        public const string StartState = "StartState";
     }
 }

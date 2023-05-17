@@ -1,4 +1,5 @@
-﻿using BotFramework.Base;
+﻿using System.Diagnostics;
+using BotFramework.Base;
 using BotTemplateWebApi.App.Options;
 using BotTemplateWebApi.Interfaces.IServices;
 using Microsoft.Extensions.Options;
@@ -8,23 +9,34 @@ namespace BotTemplateWebApi.Services
 {
     public class BotSingleton : IBotSingleton
     {
-        private Bot _bot;
-        private readonly ApplicationConfiguration.BotConfiguration _botConfig;
+        public static Bot Bot;
+        private readonly string _token;
+        private readonly string _webhook;
+        
 
-        public BotSingleton(IOptions<ApplicationConfiguration.BotConfiguration> options, 
-            IOptions<ApplicationConfiguration.BotConfiguration> botConfig)
+        public BotSingleton(string token, string webhook)
         {
-            _botConfig = botConfig.Value;
+            _token = token;
+            _webhook = webhook;
+            var bot = GetInstance();
+            Debug.WriteLine("BOT URL - " + bot.ApiClient.GetWebhookInfoAsync().Result.Url);
+            Debug.WriteLine("BOT IP - " + bot.ApiClient.GetWebhookInfoAsync().Result.IpAddress);
+            Debug.WriteLine("BOT PENDING COUNT - " + bot.ApiClient.GetWebhookInfoAsync().Result.PendingUpdateCount.ToString());
         }
         
-        public async ValueTask<Bot> GetInstance()
+        public BotSingleton(IOptions<ApplicationConfiguration.BotConfiguration> botConfig)
+        : this(botConfig.Value.TelegramToken, botConfig.Value.Webhook)
         {
-            if (_bot != null) return _bot;
+        }
+        
+        public Bot GetInstance()
+        {
+            if (Bot != null) return Bot;
             
-            TelegramBotClient botClient = new(_botConfig.TelegramToken);
-            await botClient.SetWebhookAsync(_botConfig.Webhook);
-            _bot = new Bot(botClient);
-            return _bot;
+            TelegramBotClient botClient = new(_token);
+            botClient.SetWebhookAsync(_webhook).Wait();
+            Bot = new Bot(botClient);
+            return Bot;
         }
     }
 }
