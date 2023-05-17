@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using BotFramework.Enums;
-using BotFramework.Helpers;
 using BotFramework.Models.Message;
+using BotFramework.Other;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
@@ -95,19 +95,19 @@ namespace BotFramework.Models
         /// <returns></returns>
         public Task<MessagePicture> GetMessagePhotoAsync(PhotoQuality quality)
         {
-            return HelperBot.GetPhotoAsync(this.Bot, this.BaseMessage, quality);
+            return BotMediaHelper.GetPhotoAsync(this.Bot, this.BaseMessage, quality);
         }
 
 
         public Task<MessageAudio> GetMessageAudioAsync()
         {
-            return HelperBot.GetAudioAsync(this.Bot, BaseMessage);
+            return BotMediaHelper.GetAudioAsync(this.Bot, BaseMessage);
         }
 
 
         public Task<MessageVoice> GetMessageVoiceAsync()
         {
-            return HelperBot.GetVoiceAsync(this.Bot, BaseMessage);
+            return BotMediaHelper.GetVoiceAsync(this.Bot, BaseMessage);
         }
 
     }

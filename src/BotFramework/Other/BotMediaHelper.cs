@@ -7,9 +7,9 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace BotFramework.Helpers
+namespace BotFramework.Other
 {
-    public class HelperBot
+    public class BotMediaHelper
     {
         public static async Task<MessagePicture> GetPhotoAsync(TelegramBotClient bot, Message mes, PhotoQuality quality = PhotoQuality.High)
         {

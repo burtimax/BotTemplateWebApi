@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using BotFramework.Db.Entity;
 using BotFramework.Exceptions;
 using BotFramework.Extensions;
-using BotFramework.Interfaces;
+using BotFramework.Repository;
 using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

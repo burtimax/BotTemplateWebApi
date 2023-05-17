@@ -9,12 +9,12 @@ using Telegram.Bot.Types;
 
 namespace BotTemplateWebApi.States.TestBot;
 
-[BotState("test")]
-public class TestBotState : BaseBotState
+[BotState("test", version: 2)]
+public class TestBotStateV2 : BaseBotState
 {
     private TelegramBotClient _botClient;
     
-    public TestBotState(IServiceProvider serviceProvider)
+    public TestBotStateV2(IServiceProvider serviceProvider)
     {
         IBotSingleton botSingleton = serviceProvider.GetRequiredService<IBotSingleton>();
         _botClient = botSingleton.GetInstance().ApiClient;
@@ -22,7 +22,7 @@ public class TestBotState : BaseBotState
 
     public override async Task<IActionResult> HandleBotRequest(Update update)
     {
-        await _botClient.SendTextMessageAsync(update.Message.Chat.Id, "Hello world");
+        await _botClient.SendTextMessageAsync(update.Message.Chat.Id, "Hello world V2");
         return Ok();
     }
 }

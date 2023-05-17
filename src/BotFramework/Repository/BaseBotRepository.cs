@@ -1,14 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using BotFramework.Db;
 using BotFramework.Db.Entity;
 using BotFramework.Dto;
-using BotFramework.Interfaces;
+using BotFramework.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Types;
 
-namespace BotFramework.Implementation
+namespace BotFramework.Repository
 {
     public class BaseBotRepository : IBaseBotRepository
     {

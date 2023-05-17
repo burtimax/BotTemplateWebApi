@@ -26,4 +26,9 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Implementation" />
+    <Folder Include="Interfaces" />
+  </ItemGroup>
+
 </Project>

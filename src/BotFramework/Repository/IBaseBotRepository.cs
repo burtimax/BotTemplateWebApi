@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 using BotFramework.Db.Entity;
 using BotFramework.Dto;
-using BotFramework.Models;
 using TelegramModel = Telegram.Bot.Types;
 
-namespace BotFramework.Interfaces
+namespace BotFramework.Repository
 {
     /// <summary>
     /// Основной репозиторий для работы с базовыми сущностями бота.
@@ -23,7 +22,7 @@ namespace BotFramework.Interfaces
         /// Потому что с прошествием времени может поменяться эта информация.
         /// </summary>
         Task<BotUser> UpsertUser(TelegramModel.User user);
-        
+
         /// <summary>
         /// Получить чат по ИД.
         /// </summary>

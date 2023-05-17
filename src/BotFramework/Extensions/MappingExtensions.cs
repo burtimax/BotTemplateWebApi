@@ -1,7 +1,7 @@
 ﻿using BotFramework.Db.Entity;
 using Telegram.Bot.Types;
 
-namespace BotFramework.Implementation
+namespace BotFramework.Extensions
 {
     /// <summary>
     /// Методы для моделей TelegramClient библиотеки

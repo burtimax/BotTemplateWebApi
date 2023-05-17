@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using BotFramework.Attributes;
 using BotFramework.Db.Entity;
 using BotFramework.Exceptions;
 using BotFramework.Extensions;
 using BotFramework.Filters;
-using BotFramework.Interfaces;
+using BotFramework.Other;
+using BotFramework.Repository;
 using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -66,22 +68,56 @@ public class BotDispatcherController : BaseBotController
         
         try
         {
-            Type baseBotState = typeof(BaseBotState);
-            IEnumerable<Type> types = _assembly.GetExportedTypes().Where(t => t.IsAssignableFrom(baseBotState));
+            BotHandlerResolver resolver = new(_assembly);
+            Type? handlerType = resolver.GetPriorityStateHandlerTypeByStateName("Test");
             
-            return await ProcessRequestByHandler("BotTemplateWebApi.States.TestBot.TestBotState", updateRequest) ;
+            return await ProcessRequestByHandler(handlerType.FullName /*"BotTemplateWebApi.States.TestBot.TestBotState"*/, updateRequest) ;
         }
         catch (Exception e)
         {
             return Ok();
         }
        
-       return Ok();
+        return Ok();
 
         // Отправляем ответ пользователю
     }
 
 
+    // private string? GetTypeNameByChatState(string chatState)
+    // {
+    //     Type baseBotState = typeof(BaseBotState);
+    //     
+    //     IEnumerable<Type> stateHandlerTypes = _assembly.GetTypes().Where(t => baseBotState.IsAssignableFrom(t));
+    //     
+    //     IEnumerable<Type> HandlerTypes = stateHandlerTypes.Where(t =>
+    //     {
+    //         Attribute[] attributes = Attribute.GetCustomAttributes(t, typeof(BotStateAttribute));
+    //         return attributes.Any(attr =>
+    //         {
+    //             BotStateAttribute a = attr as BotStateAttribute;
+    //             if (string.Equals(a.StateName, chatState))
+    //             {
+    //                 return true;
+    //             }
+    //
+    //             return false;
+    //         });
+    //     });
+    //     Type? handlerType = HandlerTypes.FirstOrDefault();
+    //
+    //     return handlerType?.FullName;
+    //
+    // }
+
+    /// <summary>
+    /// Запустить обработчик типа состояния бота и получить результат. 
+    /// </summary>
+    /// <param name="handlerTypeName">Наименование типа обработчика.</param>
+    /// <param name="update">Объект запроса от Telegram API по webhook.</param>
+    /// <returns></returns>
+    /// <exception cref="NotFoundHandlerTypeException">Не найден тип обработчика запроса.</exception>
+    /// <exception cref="NotFoundHandlerMethodException">Не найден метод обработчика запроса.</exception>
     private Task<IActionResult> ProcessRequestByHandler (string handlerTypeName, Update update)
     {
         Type? handlerType = _assembly.GetType(handlerTypeName, true, true);

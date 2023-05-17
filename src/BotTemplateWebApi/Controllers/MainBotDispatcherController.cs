@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using BotFramework.Controllers;
 using BotFramework.Filters;
-using BotFramework.Interfaces;
+using BotFramework.Repository;
 using BotTemplateWebApi.Interfaces.IServices;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;

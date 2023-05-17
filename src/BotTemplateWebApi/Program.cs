@@ -1,8 +1,7 @@
 using System.Reflection;
 using BotFramework.Db;
-using BotFramework.Implementation;
-using BotFramework.Interfaces;
 using BotFramework.Middleware;
+using BotFramework.Repository;
 using BotTemplateWebApi.App.Options;
 using BotTemplateWebApi.Extentsions;
 using BotTemplateWebApi.Interfaces.IServices;
