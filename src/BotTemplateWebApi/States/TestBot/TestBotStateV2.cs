@@ -1,7 +1,6 @@
 ﻿using BotFramework.Attributes;
 using BotFramework.Controllers;
 using BotFramework.Filters;
-using BotTemplateWebApi.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Telegram.Bot;
@@ -12,12 +11,11 @@ namespace BotTemplateWebApi.States.TestBot;
 [BotState("test", version: 2)]
 public class TestBotStateV2 : BaseBotState
 {
-    private TelegramBotClient _botClient;
+    private ITelegramBotClient _botClient;
     
     public TestBotStateV2(IServiceProvider serviceProvider)
     {
-        IBotSingleton botSingleton = serviceProvider.GetRequiredService<IBotSingleton>();
-        _botClient = botSingleton.GetInstance().ApiClient;
+        ITelegramBotClient _botClient = serviceProvider.GetRequiredService<ITelegramBotClient>();
     }
 
     public override async Task<IActionResult> HandleBotRequest(Update update)

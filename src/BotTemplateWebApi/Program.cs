@@ -1,11 +1,11 @@
 using System.Reflection;
 using BotFramework.Db;
+using BotFramework.Extensions;
 using BotFramework.Middleware;
+using BotFramework.Options;
 using BotFramework.Repository;
 using BotTemplateWebApi.App.Options;
 using BotTemplateWebApi.Extentsions;
-using BotTemplateWebApi.Interfaces.IServices;
-using BotTemplateWebApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 
@@ -18,16 +18,19 @@ IServiceCollection services = builder.Services;
 
 // Register options
 services.Configure<ApplicationConfiguration>(builder.Configuration);
-services.Configure<ApplicationConfiguration.BotConfiguration>(builder.Configuration.GetSection("Bot"));
+services.Configure<BotConfiguration>(builder.Configuration.GetSection("Bot"));
+var botConfig = builder.Configuration.GetSection("Bot").Get<BotConfiguration>();
+services.AddBot(botConfig);
 
 // Add services to the container.
+string connection = "Host=127.0.0.1;Port=5432;Database=bot_template_test;Username=postgres;Password=123";
 services.AddDbContext<BotDbContext>(options =>
 {
-    options.UseNpgsql("Host=127.0.0.1;Port=5432;Database=marathon_bot_framework_test;Username=postgres;Password=123");
+    options.UseNpgsql(connection);
 });
 services.AddTransient<IBaseBotRepository, BaseBotRepository>();
 services.AddMapster(Assembly.GetExecutingAssembly());
-services.AddSingleton<IBotSingleton, BotSingleton>();
+//services.AddSingleton<IBotSingleton, BotSingleton>();
 services.AddControllers().AddNewtonsoftJson();
 services.AddHttpContextAccessor();
 
@@ -38,7 +41,12 @@ services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.Services.GetRequiredService<IBotSingleton>();
+var serviceScope = app.Services.CreateScope();
+var serviceProvider = serviceScope.ServiceProvider;
+using (BotDbContext botDbContext = serviceProvider.GetRequiredService<BotDbContext>())
+{
+    await botDbContext.Database.MigrateAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

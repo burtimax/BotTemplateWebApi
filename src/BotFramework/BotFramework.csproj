@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Db\Migrations" />
     <Folder Include="Implementation" />
     <Folder Include="Interfaces" />
   </ItemGroup>

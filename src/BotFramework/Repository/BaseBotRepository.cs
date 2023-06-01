@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using BotFramework.Db;
 using BotFramework.Db.Entity;
 using BotFramework.Dto;
@@ -11,28 +13,39 @@ namespace BotFramework.Repository
     public class BaseBotRepository : IBaseBotRepository
     {
         private readonly BotDbContext _db;
-        
+
         public BaseBotRepository(BotDbContext db)
         {
             _db = db;
         }
 
+
+        /// <inheritdoc />
         public Task<BotUser> GetUser(long userId)
         {
             return _db.Users.SingleAsync(u => u.TelegramId == userId);
         }
 
+        private async Task<bool> IsUserExists(long userId)
+        {
+            BotUser? u = await _db.Users.FirstOrDefaultAsync(u => u.TelegramId == userId);
+            return u != null;
+        }
+
+        /// <inheritdoc />
         public async Task<BotUser> UpsertUser(User user)
         {
-            var existedUser = await GetUser(user.Id);
+            bool isUserExisted = await IsUserExists(user.Id);
 
-            if (existedUser == null)
+            if (isUserExisted == false)
             {
                 BotUser newUser = user.ToBotUserEntity();
-                await _db.Users.AddAsync(newUser);
+                _db.Users.Add(newUser);
+                await _db.SaveChangesAsync();
                 return newUser;
             }
 
+            var existedUser = await GetUser(user.Id);
             existedUser.TelegramFirstname = user.FirstName;
             existedUser.TelegramLastname = user.LastName;
             existedUser.TelegramUsername = user.Username;
@@ -42,6 +55,7 @@ namespace BotFramework.Repository
             return existedUser;
         }
 
+        /// <inheritdoc />
         public Task<BotChat?> GetChat(ChatId chatId)
         {
             if (chatId.Username != null)
@@ -54,6 +68,7 @@ namespace BotFramework.Repository
             }
         }
 
+        /// <inheritdoc />
         public async Task<BotChat> AddChat(Chat chat, BotUser chatOwner)
         {
             BotChat newChat = chat.ToBotChatEntity(chatOwner.Id);
@@ -63,6 +78,7 @@ namespace BotFramework.Repository
             return newChat;
         }
 
+        /// <inheritdoc />
         public async Task<BotMessage> AddMessage(SaveMessageDto messageDto)
         {
             BotMessage newMessage = new BotMessage()

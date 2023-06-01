@@ -5,6 +5,7 @@ namespace BotFramework.Db
 {
     public class BotDbContext : DbContext
     {
+        public BotDbContext(){}
         
         public BotDbContext(DbContextOptions<BotDbContext> options) : base(options){}
 
@@ -14,18 +15,15 @@ namespace BotFramework.Db
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            // Определение провайдера необходимо для создания миграции, поэтому пусть пока побудет здесь.
+            // string mockString = "Host=127.0.0.1;Port=5432;Database=bot_framework;Username=postgres;Password=123";
+            // optionsBuilder.UseNpgsql(mockString);
             base.OnConfiguring(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Приватное свойство добавляем в модель.
-            // <see href="https://learn.microsoft.com/ru-ru/ef/core/modeling/backing-field?tabs=data-annotations">
-            modelBuilder.Entity<BotChat>()
-                .Property("_data");
-            modelBuilder.Entity<BotChat>()
-                .Property("_states");
-            
+            BotDbContextConfiguration.ConfigureContext(modelBuilder);
             base.OnModelCreating(modelBuilder);
         }
     }

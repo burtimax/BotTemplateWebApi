@@ -8,6 +8,7 @@ using BotFramework.Repository;
 using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace BotFramework.Middleware;
@@ -23,57 +24,11 @@ public class TestBotControllerMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, IBaseBotRepository botRepository, IMapper mapper)
+    public async Task InvokeAsync(HttpContext context, IBaseBotRepository botRepository, IMapper mapper, ITelegramBotClient bot)
     {
-        // _mapper = mapper;
-        // _botRepository = botRepository;
-        //  HttpRequest request = context.Request;
-        //  Update? update = null;
-        //
-        //  // Если запрос не на бота, тогда идем дальше.
-        //  if (IsBotRequest(context) == false)
-        //  {
-        //      await _next.Invoke(context);
-        //      return;
-        //  }
-        //
-        //  update = await GetUpdateFromRequest(request);
-        //
-        //  if (update == null) throw new NullUpdateModelInMiddleWareException();
-        //
-        //  User telegramUser = update.GetUser();
-        //  Chat telegramChat = update.GetChat();
-        //
-        //  // Сохраняем или обновляем информацию о пользователе.
-        //  BotUser user = await _botRepository.UpsertUser(telegramUser);
-        //
-        //  // Сохраняем чат, если еще не существует. 
-        //  BotChat? existedChat = await _botRepository.GetChat(telegramChat.Id);
-        //  BotChat chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
-        //
-        //  // Получаем текушее состояние чата. 
-        // string currentState = chat.States.CurrentState;
-        //
-        // // Собираем всю необходимую информацию для дальнейшей обработки состояний 
-        // // Получили состояние чата, теперь меняем строку запроса и переходим в новый контроллер уже дальше по pipeline.
-        //
-        // context.Request.Path = "/";
-
-        // Перенаправляем запрос на сервисы
-        
-        if (context.Response.StatusCode == 302)
-        {
-            context.Response.StatusCode = 200;
-        }
         
         await _next.Invoke(context);
-        
-        if (context.Response.StatusCode == 302)
-        {
-            context.Response.StatusCode = 200;
-        }
-        
-        // Отправляем ответ пользователю
+
     }
 
     private bool IsBotRequest(HttpContext context)
