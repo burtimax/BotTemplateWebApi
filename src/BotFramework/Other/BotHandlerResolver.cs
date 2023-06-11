@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using BotFramework.Attributes;
 using BotFramework.Controllers;
+using Telegram.Bot.Types;
 
 namespace BotFramework.Other;
 
@@ -24,7 +25,7 @@ public class BotHandlerResolver
     /// </summary>
     /// <param name="stateName">Наименование состояния чата.</param>
     /// <returns></returns>
-    public Type? GetPriorityStateHandlerTypeByStateName(string stateName)
+    public Type? GetPriorityStateHandlerType(string stateName, string userRole)
     {
         IEnumerable<Type>? handlerTypes = FilterBotHandlerTypes(_assembly.GetTypes());
 
@@ -35,7 +36,7 @@ public class BotHandlerResolver
         
         IEnumerable<Type> stateHandlerTypes = handlerTypes.Where(t => IsStateHandler(t, stateName));
 
-        Type? handlerType = GetHandlerTypeWithHighestPriority(stateHandlerTypes, stateName);
+        Type? handlerType = GetHandlerTypeWithHighestPriority(stateHandlerTypes, stateName, userRole);
 
         return handlerType;
     }
@@ -45,7 +46,7 @@ public class BotHandlerResolver
     /// </summary>
     /// <param name="handlerTypes">Список типов обработчиков.</param>
     /// <returns>Наиболее приоритетный обработчик.</returns>
-    private Type GetHandlerTypeWithHighestPriority(IEnumerable<Type> types, string stateName)
+    private Type GetHandlerTypeWithHighestPriority(IEnumerable<Type> types, string stateName, string userRole)
     {
         if (types == null || types.Any() == false)
         {
@@ -63,22 +64,12 @@ public class BotHandlerResolver
         {
             return types.First();
         }
-
-        // inline метод получения наибольшей версии 
-        double GetHighestVersion(Type t)
-        {
-            Attribute[] attributes = Attribute.GetCustomAttributes(t, typeof(BotStateAttribute));
-
-            // Не забываем отфильтровать атрибуты по наименованию состояния,
-            // чтобы не брать версии из атрибутов других состояний.
-            return attributes
-                .Where(attr => IsStateAttribute((attr as BotStateAttribute).StateName,stateName))
-                .Max(attr => (attr as BotStateAttribute).Version);
-        }
         
+        FilterStateHandlersForUserRole(userRole, ref handlersWithBotStateAttribute);
+
         handlersWithBotStateAttribute.Sort((t1, t2) =>
         {
-            double differ = GetHighestVersion(t2) - GetHighestVersion(t1);
+            double differ = GetHighestVersion(t2, stateName) - GetHighestVersion(t1, stateName);
 
             return differ switch
             {
@@ -89,6 +80,57 @@ public class BotHandlerResolver
         });
 
         return handlersWithBotStateAttribute.First();
+    }
+
+    /// <summary>
+    /// Фильтруем обработчики для пользователя.
+    /// </summary>
+    /// <param name="stateHandlers"></param>
+    void FilterStateHandlersForUserRole(string userRole, ref List<Type> stateHandlers)
+    {
+        List<Type> userHandlers = new();
+
+        foreach (var type in stateHandlers)
+        {
+            Attribute[] attributes = Attribute.GetCustomAttributes(type, typeof(BotStateAttribute));
+        
+            bool hasUserRoleAttr = attributes.Any(attr =>
+            {
+                if (attr is BotStateAttribute attribute 
+                    && string.Equals(attribute.UserRole,userRole, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (hasUserRoleAttr)
+            {
+                userHandlers.Add(type);
+            }
+        }
+
+        if (userHandlers != null && userHandlers.Any())
+        {
+            stateHandlers = userHandlers;
+        }
+    }
+
+    /// <summary>
+    /// inline метод получения наибольшей версии 
+    /// </summary>
+    /// <param name="t">Тип обработчика</param>
+    /// <returns></returns>
+    private double GetHighestVersion(Type t, string stateName)
+    {
+        Attribute[] attributes = Attribute.GetCustomAttributes(t, typeof(BotStateAttribute));
+
+        // Не забываем отфильтровать атрибуты по наименованию состояния,
+        // чтобы не брать версии из атрибутов других состояний.
+        return attributes
+            .Where(attr => IsStateAttribute((attr as BotStateAttribute).StateName,stateName))
+            .Max(attr => (attr as BotStateAttribute).Version);
     }
     
     /// <summary>

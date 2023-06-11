@@ -11,7 +11,7 @@ namespace BotFramework.Other
 {
     public class BotMediaHelper
     {
-        public static async Task<MessagePicture> GetPhotoAsync(TelegramBotClient bot, Message mes, PhotoQuality quality = PhotoQuality.High)
+        public static async Task<MessagePicture> GetPhotoAsync(ITelegramBotClient bot, Message mes, PhotoQuality quality = PhotoQuality.High)
         {
             if (bot == null ||
                 mes == null ||
@@ -26,7 +26,7 @@ namespace BotFramework.Other
         }
 
 
-        public static async Task<MessageAudio> GetAudioAsync(TelegramBotClient bot, Message mes)
+        public static async Task<MessageAudio> GetAudioAsync(ITelegramBotClient bot, Message mes)
         {
             if (bot == null ||
                 mes == null ||
@@ -37,7 +37,7 @@ namespace BotFramework.Other
             return audio;
         }
 
-        public static async Task<MessageVoice> GetVoiceAsync(TelegramBotClient bot, Message mes)
+        public static async Task<MessageVoice> GetVoiceAsync(ITelegramBotClient bot, Message mes)
         {
             if (bot == null || 
                 mes == null ||
@@ -49,7 +49,7 @@ namespace BotFramework.Other
             return voice;
         }
 
-        private static async Task<FileData> GetFile(TelegramBotClient bot, Message mes, string fileId)
+        private static async Task<FileData> GetFile(ITelegramBotClient bot, Message mes, string fileId)
         {
             if (bot == null || 
                 mes == null ||

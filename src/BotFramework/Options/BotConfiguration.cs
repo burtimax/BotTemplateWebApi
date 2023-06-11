@@ -11,4 +11,9 @@ public class BotConfiguration
     /// URL адрес, на который будут отправляться запросы к боту для обработки.
     /// </summary>
     public string Webhook { get; set; }
+
+    /// <summary>
+    /// Файл ресурсов бота
+    /// </summary>
+    public string? ResourcesFile { get; set; }
 }

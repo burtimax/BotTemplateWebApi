@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using BotFramework.Options;
+using BotTemplateWebApi.Resources;
 using Mapster;
 using MapsterMapper;
 
@@ -15,6 +17,22 @@ public static class IServiceCollectionExtensions
     {
         var mapperConfig = new Mapper(config);
         services.AddSingleton<IMapper>(mapperConfig);
+    }
+
+    /// <summary>
+    /// Зарегистрировать класс ресурсов бота. 
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="resourcesFilePath"></param>
+    /// <returns></returns>
+    public static BotResources ConfigureBotResources(this IServiceCollection services, string resourcesFilePath)
+    {
+        if (resourcesFilePath == null) throw new ArgumentNullException(nameof(resourcesFilePath));
+        
+        var resourcesConfigBuilder = new ConfigurationBuilder().AddJsonFile(resourcesFilePath, false, true);
+        IConfiguration resourcesConfiguration = resourcesConfigBuilder.Build();
+        services.Configure<BotResources>(resourcesConfiguration);
+        return resourcesConfiguration.Get<BotResources>();
     }
     
     /// <summary>

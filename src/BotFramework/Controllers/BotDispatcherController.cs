@@ -64,7 +64,7 @@ public class BotDispatcherController : BaseBotController
             // Перенаправляем запрос на сервисы
        
             BotHandlerResolver resolver = new(_assembly);
-            Type? handlerType = resolver.GetPriorityStateHandlerTypeByStateName("Test");
+            Type? handlerType = resolver.GetPriorityStateHandlerType("Test", user.Role);
 
             return await ProcessRequestByHandler(handlerType, update, chat, user);
         }

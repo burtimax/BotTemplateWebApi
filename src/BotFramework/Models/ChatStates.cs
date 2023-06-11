@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using BotFramework.Enums;
 
 namespace BotFramework.Models;
 
@@ -17,10 +19,7 @@ public class ChatStates
 
     public string CurrentState
     {
-        get
-        {
-            return _states.Last();
-        }
+        get { return _states.Last(); }
         set
         {
             if (_states == null)
@@ -42,8 +41,50 @@ public class ChatStates
 
     public string? PreviousState => _states.Count > 1 ? _states[_states.Count - 2] : null;
 
-    public string FirstState => _states.First();
+    public string RootState => _states.First();
 
     public List<string> All => _states;
 
+    /// <summary>
+    /// Установить состояние чата.
+    /// </summary>
+    /// <param name="stateName"></param>
+    /// <param name="setterType"></param>
+    public void Set(string stateName, ChatStateSetterType setterType)
+    {
+        switch (setterType)
+        {
+            case ChatStateSetterType.SetNext:
+                _states.Add(stateName);
+                return;
+            case ChatStateSetterType.ChangeCurrent:
+                CurrentState = stateName;
+                return;
+            case ChatStateSetterType.SetRoot:
+                _states = new List<string>();
+                _states.Add(stateName);
+                return;
+            default: throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Возвращение в предыдущие состояния.
+    /// </summary>
+    /// <param name="goBackType"></param>
+    public void GoBack(ChatStateGoBackType goBackType)
+    {
+        switch (goBackType)
+        {
+            case ChatStateGoBackType.GoToPrevious:
+                _states.RemoveAt(_states.Count - 1);
+                return;
+            case ChatStateGoBackType.GoToRoot:
+                string rootState = RootState;
+                _states = new List<string>();
+                _states.Add(rootState);
+                return;
+            default: throw new NotImplementedException();
+        }
+    }
 }

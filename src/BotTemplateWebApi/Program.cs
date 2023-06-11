@@ -6,6 +6,7 @@ using BotFramework.Options;
 using BotFramework.Repository;
 using BotTemplateWebApi.App.Options;
 using BotTemplateWebApi.Extentsions;
+using BotTemplateWebApi.Resources;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 
@@ -20,6 +21,7 @@ IServiceCollection services = builder.Services;
 services.Configure<ApplicationConfiguration>(builder.Configuration);
 services.Configure<BotConfiguration>(builder.Configuration.GetSection("Bot"));
 var botConfig = builder.Configuration.GetSection("Bot").Get<BotConfiguration>();
+BotResources botResources = services.ConfigureBotResources(botConfig.ResourcesFile);
 services.AddBot(botConfig);
 
 // Add services to the container.

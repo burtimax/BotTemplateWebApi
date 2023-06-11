@@ -9,7 +9,7 @@ using Telegram.Bot.Types;
 namespace BotTemplateWebApi.States.TestBot;
 
 [BotState("test", version: 2)]
-public class TestBotStateV2 : BaseBotState
+public class TestBotStateV2 : BotState
 {
     public TestBotStateV2(IServiceProvider serviceProvider) : base(serviceProvider)
     {
@@ -17,7 +17,9 @@ public class TestBotStateV2 : BaseBotState
 
     public override async Task<IActionResult> HandleBotRequest(Update update)
     {
-        await BotClient.SendTextMessageAsync(update.Message.Chat.Id, "Hello world V2");
+        var r = new Random(DateTime.Now.Millisecond);
+        string message = r.Next() % 2 == 0 ? R.Test.Introduction : R.Test.Farewell;
+        await BotClient.SendTextMessageAsync(Chat.ChatId, message);
         return Ok();
     }
 }
