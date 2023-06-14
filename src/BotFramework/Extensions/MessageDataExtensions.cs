@@ -28,7 +28,7 @@ namespace BotFramework.Extensions
                 
             if(mes.Type != MessageType.Photo)
             {
-                throw new UnexpectedMessageType();
+                throw new UnexpectedMessageTypeException();
             }
             
             //ToDo проверить получение фотографий различного качества
@@ -54,7 +54,7 @@ namespace BotFramework.Extensions
                 
             if(mes.Type != MessageType.Audio)
             {
-                throw new UnexpectedMessageType();
+                throw new UnexpectedMessageTypeException();
             }
 
             MessageAudio audio = new MessageAudio();
@@ -77,7 +77,7 @@ namespace BotFramework.Extensions
                 
             if(mes.Type != MessageType.Voice)
             {
-                throw new UnexpectedMessageType();
+                throw new UnexpectedMessageTypeException();
             }
 
             MessageVoice voice = new MessageVoice();

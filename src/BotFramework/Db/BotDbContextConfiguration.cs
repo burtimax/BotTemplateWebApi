@@ -28,7 +28,7 @@ public class BotDbContextConfiguration
     {
         builder.Entity<BotUser>().ToTable("users", schema);
         builder.Entity<BotChat>().ToTable("chats", schema);
-        builder.Entity<BotMessage>().ToTable("messages", schema);
+        builder.Entity<BotUpdate>().ToTable("updates", schema);
     }
     
     /// <summary>
@@ -96,7 +96,7 @@ public class BotDbContextConfiguration
         });
         
         modelBuilder.Entity<BotChat>()
-            .Property("_states");
+            .Property("_states");   
     }
     
 }

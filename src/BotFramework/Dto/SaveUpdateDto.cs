@@ -5,7 +5,7 @@ namespace BotFramework.Dto
     /// <summary>
     /// Dto для сохранения сообщения.
     /// </summary>
-    public class SaveMessageDto
+    public class SaveUpdateDto
     {
         /// <summary>
         /// Идентификатор сущности чата, которому принадлежит сообщение.
@@ -21,12 +21,12 @@ namespace BotFramework.Dto
         /// <summary>
         /// Тип сообщения.
         /// </summary>
-        public string MessageType { get; set; }
+        public string Type { get; set; }
 
         /// <summary>
         /// Содержимое сообщения.
         /// </summary>
         /// <remarks>Текст, ссылка на файл и т.д.</remarks>
-        public string MessageContent { get; set; }
+        public string Content { get; set; }
     }
 }

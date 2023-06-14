@@ -1,20 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using BotFramework.Attributes;
 using BotFramework.Db.Entity;
+using BotFramework.Dto;
 using BotFramework.Exceptions;
 using BotFramework.Extensions;
 using BotFramework.Filters;
+using BotFramework.Interfaces;
 using BotFramework.Other;
 using BotFramework.Repository;
 using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 
 namespace BotFramework.Controllers;
 
@@ -28,7 +36,10 @@ public class BotDispatcherController : BaseBotController
     private readonly HttpContext _context;
     private readonly Assembly _assembly;
 
-    public BotDispatcherController(IMapper mapper, IBaseBotRepository botRepository,
+    private readonly ISaveUpdateService _saveUpdateService;
+
+    public BotDispatcherController(IMapper mapper, 
+        IBaseBotRepository botRepository,
         IHttpContextAccessor contextAccessor,
         Assembly assembly)
     {
@@ -36,10 +47,15 @@ public class BotDispatcherController : BaseBotController
         _mapper = mapper;
         _botRepository = botRepository;
         _context = contextAccessor.HttpContext;
+        _saveUpdateService = _context.RequestServices.GetRequiredService<ISaveUpdateService>();
     }
 
     public override async Task<IActionResult> HandleBotRequest(Update update)
     {
+        // Объявим здесь. Инициализируем далее.
+        BotUser user = null;
+        BotChat chat = null;
+        
         try
         {
             HttpRequest request = _context.Request;
@@ -50,19 +66,17 @@ public class BotDispatcherController : BaseBotController
             Chat telegramChat = update.GetChat();
 
             // Сохраняем или обновляем информацию о пользователе.
-            BotUser user = await _botRepository.UpsertUser(telegramUser);
+            user = await _botRepository.UpsertUser(telegramUser);
 
             // Сохраняем чат, если еще не существует. 
             BotChat? existedChat = await _botRepository.GetChat(telegramChat.Id);
-            BotChat chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
+            chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
+            
+            await _saveUpdateService.SaveUpdateInBotHistory(user, chat, update);
 
             // Получаем текушее состояние чата. 
             string currentState = chat.States.CurrentState;
 
-            // Собираем всю необходимую информацию для дальнейшей обработки состояний
-
-            // Перенаправляем запрос на сервисы
-       
             BotHandlerResolver resolver = new(_assembly);
             Type? handlerType = resolver.GetPriorityStateHandlerType("Test", user.Role);
 
@@ -70,6 +84,9 @@ public class BotDispatcherController : BaseBotController
         }
         catch (Exception e)
         {
+            BotExceptionHandler exceptionHandler = new();
+            await exceptionHandler.Handle(e, update, user, chat, HttpContext.RequestServices);
+
             return Ok();
         }
 

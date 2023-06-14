@@ -1,4 +1,9 @@
-﻿using BotFramework.Options;
+﻿using BotFramework.Db;
+using BotFramework.Implementation;
+using BotFramework.Interfaces;
+using BotFramework.Options;
+using BotFramework.Repository;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
 
@@ -12,6 +17,15 @@ public static class IServiceCollectionExtension
         botClient.SetWebhookAsync(botConfiguration.Webhook).Wait();
 
         services.AddSingleton<ITelegramBotClient>(botClient);
+        
+        services.AddDbContext<BotDbContext>(options =>
+        {
+            options.UseNpgsql(botConfiguration.DbConnection);
+        });
+        
+        services.AddTransient<IBaseBotRepository, BaseBotRepository>();
+        services.AddTransient<IBotUpdateRepository, BotUpdateRepository>();
+        services.AddTransient<ISaveUpdateService, SaveUpdateService>();
 
         return services;
     }

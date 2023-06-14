@@ -5,10 +5,10 @@ namespace BotFramework.Db.Entity
     /// <summary>
     /// Сообщение пользователя
     /// </summary>
-    public class BotMessage : BaseBotEntity<Guid>
+    public class BotUpdate : BaseBotEntity<Guid>
     {
         /// <summary>
-        /// Внешний ключ
+        /// Внешний ключ на сущность BotChat
         /// </summary>
         public long BotChatId { get; set; }
         public BotChat Chat { get; set; }

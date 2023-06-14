@@ -2,9 +2,9 @@
 
 namespace BotFramework.Exceptions
 {
-    public class UnexpectedMessageType : Exception
+    public class UnexpectedMessageTypeException : Exception
     {
-        public UnexpectedMessageType() : 
+        public UnexpectedMessageTypeException() : 
             base("Unexpected message type")
         {
             

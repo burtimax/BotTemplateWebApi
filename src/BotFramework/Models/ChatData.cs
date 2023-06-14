@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BotFramework.Exceptions;
 using Newtonsoft.Json;
 
@@ -67,5 +68,17 @@ public class ChatData
     public bool Contains(string key)
     {
         return _data.ContainsKey(key);
+    }
+
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        StringBuilder sb = new();
+        foreach (KeyValuePair<string,string> keyBValuePair in _data)
+        {
+            sb.AppendLine($"[{keyBValuePair.Key}] : [{keyBValuePair.Value}]");
+        }
+
+        return sb.ToString();
     }
 }

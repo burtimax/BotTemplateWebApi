@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BotFramework.Enums;
 
 namespace BotFramework.Models;
@@ -86,5 +87,21 @@ public class ChatStates
                 return;
             default: throw new NotImplementedException();
         }
+    }
+
+    /// <summary>
+    /// Переопределяем метод конвертации в строку.
+    /// Отображаем состояния чата.
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString()
+    {
+        StringBuilder sb = new();
+        foreach (string state in _states)
+        {
+            sb.Append($"\\{state}");
+        }
+
+        return sb.ToString();
     }
 }

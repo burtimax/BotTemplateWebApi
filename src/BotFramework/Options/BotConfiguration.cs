@@ -16,4 +16,9 @@ public class BotConfiguration
     /// Файл ресурсов бота
     /// </summary>
     public string? ResourcesFile { get; set; }
+    
+    /// <summary>
+    /// Строка подключения к БД бота.
+    /// </summary>
+    public string DbConnection { get; set; }
 }

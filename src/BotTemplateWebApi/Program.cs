@@ -25,12 +25,6 @@ BotResources botResources = services.ConfigureBotResources(botConfig.ResourcesFi
 services.AddBot(botConfig);
 
 // Add services to the container.
-string connection = "Host=127.0.0.1;Port=5432;Database=bot_template_test;Username=postgres;Password=123";
-services.AddDbContext<BotDbContext>(options =>
-{
-    options.UseNpgsql(connection);
-});
-services.AddTransient<IBaseBotRepository, BaseBotRepository>();
 services.AddMapster(Assembly.GetExecutingAssembly());
 //services.AddSingleton<IBotSingleton, BotSingleton>();
 services.AddControllers().AddNewtonsoftJson();

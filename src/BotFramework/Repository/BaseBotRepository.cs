@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BotFramework.Db;
@@ -40,6 +41,7 @@ namespace BotFramework.Repository
             if (isUserExisted == false)
             {
                 BotUser newUser = user.ToBotUserEntity();
+                newUser.CreatedAt = DateTimeOffset.Now;
                 _db.Users.Add(newUser);
                 await _db.SaveChangesAsync();
                 return newUser;
@@ -73,25 +75,27 @@ namespace BotFramework.Repository
         {
             BotChat newChat = chat.ToBotChatEntity(chatOwner.Id);
             newChat.States.CurrentState = BotConstants.StartState;
+            newChat.CreatedAt = DateTimeOffset.Now;
             _db.Chats.Add(newChat);
             await _db.SaveChangesAsync();
             return newChat;
         }
 
         /// <inheritdoc />
-        public async Task<BotMessage> AddMessage(SaveMessageDto messageDto)
+        public async Task<BotUpdate> AddUpdate(SaveUpdateDto updateDto)
         {
-            BotMessage newMessage = new BotMessage()
+            BotUpdate newUpdate = new BotUpdate()
             {
-                TelegramMessageId = messageDto.TelegramId,
-                BotChatId = messageDto.BotChatId,
-                Type = messageDto.MessageType,
-                Content = messageDto.MessageContent
+                TelegramMessageId = updateDto.TelegramId,
+                BotChatId = updateDto.BotChatId,
+                Type = updateDto.Type,
+                Content = updateDto.Content
             };
 
-            _db.Messages.Add(newMessage);
+            newUpdate.CreatedAt = DateTimeOffset.Now;
+            _db.Updates.Add(newUpdate);
             await _db.SaveChangesAsync();
-            return newMessage;
+            return newUpdate;
         }
     }
 }

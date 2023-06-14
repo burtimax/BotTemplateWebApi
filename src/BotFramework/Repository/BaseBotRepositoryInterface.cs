@@ -37,6 +37,6 @@ namespace BotFramework.Repository
         /// <summary>
         /// Добавить сообщение.
         /// </summary>
-        Task<BotMessage> AddMessage(SaveMessageDto messageDto);
+        Task<BotUpdate> AddUpdate(SaveUpdateDto updateDto);
     }
 }

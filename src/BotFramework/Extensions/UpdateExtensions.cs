@@ -1,4 +1,5 @@
 ﻿using System;
+using BotFramework.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -12,20 +13,46 @@ namespace BotFramework.Extensions
         /// </summary>
         /// <param name="update">Объект запроса от бота.</param>
         /// <returns></returns>
-        public static Chat GetChat(this Update update)
+        public static Chat? GetChat(this Update update)
         {
-            switch (update.Type)
+            return update.Type switch
             {
-                case UpdateType.Message:
-                    return update.Message.Chat;
-                    break;
+                UpdateType.Message => update.Message.Chat,
+                UpdateType.CallbackQuery => update.CallbackQuery.Message.Chat,
+                UpdateType.ChannelPost => update.ChannelPost.Chat,
+                UpdateType.ChatMember => update.ChatMember.Chat,
+                UpdateType.EditedMessage => update.EditedMessage.Chat,
+                UpdateType.ChatJoinRequest => update.ChatJoinRequest.Chat,
+                UpdateType.MyChatMember => update.MyChatMember.Chat,
+                _ => null,
+            };
+        }
 
-                case UpdateType.CallbackQuery:
-                    return update.CallbackQuery.Message.Chat;
-                    break;
-            }
-
-            return null;
+        /// <summary>
+        /// Получить полезную нагрузку объекта запроса.
+        /// </summary>
+        /// <param name="update">Объект запроса бота.</param>
+        /// <returns></returns>
+        public static object GetPayload(this Update update)
+        {
+            return update.Type switch
+            {
+                UpdateType.Message => update.Message,
+                UpdateType.Poll => update.Poll,
+                UpdateType.CallbackQuery => update.CallbackQuery,
+                UpdateType.ChannelPost => update.ChannelPost,
+                UpdateType.ChatMember => update.ChatMember,
+                UpdateType.EditedMessage => update.EditedMessage,
+                UpdateType.InlineQuery => update.InlineQuery,
+                UpdateType.PollAnswer => update.PollAnswer,
+                UpdateType.ShippingQuery => update.ShippingQuery,
+                UpdateType.ChatJoinRequest => update.ChatJoinRequest,
+                UpdateType.ChosenInlineResult => update.ChosenInlineResult,
+                UpdateType.EditedChannelPost => update.EditedChannelPost,
+                UpdateType.MyChatMember => update.MyChatMember,
+                UpdateType.PreCheckoutQuery => update.PreCheckoutQuery,
+                UpdateType.Unknown => throw new UnknownUpdateTypeException()
+            };
         }
         
         /// <summary>
