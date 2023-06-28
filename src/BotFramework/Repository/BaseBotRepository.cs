@@ -19,8 +19,7 @@ namespace BotFramework.Repository
         {
             _db = db;
         }
-
-
+        
         /// <inheritdoc />
         public Task<BotUser> GetUser(long userId)
         {
@@ -68,6 +67,12 @@ namespace BotFramework.Repository
             {
                 return _db.Chats.SingleOrDefaultAsync(c => c.TelegramId == chatId.Identifier);
             }
+        }
+
+        /// <inheritdoc />
+        public Task<BotChat?> GetChat(long botUserId)
+        {
+            return _db.Chats.SingleOrDefaultAsync(c => c.BotUserId == botUserId);
         }
 
         /// <inheritdoc />

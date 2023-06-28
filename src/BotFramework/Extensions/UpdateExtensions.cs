@@ -24,6 +24,14 @@ namespace BotFramework.Extensions
                 UpdateType.EditedMessage => update.EditedMessage.Chat,
                 UpdateType.ChatJoinRequest => update.ChatJoinRequest.Chat,
                 UpdateType.MyChatMember => update.MyChatMember.Chat,
+                UpdateType.InlineQuery => null,
+                UpdateType.ShippingQuery => null,
+                UpdateType.PollAnswer => null,
+                UpdateType.ChosenInlineResult => null,
+                UpdateType.EditedChannelPost => null,
+                UpdateType.PreCheckoutQuery => null,
+                UpdateType.Poll => null,
+                UpdateType.Unknown => null,
                 _ => null,
             };
         }
@@ -62,52 +70,25 @@ namespace BotFramework.Extensions
         /// <returns>User object</returns>
         public static User GetUser(this Update update)
         {
-            switch (update.Type)
+            return update.Type switch
             {
-                case Telegram.Bot.Types.Enums.UpdateType.Message:
-                    return update.Message.From;
-                    break;
-
-                case UpdateType.CallbackQuery:
-                    return update.CallbackQuery.From;
-                    break;
-
-                case UpdateType.ChosenInlineResult:
-                    return update.ChosenInlineResult.From;
-                    break;
-
-                case UpdateType.ChannelPost:
-                    return update.ChannelPost.From;
-                    break;
-
-                case UpdateType.EditedChannelPost:
-                    return update.EditedChannelPost.From;
-                    break;
-
-                case UpdateType.EditedMessage:
-                    return update.EditedMessage.From;
-                    break;
-
-                case UpdateType.InlineQuery:
-                    return update.InlineQuery.From;
-                    break;
-
-                case UpdateType.PollAnswer:
-                    return update.PollAnswer.User;
-                    break;
-
-                case UpdateType.PreCheckoutQuery:
-                    return update.PreCheckoutQuery.From;
-                    break;
-
-                case UpdateType.ShippingQuery:
-                    return update.ShippingQuery.From;
-                    break;
-                default:
-                    throw new NotImplementedException($"Not implemented [{nameof(GetUser)}] for update type [{update.Type}]");
-            }
-
-            return null;
+                UpdateType.Message => update.Message.From,
+                UpdateType.CallbackQuery => update.CallbackQuery.From,
+                UpdateType.ChannelPost => update.ChannelPost.From,
+                UpdateType.ChatMember => update.ChatMember.From,
+                UpdateType.EditedMessage => update.EditedMessage.From,
+                UpdateType.InlineQuery => update.InlineQuery.From,
+                UpdateType.ShippingQuery => update.ShippingQuery.From,
+                UpdateType.PollAnswer => update.PollAnswer.User,
+                UpdateType.ChatJoinRequest => update.ChatJoinRequest.From,
+                UpdateType.ChosenInlineResult => update.ChosenInlineResult.From,
+                UpdateType.EditedChannelPost => update.EditedChannelPost.From,
+                UpdateType.MyChatMember => update.MyChatMember.From,
+                UpdateType.PreCheckoutQuery => update.PreCheckoutQuery.From,
+                UpdateType.Poll => null,
+                UpdateType.Unknown => null,
+                _ => null,
+            };
         }
     }
 }

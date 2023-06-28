@@ -21,6 +21,7 @@ public class BotDbContextConfiguration
         SetTableAndSchema(builder);
         SetFilters(builder);
         SetOtherConfigs(builder);
+        SetIndexes(builder);
         SetAllTableNamesToSnakeCase(builder);
     }
 
@@ -94,9 +95,26 @@ public class BotDbContextConfiguration
         {
             entity.Property("_data");
         });
+
+        // Хранение свойств пользователя.
+        modelBuilder.Entity<BotUser>(entity =>
+        {
+            entity.Property("_data");
+        });
         
         modelBuilder.Entity<BotChat>()
             .Property("_states");   
     }
-    
+
+    private static void SetIndexes(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BotUser>()
+            .HasIndex(u => u.TelegramId);
+
+        modelBuilder.Entity<BotChat>()
+            .HasIndex(c => c.ChatId);
+
+        modelBuilder.Entity<BotUpdate>()
+            .HasIndex(u => u.BotChatId);
+    }
 }

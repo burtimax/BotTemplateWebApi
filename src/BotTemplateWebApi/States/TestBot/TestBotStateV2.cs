@@ -17,8 +17,8 @@ public class TestBotStateV2 : BotState
 
     public override async Task<IActionResult> HandleBotRequest(Update update)
     {
-        int t = 0;
-        int v = 100 / t;
+        //int t = 0;
+        //int v = 100 / t;
         
         var r = new Random(DateTime.Now.Millisecond);
         string message = r.Next() % 2 == 0 ? R.Test.Introduction : R.Test.Farewell;

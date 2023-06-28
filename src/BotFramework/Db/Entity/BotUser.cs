@@ -1,11 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using BotFramework.Models;
 
 namespace BotFramework.Db.Entity
 {
     /// <summary>
     /// Пользователь.
-    /// </summary>
-    
+    /// </summary
     public class BotUser : BaseBotEntity<long>
     {
         /// <summary>
@@ -45,6 +47,25 @@ namespace BotFramework.Db.Entity
         /// </summary>
         public string? TelegramLastname { get; set; }
 
+        /// <summary>
+        /// Свойства пользователя.
+        /// </summary>
+        /// <remarks>
+        /// Не переименовывать свойство, потому что оно в модели БД <seealso cref="BotDbContext.OnModelCreating"/>
+        /// </remarks>
+        private Dictionary<string, string> _data = new ();
+
+        #region NotMappedData
+        
+        private UserProperties? _chatData = null;
+
+        /// <summary>
+        /// Свойство для работы с временными данными чата.
+        /// </summary>
+        [NotMapped] public UserProperties UserProperties => _chatData ??= new UserProperties(_data);
+        
+        #endregion
+        
         /// <summary>
         /// Получить строку Username в виде [@username].
         /// </summary>

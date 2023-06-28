@@ -62,14 +62,20 @@ public class BotDispatcherController : BaseBotController
 
             if (update == null) throw new NullUpdateModelInMiddleWareException();
 
-            User telegramUser = update.GetUser();
-            Chat telegramChat = update.GetChat();
+            User? telegramUser = update.GetUser();
+            Chat? telegramChat = update.GetChat();
 
             // Сохраняем или обновляем информацию о пользователе.
             user = await _botRepository.UpsertUser(telegramUser);
 
+            if (user == null)
+            {
+                // ToDo добавить отдельный обработчик для типов обновлений с нулевым пользователем.
+                throw new NotImplementedException("Сейчас пока типы обновлений, у которых User == null не обрабатываются");
+            }
+            
             // Сохраняем чат, если еще не существует. 
-            BotChat? existedChat = await _botRepository.GetChat(telegramChat.Id);
+            BotChat? existedChat = await _botRepository.GetChat(telegramChat?.Id ?? user.Id);
             chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
             
             await _saveUpdateService.SaveUpdateInBotHistory(user, chat, update);
