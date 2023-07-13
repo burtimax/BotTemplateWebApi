@@ -21,7 +21,7 @@ public class SaveUpdateService : ISaveUpdateService
     }
     
     /// <inheritdoc />
-    public async Task SaveUpdateInBotHistory(BotUser user, BotChat chat, Update update)
+    public async Task<BotUpdate> SaveUpdateInBotHistory(BotUser user, BotChat chat, Update update)
     {
         SaveUpdateDto saveUpdateDto = new()
         {
@@ -50,6 +50,6 @@ public class SaveUpdateService : ISaveUpdateService
             UpdateType.Unknown => null,
         };
 
-        await _botRepository.AddUpdate(saveUpdateDto);
+        return await _botRepository.AddUpdate(saveUpdateDto);
     }
 }

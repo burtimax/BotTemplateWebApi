@@ -18,6 +18,7 @@ IServiceCollection services = builder.Services;
 // Initialize
 
 // Register options
+services.AddLogging();
 services.Configure<ApplicationConfiguration>(builder.Configuration);
 services.Configure<BotConfiguration>(builder.Configuration.GetSection("Bot"));
 var botConfig = builder.Configuration.GetSection("Bot").Get<BotConfiguration>();

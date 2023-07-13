@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BotFramework.Db.Entity;
+using BotFramework.Dto;
 using Telegram.Bot.Types;
 
 namespace BotFramework.Interfaces;
@@ -16,5 +17,5 @@ public interface ISaveUpdateService
     /// <param name="chat"></param>
     /// <param name="update"></param>
     /// <returns></returns>
-    public Task SaveUpdateInBotHistory(BotUser user, BotChat chat, Update update);
+    public Task<BotUpdate> SaveUpdateInBotHistory(BotUser user, BotChat chat, Update update);
 }

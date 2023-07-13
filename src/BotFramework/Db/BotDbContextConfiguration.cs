@@ -111,9 +111,6 @@ public class BotDbContextConfiguration
         modelBuilder.Entity<BotUser>()
             .HasIndex(u => u.TelegramId);
 
-        modelBuilder.Entity<BotChat>()
-            .HasIndex(c => c.ChatId);
-
         modelBuilder.Entity<BotUpdate>()
             .HasIndex(u => u.BotChatId);
     }

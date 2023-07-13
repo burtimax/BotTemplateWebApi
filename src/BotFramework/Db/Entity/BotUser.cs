@@ -57,12 +57,12 @@ namespace BotFramework.Db.Entity
 
         #region NotMappedData
         
-        private UserProperties? _chatData = null;
+        private UserProperties? _userProperties = null;
 
         /// <summary>
         /// Свойство для работы с временными данными чата.
         /// </summary>
-        [NotMapped] public UserProperties UserProperties => _chatData ??= new UserProperties(_data);
+        [NotMapped] public UserProperties UserProperties => _userProperties ??= new UserProperties(_data);
         
         #endregion
         

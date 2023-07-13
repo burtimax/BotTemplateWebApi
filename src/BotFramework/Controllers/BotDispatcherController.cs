@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using BotFramework.Attributes;
+using BotFramework.Base;
 using BotFramework.Db.Entity;
 using BotFramework.Dto;
 using BotFramework.Exceptions;
@@ -19,6 +20,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -31,6 +33,7 @@ public class BotDispatcherController : BaseBotController
 {
     private static int t = 0;
 
+    private readonly ILogger _logger;
     private readonly IMapper _mapper;
     private readonly IBaseBotRepository _botRepository;
     private readonly HttpContext _context;
@@ -48,6 +51,8 @@ public class BotDispatcherController : BaseBotController
         _botRepository = botRepository;
         _context = contextAccessor.HttpContext;
         _saveUpdateService = _context.RequestServices.GetRequiredService<ISaveUpdateService>();
+        var loggerFactory = _context.RequestServices.GetRequiredService<ILoggerFactory>();
+        _logger = loggerFactory.CreateLogger("Bot");
     }
 
     public override async Task<IActionResult> HandleBotRequest(Update update)
@@ -55,6 +60,7 @@ public class BotDispatcherController : BaseBotController
         // Объявим здесь. Инициализируем далее.
         BotUser user = null;
         BotChat chat = null;
+        BotUpdate savedUpdate = null;
         
         try
         {
@@ -78,7 +84,7 @@ public class BotDispatcherController : BaseBotController
             BotChat? existedChat = await _botRepository.GetChat(telegramChat?.Id ?? user.Id);
             chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
             
-            await _saveUpdateService.SaveUpdateInBotHistory(user, chat, update);
+            savedUpdate = await _saveUpdateService.SaveUpdateInBotHistory(user, chat, update);
 
             // Получаем текушее состояние чата. 
             string currentState = chat.States.CurrentState;
@@ -86,10 +92,24 @@ public class BotDispatcherController : BaseBotController
             BotHandlerResolver resolver = new(_assembly);
             Type? handlerType = resolver.GetPriorityStateHandlerType("Test", user.Role);
 
-            return await ProcessRequestByHandler(handlerType, update, chat, user);
+            _logger.LogInformation(LogFormat.ReceiveUpdate, 
+                savedUpdate.Id.ToString(), 
+                $"{user?.TelegramId.ToString() ?? "UnknownUser"}/@{user?.TelegramUsername ?? "_"}",
+                $"{chat?.TelegramId.ToString() ?? "_"}",
+                $"{chat?.States?.CurrentState ?? "_"}",
+                update.Type.ToString()
+            );
+            
+            IActionResult res = await ProcessRequestByHandler(handlerType, update, chat, user);
+            
+            _logger.LogInformation(LogFormat.ProcessedUpdate, savedUpdate.Id.ToString());
+
+            return res;
         }
         catch (Exception e)
         {
+            _logger.LogError(LogFormat.ExceptionUpdate, savedUpdate.Id, e.Message);
+            
             BotExceptionHandler exceptionHandler = new();
             await exceptionHandler.Handle(e, update, user, chat, HttpContext.RequestServices);
 
