@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 using BotFramework.Attributes;
 using BotFramework.Base;
 using BotFramework.Db.Entity;
+using BotFramework.Dispatcher;
+using BotFramework.Dispatcher.HandlerResolvers;
 using BotFramework.Dto;
 using BotFramework.Exceptions;
 using BotFramework.Extensions;
-using BotFramework.Filters;
-using BotFramework.Interfaces;
 using BotFramework.Other;
 using BotFramework.Repository;
+using BotFramework.Services;
 using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -84,13 +85,25 @@ public class BotDispatcherController : BaseBotController
             BotChat? existedChat = await _botRepository.GetChat(telegramChat?.Id ?? user.Id);
             chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
             
+            // Сохраняем запрос в истории бота.
             savedUpdate = await _saveUpdateService.SaveUpdateInBotHistory(user, chat, update);
 
+            // Команды бота обрабатываются вне очереди, вне состояний.
+            if (IsBotCommandUpdate(update))
+            {
+                // Ищем обработчик команды.
+                string command = update.Message.Text;
+                BotCommandHandlerResolver commandHandlerResolver = new(_assembly);
+                Type commandHandler = commandHandlerResolver.GetPriorityCommandHandlerType(command, user.Role)
+                    ?? throw new NotFoundHandlerForCommandException(command, _assembly.GetName().Name);
+                
+                // Обрабатываем команду.
+                await ProcessRequestByHandler<BaseBotCommand>(commandHandler, update, chat, user);
+                return Ok();
+            }
+            
             // Получаем текушее состояние чата. 
             string currentState = chat.States.CurrentState;
-
-            BotHandlerResolver resolver = new(_assembly);
-            Type? handlerType = resolver.GetPriorityStateHandlerType("Test", user.Role);
 
             _logger.LogInformation(LogFormat.ReceiveUpdate, 
                 savedUpdate.Id.ToString(), 
@@ -99,12 +112,16 @@ public class BotDispatcherController : BaseBotController
                 $"{chat?.States?.CurrentState ?? "_"}",
                 update.Type.ToString()
             );
+
+            BotStateHandlerResolver resolver = new(_assembly);
+            Type handlerType = resolver.GetPriorityStateHandlerType("Test", user.Role)
+                ?? throw new NotFoundHandlerForStateException(currentState, _assembly.GetName().Name);
             
-            IActionResult res = await ProcessRequestByHandler(handlerType, update, chat, user);
+            await ProcessRequestByHandler<BaseBotState>(handlerType, update, chat, user);
             
             _logger.LogInformation(LogFormat.ProcessedUpdate, savedUpdate.Id.ToString());
 
-            return res;
+            return Ok();
         }
         catch (Exception e)
         {
@@ -122,18 +139,31 @@ public class BotDispatcherController : BaseBotController
     }
 
     /// <summary>
-    /// Запустить обработчик типа состояния бота и получить результат. 
+    /// Является ли запрос командой бота.
+    /// </summary>
+    /// <remarks>
+    /// Команды представлены в виде текста, начинающегося с '/'.
+    /// Например "/command".
+    /// </remarks>
+    /// <param name="update">Запрос бота.</param>
+    /// <returns>Является или не является командой.</returns>
+    private bool IsBotCommandUpdate(Update update) =>
+        update.Type == UpdateType.Message && update.Message.Text.StartsWith("/");
+
+    /// <summary>
+    /// Запустить обработчик типа состояния или команды бота и получить результат. 
     /// </summary>
     /// <param name="handlerTypeName">Наименование типа обработчика.</param>
     /// <param name="update">Объект запроса от Telegram API по webhook.</param>
+    /// <remarks>T - <see cref="BaseBotState"/> или <see cref="BaseBotCommand"/>.</remarks>
     /// <returns></returns>
-    /// <exception cref="NotFoundHandlerTypeException">Не найден тип обработчика запроса.</exception>
+    /// <exception cref="NotFoundHandlerForStateException">Не найден тип обработчика запроса.</exception>
     /// <exception cref="NotFoundHandlerMethodException">Не найден метод обработчика запроса.</exception>
-    private Task<IActionResult> ProcessRequestByHandler(Type handlerType, Update update, BotChat chat, BotUser user)
+    private async Task ProcessRequestByHandler<T>(Type handlerType, Update update, BotChat chat, BotUser user) where T : IBaseBotHandler
     {
         if (handlerType == null) throw new ArgumentNullException(nameof(handlerType));
         
-        BaseBotState handlerInstance = (BaseBotState) _assembly.CreateInstance(handlerType.FullName, true, BindingFlags.Default, null,
+        T handlerInstance = (T) _assembly.CreateInstance(handlerType.FullName, true, BindingFlags.Default, null,
             new object[] { HttpContext.RequestServices }, null, null);
 
         if (handlerInstance == null)
@@ -146,8 +176,8 @@ public class BotDispatcherController : BaseBotController
         handlerInstance.User = user;
         
         // Каждое состояние должно быть наследником типа BaseBotState и реализовывать метод HandleBotRequest
-        string handlerMethodName = nameof(BaseBotState.HandleBotRequest);
 
+        string handlerMethodName = nameof(IBaseBotHandler.HandleBotRequest);
         MethodInfo? handler = handlerType?.GetMethod(handlerMethodName);
 
         if (handler == null)
@@ -155,7 +185,6 @@ public class BotDispatcherController : BaseBotController
             throw new NotFoundHandlerMethodException(handlerMethodName, handlerType?.Name, _assembly.GetName().Name);
         }
 
-        var result = (Task<IActionResult>)handler?.Invoke(handlerInstance, new[] { update });
-        return result!;
+        handler?.Invoke(handlerInstance, new[] { update });
     }
 }

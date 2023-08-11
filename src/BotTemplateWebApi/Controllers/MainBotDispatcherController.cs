@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Security.Claims;
 using BotFramework.Controllers;
-using BotFramework.Filters;
 using BotFramework.Repository;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;

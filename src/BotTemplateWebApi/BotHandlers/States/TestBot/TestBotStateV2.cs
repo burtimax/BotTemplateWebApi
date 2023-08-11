@@ -1,6 +1,5 @@
 ﻿using BotFramework.Attributes;
 using BotFramework.Controllers;
-using BotFramework.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Telegram.Bot;

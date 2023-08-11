@@ -12,5 +12,6 @@ public class BotStateAttribute : Attribute
     {
         this.StateName = stateName;
         this.Version = version;
+        this.UserRole = userRole;
     }
 }

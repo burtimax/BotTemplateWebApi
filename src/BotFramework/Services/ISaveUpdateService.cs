@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 using BotFramework.Db.Entity;
-using BotFramework.Dto;
 using Telegram.Bot.Types;
 
-namespace BotFramework.Interfaces;
+namespace BotFramework.Services;
 
 /// <summary>
 /// Сервис сохранения запросов для бота в истории.

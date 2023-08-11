@@ -1,9 +1,7 @@
 using System.Reflection;
 using BotFramework.Db;
 using BotFramework.Extensions;
-using BotFramework.Middleware;
 using BotFramework.Options;
-using BotFramework.Repository;
 using BotTemplateWebApi.App.Options;
 using BotTemplateWebApi.Extentsions;
 using BotTemplateWebApi.Resources;
@@ -53,7 +51,7 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseMiddleware<BotControllerMiddleware>();
-app.UseMiddleware<TestBotControllerMiddleware>();
+//app.UseMiddleware<TestBotControllerMiddleware>();
 //app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();

@@ -4,16 +4,15 @@ using System.Linq;
 using System.Reflection;
 using BotFramework.Attributes;
 using BotFramework.Controllers;
-using Telegram.Bot.Types;
 
-namespace BotFramework.Other;
+namespace BotFramework.Dispatcher.HandlerResolvers;
 
-public class BotHandlerResolver
+public class BotStateHandlerResolver
 {
     private readonly Assembly _assembly;
     private readonly Type _baseBotStateType = typeof(BaseBotState);
 
-    public BotHandlerResolver(Assembly assembly)
+    public BotStateHandlerResolver(Assembly assembly)
     {
         if (assembly is null) throw new ArgumentNullException(nameof(assembly));
         

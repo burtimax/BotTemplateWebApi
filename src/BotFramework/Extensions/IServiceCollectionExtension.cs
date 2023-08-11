@@ -1,8 +1,7 @@
 ﻿using BotFramework.Db;
-using BotFramework.Implementation;
-using BotFramework.Interfaces;
 using BotFramework.Options;
 using BotFramework.Repository;
+using BotFramework.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
