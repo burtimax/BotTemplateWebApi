@@ -48,7 +48,7 @@ namespace BotFramework.Db.Entity
         public string? TelegramLastname { get; set; }
 
         /// <summary>
-        /// Свойства пользователя.
+        /// Словарь для хранения свойств пользователя (динамически).
         /// </summary>
         /// <remarks>
         /// Не переименовывать свойство, потому что оно в модели БД <seealso cref="BotDbContext.OnModelCreating"/>

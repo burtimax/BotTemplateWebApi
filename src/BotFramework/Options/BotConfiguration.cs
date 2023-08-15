@@ -1,4 +1,6 @@
-﻿namespace BotFramework.Options;
+﻿using Newtonsoft.Json.Serialization;
+
+namespace BotFramework.Options;
 
 public class BotConfiguration
 {
@@ -21,4 +23,14 @@ public class BotConfiguration
     /// Строка подключения к БД бота.
     /// </summary>
     public string DbConnection { get; set; }
+    
+    /// <summary>
+    /// Пароль для команд бота.
+    /// </summary>
+    public string Password { get; set; }
+
+    /// <summary>
+    /// Директория для хранения медиа файлов бота.
+    /// </summary>
+    public string MediaPath { get; set; }
 }

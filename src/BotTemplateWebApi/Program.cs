@@ -19,6 +19,7 @@ IServiceCollection services = builder.Services;
 services.AddLogging();
 services.Configure<ApplicationConfiguration>(builder.Configuration);
 services.Configure<BotConfiguration>(builder.Configuration.GetSection("Bot"));
+services.Configure<BotOptions>(builder.Configuration.GetSection("BotOptions"));
 var botConfig = builder.Configuration.GetSection("Bot").Get<BotConfiguration>();
 BotResources botResources = services.ConfigureBotResources(botConfig.ResourcesFile);
 services.AddBot(botConfig);

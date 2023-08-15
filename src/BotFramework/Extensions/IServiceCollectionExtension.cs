@@ -1,4 +1,5 @@
-﻿using BotFramework.Db;
+﻿using System;
+using BotFramework.Db;
 using BotFramework.Options;
 using BotFramework.Repository;
 using BotFramework.Services;
@@ -10,13 +11,14 @@ namespace BotFramework.Extensions;
 
 public static class IServiceCollectionExtension
 {
-    public static IServiceCollection AddBot (this IServiceCollection services, BotConfiguration botConfiguration)
+    public static IServiceCollection AddBot(this IServiceCollection services, BotConfiguration botConfiguration,
+        Action<BotOptions> botOptions = null)
     {
         TelegramBotClient botClient = new(botConfiguration.TelegramToken);
         botClient.SetWebhookAsync(botConfiguration.Webhook).Wait();
 
         services.AddSingleton<ITelegramBotClient>(botClient);
-        
+
         services.AddDbContext<BotDbContext>(options =>
         {
             options.UseNpgsql(botConfiguration.DbConnection);

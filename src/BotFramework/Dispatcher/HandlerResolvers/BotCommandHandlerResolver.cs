@@ -9,8 +9,7 @@ using BotFramework.Controllers;
 namespace BotFramework.Dispatcher.HandlerResolvers;
 
 public class BotCommandHandlerResolver
-{
-       private readonly Assembly _assembly;
+{ private readonly Assembly _assembly;
     private readonly Type _baseBotCommandType = typeof(BaseBotCommand);
 
     public BotCommandHandlerResolver(Assembly assembly)
