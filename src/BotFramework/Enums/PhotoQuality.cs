@@ -5,8 +5,9 @@
     /// </summary>
     public enum PhotoQuality
     {
-        Low = 0,
-        Middle = 1,
-        High = 2,
+        Min = 0,
+        Low = 1,
+        Middle = 2,
+        High = 3,
     }
 }

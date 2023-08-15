@@ -21,24 +21,24 @@ public class GetAudioMessageSample : BaseBotState
     {
         if (update.Message.Type != MessageType.Voice)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Need voice");
+            await BotClient.SendTextMessageAsync(Chat.ChatId, "Жду голосовое от тебя.");
             return;
         }
 
         // Можно сохранить файл локально на компьютер, а можно загрузить файл из серверов Telegram.
         
-        // FilePath fp = new FilePath(Path.Combine(MediaPath, update.Message.Voice.FileUniqueId + ".burtimax"));
-        // InputOnlineFile iof = await BotMediaHelper.GetFileByPath(fp); // Получаем файл из диска.
+        FilePath fp = new FilePath(Path.Combine(MediaPath, update.Message.Voice.FileUniqueId + ".burtimax"));
+        InputOnlineFile iofLocal = new InputOnlineFile(await BotMediaHelper.GetFileByPathAsync(fp)); // Получаем файл из диска.
 
         var file = await BotMediaHelper.GetFileFromTelegramAsync(BotClient, update.Message.Voice.FileId); // Качаем файл из серверов Telegram.
         
-        InputOnlineFile iof = new InputOnlineFile(file.fileData);
+        InputOnlineFile iofFromServer = new InputOnlineFile(file.fileData);
         
         await BotClient.SendVoiceAsync(
             chatId: Chat.ChatId,
-            iof, "Hello");
+            iofFromServer, "Hello");
 
-        if (iof.Content != null) await iof.Content.DisposeAsync();
+        if (iofFromServer.Content != null) await iofFromServer.Content.DisposeAsync();
 
         await BotClient.SendTextMessageAsync(Chat.ChatId, "Вот держи свое голосовое обратно)");
     }

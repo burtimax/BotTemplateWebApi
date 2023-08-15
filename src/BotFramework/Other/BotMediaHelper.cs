@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using BotFramework.Enums;
+using BotFramework.Extensions;
 using BotFramework.Models;
 using BotFramework.Models.Message;
 using Telegram.Bot;
@@ -21,16 +23,33 @@ namespace BotFramework.Other
         /// <param name="botClient">API клиент.</param>
         /// <param name="file">Данные о файле.</param>
         /// <param name="fp">Полный путь к файлу.</param>
-        public static async Task DownloadAndSaveTelegramFileAsync(ITelegramBotClient botClient, FileBase file, FilePath fp)
+        public static async Task DownloadAndSaveTelegramFileAsync(ITelegramBotClient botClient, string fileId, FilePath fp)
         {
             using (FileStream fs = new FileStream(fp, FileMode.Create))
             {
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    await botClient.GetInfoAndDownloadFileAsync(file.FileId, ms);
+                    await botClient.GetInfoAndDownloadFileAsync(fileId, ms);
                     ms.Position = 0;
                     await fs.WriteAsync(ms.GetBuffer());
                 }
+            }
+        }
+
+        /// <summary>
+        /// Сохранить файл на диске.
+        /// </summary>
+        /// <param name="filePath">Полный путь к файлу.</param>
+        /// <param name="ms">Данные файла.</param>
+        public static async Task SaveFileAsync(FilePath filePath, MemoryStream ms)
+        {
+            if (ms is null || ms.Length == 0) throw new ArgumentNullException(nameof(ms));
+            if (string.IsNullOrEmpty(filePath)) throw new ArgumentNullException(nameof(filePath));
+            
+            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            {
+                ms.Position = 0;
+                await fs.WriteAsync(ms.GetBuffer());
             }
         }
 
@@ -39,11 +58,13 @@ namespace BotFramework.Other
         /// </summary>
         /// <param name="filePath">Путь к файлу.</param>
         /// <returns></returns>
-        public static async Task<InputOnlineFile> GetFileByPathAsync(string filePath)
+        public static async Task<MemoryStream> GetFileByPathAsync(FilePath filePath)
         {
+            if (string.IsNullOrEmpty(filePath)) throw new ArgumentNullException(nameof(filePath));
+            
             MemoryStream ms = new(await File.ReadAllBytesAsync(filePath));
             ms.Position = 0;
-            return new InputOnlineFile(ms);
+            return ms;
         }
 
         /// <summary>
@@ -54,10 +75,30 @@ namespace BotFramework.Other
         /// <returns>Данные по файлу.</returns>
         public static async Task<(Telegram.Bot.Types.File fileInfo, MemoryStream fileData)> GetFileFromTelegramAsync(ITelegramBotClient botClient, string fileId)
         {
+            if (botClient == null) throw new ArgumentNullException(nameof(botClient));
+            if (string.IsNullOrEmpty(fileId)) throw new ArgumentNullException(nameof(fileId));
+            
             MemoryStream ms = new();
             Telegram.Bot.Types.File res = await botClient.GetInfoAndDownloadFileAsync(fileId, ms);
             ms.Position = 0;
             return (res, ms);
+        }
+
+        /// <summary>
+        /// Получить фото из Telegram.
+        /// </summary>
+        /// <param name="botClient">API клиент.</param>
+        /// <param name="requiredQuality">Требуемое качество фото.</param>
+        /// <param name="photoSizes">Фото размеры. <see cref="Update.Message.Photo"/></param>
+        /// <returns>Данные по фото.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static Task<(Telegram.Bot.Types.File fileInfo, MemoryStream fileData)> GetPhotoFromTelegramAsync(
+            ITelegramBotClient botClient, PhotoQuality requiredQuality, PhotoSize[] photoSizes)
+        {
+            if (botClient is null) throw new ArgumentNullException(nameof(botClient));
+            if (photoSizes is null || photoSizes.Any() == false) throw new ArgumentNullException(nameof(photoSizes));
+            
+            return GetFileFromTelegramAsync(botClient, photoSizes.GetFileByQuality(PhotoQuality.Low).FileId);
         }
         
         public static async Task<MessagePicture> GetPhotoAsync(ITelegramBotClient bot, Message mes, PhotoQuality quality = PhotoQuality.High)
@@ -66,9 +107,7 @@ namespace BotFramework.Other
                 mes == null ||
                 mes.Type != MessageType.Photo) return null;
 
-            int qualityIndex = (int) Math.Round(((int)quality) / ((double)PhotoQuality.High) * mes.Photo.Length-1);
-            string fileId = null;
-            fileId = mes.Photo[qualityIndex].FileId;
+            string fileId = mes.Photo.GetFileByQuality(quality).FileId;
             MessagePicture picture = new MessagePicture();
             picture.File = await GetFile(bot, mes, fileId) ;
             return picture;

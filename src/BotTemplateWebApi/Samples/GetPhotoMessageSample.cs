@@ -1,6 +1,8 @@
 ﻿using BotFramework.Attributes;
 using BotFramework.Base;
 using BotFramework.Controllers;
+using BotFramework.Enums;
+using BotFramework.Extensions;
 using BotFramework.Models;
 using BotFramework.Other;
 using Telegram.Bot;
@@ -19,27 +21,29 @@ public class GetPhotoMessageSample : BaseBotState
 
     public override async Task HandleBotRequest(Update update)
     {
-        if (update.Message.Type != MessageType.Voice)
+        if (update.Message.Type != MessageType.Photo)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Need voice");
+            await BotClient.SendTextMessageAsync(Chat.ChatId, "Жду фото от тебя.");
             return;
         }
 
         // Можно сохранить файл локально на компьютер, а можно загрузить файл из серверов Telegram.
         
-        // FilePath fp = new FilePath(Path.Combine(MediaPath, update.Message.Voice.FileUniqueId + ".burtimax"));
-        // InputOnlineFile iof = await BotMediaHelper.GetFileByPath(fp); // Получаем файл из диска.
+        FilePath fp = new FilePath(Path.Combine(MediaPath, update.Message.Photo.GetFileByQuality(PhotoQuality.Low).FileUniqueId + ".jpeg"));
+        await BotMediaHelper.DownloadAndSaveTelegramFileAsync(BotClient,
+            update.Message.Photo.GetFileByQuality(PhotoQuality.Low).FileId, fp);
+        InputOnlineFile iof = new InputOnlineFile(await BotMediaHelper.GetFileByPathAsync(fp)); // Получаем файл из диска.
 
-        var file = await BotMediaHelper.GetFileFromTelegramAsync(BotClient, update.Message.Voice.FileId); // Качаем файл из серверов Telegram.
+        var file = await BotMediaHelper.GetPhotoFromTelegramAsync(BotClient, PhotoQuality.Low, update.Message.Photo!); // Качаем файл из серверов Telegram.
         
-        InputOnlineFile iof = new InputOnlineFile(file.fileData);
+        InputOnlineFile iofServer = new InputOnlineFile(file.fileData);
         
-        await BotClient.SendVoiceAsync(
+        await BotClient.SendPhotoAsync(
             chatId: Chat.ChatId,
             iof, "Hello");
 
         if (iof.Content != null) await iof.Content.DisposeAsync();
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, "Вот держи свое голосовое обратно)");
+        await BotClient.SendTextMessageAsync(Chat.ChatId, "Вот держи свое фото обратно в шакальном качестве)");
     }
 }
