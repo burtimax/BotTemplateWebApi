@@ -10,10 +10,16 @@ using Telegram.Bot.Types.InputFiles;
 
 namespace BotTemplateWebApi.Samples;
 
-[BotState("GetAudioMessageSample")]
-public class GetAudioMessageSample : BaseBotState
+/// <summary>
+/// Пример получения голосового сообщения и отправки его в ответ.
+/// </summary>
+/// <remarks>
+/// Показываю, что можно получить файл 2 способами: из локального хранилища, из сервера Telegram.
+/// </remarks>
+[BotState("AudioMessageSample")]
+public class AudioMessageSample : BaseBotState
 {
-    public GetAudioMessageSample(IServiceProvider serviceProvider) : base(serviceProvider)
+    public AudioMessageSample(IServiceProvider serviceProvider) : base(serviceProvider)
     {
     }
 

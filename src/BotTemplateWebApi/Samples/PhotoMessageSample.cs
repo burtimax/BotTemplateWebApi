@@ -12,10 +12,16 @@ using Telegram.Bot.Types.InputFiles;
 
 namespace BotTemplateWebApi.Samples;
 
-[BotState("GetPhotoMessageSample")]
-public class GetPhotoMessageSample : BaseBotState
+/// <summary>
+/// Пример получения фото и отправки фото в ответ.
+/// </summary>
+/// <remarks>
+/// Показываю, что можно получить файл 2 способами: из локального хранилища, из сервера Telegram.
+/// </remarks>
+[BotState("PhotoMessageSample")]
+public class PhotoMessageSample : BaseBotState
 {
-    public GetPhotoMessageSample(IServiceProvider serviceProvider) : base(serviceProvider)
+    public PhotoMessageSample(IServiceProvider serviceProvider) : base(serviceProvider)
     {
     }
 

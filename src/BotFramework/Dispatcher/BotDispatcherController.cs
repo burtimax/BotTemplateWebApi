@@ -119,9 +119,8 @@ public class BotDispatcherController : BaseBotController
                 $"{chat?.States?.CurrentState ?? "_"}",
                 update.Type.ToString()
             );
-
-            BotStateHandlerResolver resolver = new(_assembly);
-            Type handlerType = resolver.GetPriorityStateHandlerType("GetPhotoMessageSample", user.Role)
+    BotStateHandlerResolver resolver = new(_assembly);
+            Type handlerType = resolver.GetPriorityStateHandlerType(currentState, user.Role)
                 ?? throw new NotFoundHandlerForStateException(currentState, _assembly.GetName().Name);
             
             await ProcessRequestByHandler<BaseBotState>(handlerType, update, chat, user);

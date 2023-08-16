@@ -5,6 +5,8 @@
 <!--    <LangVersion>9</LangVersion>-->
     <RootNamespace>BotFramework</RootNamespace>
     <Nullable>enable</Nullable>
+    <PackageId>Burtimax.TelegramBot.Framework</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>

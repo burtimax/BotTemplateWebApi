@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using BotFramework.Enums;
 using BotFramework.Extensions;
 using BotFramework.Models;
-using BotFramework.Models.Message;
 using Telegram.Bot;
 using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
@@ -99,54 +98,6 @@ namespace BotFramework.Other
             if (photoSizes is null || photoSizes.Any() == false) throw new ArgumentNullException(nameof(photoSizes));
             
             return GetFileFromTelegramAsync(botClient, photoSizes.GetFileByQuality(PhotoQuality.Low).FileId);
-        }
-        
-        public static async Task<MessagePicture> GetPhotoAsync(ITelegramBotClient bot, Message mes, PhotoQuality quality = PhotoQuality.High)
-        {
-            if (bot == null ||
-                mes == null ||
-                mes.Type != MessageType.Photo) return null;
-
-            string fileId = mes.Photo.GetFileByQuality(quality).FileId;
-            MessagePicture picture = new MessagePicture();
-            picture.File = await GetFile(bot, mes, fileId) ;
-            return picture;
-        }
-
-
-        public static async Task<MessageAudio> GetAudioAsync(ITelegramBotClient bot, Message mes)
-        {
-            if (bot == null ||
-                mes == null ||
-                mes.Type != MessageType.Audio) return null;
-
-            MessageAudio audio = new MessageAudio();
-            audio.File = await GetFile(bot, mes, mes.Audio.FileId);
-            return audio;
-        }
-
-        public static async Task<MessageVoice> GetVoiceAsync(ITelegramBotClient bot, Message mes)
-        {
-            if (bot == null || 
-                mes == null ||
-                mes.Type != MessageType.Voice) return null;
-
-            MessageVoice voice = new MessageVoice();
-            var fileId = mes.Voice.FileId;
-            voice.File = await GetFile(bot, mes, fileId);
-            return voice;
-        }
-
-        private static async Task<FileData> GetFile(ITelegramBotClient bot, Message mes, string fileId)
-        {
-            if (bot == null || 
-                mes == null ||
-                string.IsNullOrEmpty(fileId)) return null ;
-
-            FileData fileData = new FileData();
-            fileData.Stream = new MemoryStream();
-            fileData.Info = await bot.GetInfoAndDownloadFileAsync(fileId, fileData.Stream);
-            return fileData;
         }
     }
 }
