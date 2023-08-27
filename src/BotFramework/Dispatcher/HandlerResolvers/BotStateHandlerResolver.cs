@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BotFramework.Attributes;
-using BotFramework.Controllers;
+using BotFramework.Base;
 
 namespace BotFramework.Dispatcher.HandlerResolvers;
 

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Dynamic;
 using System.Threading.Tasks;
-using BotFramework.Base;
 using BotFramework.Db;
 using BotFramework.Db.Entity;
 using BotFramework.Options;
@@ -11,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace BotFramework.Controllers;
+namespace BotFramework.Base;
 
 /// <summary>
 /// Базовый класс обработчика состояния.

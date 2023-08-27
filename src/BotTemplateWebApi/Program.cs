@@ -2,11 +2,13 @@ using System.Reflection;
 using BotFramework.Db;
 using BotFramework.Extensions;
 using BotFramework.Options;
+using BotFramework.Other;
 using BotTemplateWebApi.App.Options;
 using BotTemplateWebApi.Extentsions;
 using BotTemplateWebApi.Resources;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
+using Telegram.Bot.Types.ReplyMarkups;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 

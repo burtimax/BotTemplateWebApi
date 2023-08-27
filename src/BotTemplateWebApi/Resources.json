@@ -4,7 +4,9 @@
     "DefaultAnswer" : "Ответ по умолчанию :)" // Ответ по умолчанию для бота.
   },
   "Test" : { // Тестовое состояние
-    "Introduction" : "Привет, бро)",
-    "Farewell" : "shit nigga"
+    "Introduction" : "Привет, бро, {{Test.Farewell}})",
+    "Farewell" : "shit nigga",
+    "Keyboard" : "[{{Test.Introduction}}] [{{Common.DefaultAnswer}}] [ ] \n [ ] [ ] [ ] ",
+    "Goodbye" : "Goodbye {{Test.Farewell}}"
   }
 }

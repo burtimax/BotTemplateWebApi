@@ -1,8 +1,12 @@
 ﻿using System.Reflection;
 using BotFramework.Options;
+using BotFramework.Other;
 using BotTemplateWebApi.Resources;
 using Mapster;
 using MapsterMapper;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NuGet.Protocol;
 
 namespace BotTemplateWebApi.Extentsions;
 
@@ -29,10 +33,29 @@ public static class IServiceCollectionExtensions
     {
         if (resourcesFilePath == null) throw new ArgumentNullException(nameof(resourcesFilePath));
         
-        var resourcesConfigBuilder = new ConfigurationBuilder().AddJsonFile(resourcesFilePath, false, true);
+        string json = File.ReadAllText(resourcesFilePath);
+        BotResourcesBuilder resourcesBuilder = new(json);
+        json = resourcesBuilder.Build();
+
+        // var resourcesConfigBuilder = new ConfigurationBuilder().AddJsonFile(resourcesFilePath, false, true);
+        // IConfiguration resourcesConfiguration = resourcesConfigBuilder.Build();
+
+        Stream jsonStream = GenerateStreamFromString(json);
+        var resourcesConfigBuilder = new ConfigurationBuilder().AddJsonStream(jsonStream);
         IConfiguration resourcesConfiguration = resourcesConfigBuilder.Build();
+        
         services.Configure<BotResources>(resourcesConfiguration);
         return resourcesConfiguration.Get<BotResources>();
+    }
+    
+    private static Stream GenerateStreamFromString(string s)
+    {
+        var stream = new MemoryStream();
+        var writer = new StreamWriter(stream);
+        writer.Write(s);
+        writer.Flush();
+        stream.Position = 0;
+        return stream;
     }
     
     /// <summary>

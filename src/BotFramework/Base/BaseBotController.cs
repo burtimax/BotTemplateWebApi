@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
 
-namespace BotFramework.Controllers;
+namespace BotFramework.Base;
 
 [Controller]
 public abstract class BaseBotController : ControllerBase

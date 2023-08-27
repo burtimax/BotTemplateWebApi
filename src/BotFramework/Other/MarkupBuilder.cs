@@ -2,7 +2,7 @@
 using System.Linq;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace BotFramework.Models
+namespace BotFramework.Other
 {
     /// <summary>
     /// Строитель клавиатуры

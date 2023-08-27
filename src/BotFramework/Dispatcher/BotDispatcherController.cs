@@ -1,18 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using BotFramework.Attributes;
 using BotFramework.Base;
 using BotFramework.Db.Entity;
-using BotFramework.Dispatcher;
 using BotFramework.Dispatcher.HandlerResolvers;
-using BotFramework.Dto;
 using BotFramework.Exceptions;
 using BotFramework.Extensions;
 using BotFramework.Options;
@@ -25,12 +16,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
 
-namespace BotFramework.Controllers;
+namespace BotFramework.Dispatcher;
 
 [Controller]
 public class BotDispatcherController : BaseBotController
