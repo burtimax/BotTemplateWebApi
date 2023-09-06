@@ -34,7 +34,7 @@ public class PhotoMessageSample : BaseBotState
 
         // Можно сохранить файл локально на компьютер, а можно загрузить файл из серверов Telegram.
         
-        FilePath fp = new FilePath(Path.Combine(MediaPath, update.Message.Photo.GetFileByQuality(PhotoQuality.Low).FileUniqueId + ".jpeg"));
+        FilePath fp = new FilePath(Path.Combine(MediaDirectory, update.Message.Photo.GetFileByQuality(PhotoQuality.Low).FileUniqueId + ".jpeg"));
         await BotMediaHelper.DownloadAndSaveTelegramFileAsync(BotClient,
             update.Message.Photo.GetFileByQuality(PhotoQuality.Low).FileId, fp);
         InputOnlineFile iof = new InputOnlineFile(await BotMediaHelper.GetFileByPathAsync(fp)); // Получаем файл из диска.

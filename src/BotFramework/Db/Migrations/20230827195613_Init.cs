@@ -11,7 +11,7 @@ namespace BotFramework.Db.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Добавлен скрипт активации расширения. 
+            // Добавить расширение для хранения словарей.
             migrationBuilder.Sql("CREATE EXTENSION IF NOT EXISTS hstore;");
             
             migrationBuilder.EnsureSchema(
@@ -95,11 +95,70 @@ namespace BotFramework.Db.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "exceptions",
+                schema: "bot",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table.Column<long>(type: "bigint", nullable: true),
+                    chat_id = table.Column<long>(type: "bigint", nullable: true),
+                    update_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    exception_message = table.Column<string>(type: "text", nullable: true),
+                    stack_trace = table.Column<string>(type: "text", nullable: true),
+                    report_description = table.Column<string>(type: "text", nullable: true),
+                    report_file_name = table.Column<string>(type: "text", nullable: true),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_exceptions", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_exceptions_chats_chat_id",
+                        column: x => x.chat_id,
+                        principalSchema: "bot",
+                        principalTable: "chats",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_exceptions_updates_update_id",
+                        column: x => x.update_id,
+                        principalSchema: "bot",
+                        principalTable: "updates",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_exceptions_users_user_id",
+                        column: x => x.user_id,
+                        principalSchema: "bot",
+                        principalTable: "users",
+                        principalColumn: "id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "ix_chats_bot_user_id",
                 schema: "bot",
                 table: "chats",
                 column: "bot_user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_exceptions_chat_id",
+                schema: "bot",
+                table: "exceptions",
+                column: "chat_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_exceptions_update_id",
+                schema: "bot",
+                table: "exceptions",
+                column: "update_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_exceptions_user_id",
+                schema: "bot",
+                table: "exceptions",
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_updates_bot_chat_id",
@@ -116,6 +175,10 @@ namespace BotFramework.Db.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "exceptions",
+                schema: "bot");
+
             migrationBuilder.DropTable(
                 name: "updates",
                 schema: "bot");

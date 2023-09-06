@@ -26,7 +26,7 @@ public interface IBaseBotHandler
     /// <summary>
     /// Путь к директории медиафайлов бота.
     /// </summary>
-    public string MediaPath { get; set; }
+    public string MediaDirectory { get; set; }
     
     /// <summary>
     /// Клиент телеграм АПИ.

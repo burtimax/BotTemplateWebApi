@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
-using BotFramework.Db;
 using BotFramework.Db.Entity;
 using BotFramework.Repository;
 using Newtonsoft.Json;
 using Telegram.Bot.Types;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
-namespace BotFramework.Other;
+namespace BotFramework.Other.ReportGenerator;
 
 /// <summary>
 /// Генератор сообщений об ошибках.
 /// </summary>
-public class ExceptionMessageGenerator
+public class ExceptionMessageReportGenerator
 {
     public async Task<string> GenerateExceptionMessage(Exception e, Update update, BotUser user, BotChat chat, IBotUpdateRepository updateRepository)
     {

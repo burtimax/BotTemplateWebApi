@@ -18,7 +18,7 @@ public class MainBotDispatcherController : BotDispatcherController
 
     public MainBotDispatcherController(ITelegramBotClient botClient, IMapper mapper, IBaseBotRepository baseBotRepository,
         IHttpContextAccessor contextAccessor) 
-        : base(mapper, baseBotRepository, contextAccessor, Assembly.GetExecutingAssembly())
+        : base(baseBotRepository, contextAccessor, Assembly.GetExecutingAssembly())
     {
         _botClient = botClient;
     }

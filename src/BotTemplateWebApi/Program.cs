@@ -23,12 +23,11 @@ services.Configure<ApplicationConfiguration>(builder.Configuration);
 services.Configure<BotConfiguration>(builder.Configuration.GetSection("Bot"));
 services.Configure<BotOptions>(builder.Configuration.GetSection("BotOptions"));
 var botConfig = builder.Configuration.GetSection("Bot").Get<BotConfiguration>();
-BotResources botResources = services.ConfigureBotResources(botConfig.ResourcesFile);
+BotResources botResources = services.ConfigureBotResources(botConfig.ResourcesFilePath);
 services.AddBot(botConfig);
 
 // Add services to the container.
 services.AddMapster(Assembly.GetExecutingAssembly());
-//services.AddSingleton<IBotSingleton, BotSingleton>();
 services.AddControllers().AddNewtonsoftJson();
 services.AddHttpContextAccessor();
 
@@ -39,28 +38,14 @@ services.AddSwaggerGen();
 
 var app = builder.Build();
 
-var serviceScope = app.Services.CreateScope();
-var serviceProvider = serviceScope.ServiceProvider;
-using (BotDbContext botDbContext = serviceProvider.GetRequiredService<BotDbContext>())
-{
-    await botDbContext.Database.MigrateAsync();
-}
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-//app.UseMiddleware<BotControllerMiddleware>();
-//app.UseMiddleware<TestBotControllerMiddleware>();
 //app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();
-
 app.MapControllers();
-
-
-
 app.Run();

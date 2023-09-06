@@ -5,6 +5,11 @@ namespace BotFramework.Options;
 public class BotConfiguration
 {
     /// <summary>
+    /// Наименование бота.
+    /// </summary>
+    public string Name { get; set; }
+    
+    /// <summary>
     /// Токен бота из Telegram.org.
     /// </summary>
     public string TelegramToken { get; set; }
@@ -17,7 +22,7 @@ public class BotConfiguration
     /// <summary>
     /// Файл ресурсов бота
     /// </summary>
-    public string? ResourcesFile { get; set; }
+    public string? ResourcesFilePath { get; set; }
     
     /// <summary>
     /// Строка подключения к БД бота.
@@ -32,5 +37,10 @@ public class BotConfiguration
     /// <summary>
     /// Директория для хранения медиа файлов бота.
     /// </summary>
-    public string MediaPath { get; set; }
+    public string MediaDirectory { get; set; }
+
+    /// <summary>
+    /// Директория для хранения файлов-отчетов ошибок бота.
+    /// </summary>
+    public string ExceptionDirectory { get; set; }
 }

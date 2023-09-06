@@ -32,7 +32,7 @@ public class AudioMessageSample : BaseBotState
 
         // Можно сохранить файл локально на компьютер, а можно загрузить файл из серверов Telegram.
         
-        FilePath fp = new FilePath(Path.Combine(MediaPath, update.Message.Voice.FileUniqueId + ".burtimax"));
+        FilePath fp = new FilePath(Path.Combine(MediaDirectory, update.Message.Voice.FileUniqueId + ".burtimax"));
         InputOnlineFile iofLocal = new InputOnlineFile(await BotMediaHelper.GetFileByPathAsync(fp)); // Получаем файл из диска.
 
         var file = await BotMediaHelper.GetFileFromTelegramAsync(BotClient, update.Message.Voice.FileId); // Качаем файл из серверов Telegram.

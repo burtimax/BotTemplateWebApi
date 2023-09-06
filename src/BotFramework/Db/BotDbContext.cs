@@ -12,6 +12,8 @@ namespace BotFramework.Db
         public DbSet<BotUser> Users { get; set; }
         public DbSet<BotChat> Chats { get; set; }
         public DbSet<BotUpdate> Updates { get; set; }
+        
+        public DbSet<BotException> Exceptions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

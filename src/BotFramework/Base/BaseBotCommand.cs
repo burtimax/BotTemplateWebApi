@@ -26,7 +26,7 @@ public abstract class BaseBotCommand : ControllerBase, IBaseBotHandler
     public BotDbContext BotDbContext { get; set; }
     
     /// <inheritdoc/>
-    public string MediaPath { get; set; }
+    public string MediaDirectory { get; set; }
     
     /// <inheritdoc/>
     public ITelegramBotClient BotClient { get; set; }
@@ -36,7 +36,7 @@ public abstract class BaseBotCommand : ControllerBase, IBaseBotHandler
         BotClient = serviceProvider.GetRequiredService<ITelegramBotClient>();
         BotDbContext = serviceProvider.GetRequiredService<BotDbContext>();
         var botConfig = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
-        MediaPath = botConfig.MediaPath;
+        MediaDirectory = botConfig.MediaDirectory;
     }
 
     /// <inheritdoc/>

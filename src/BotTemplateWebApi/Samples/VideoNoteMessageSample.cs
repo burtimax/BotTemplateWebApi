@@ -34,7 +34,7 @@ public class VideoNoteMessageSample : BaseBotState
 
         // Можно сохранить файл локально на компьютер, а можно загрузить файл из серверов Telegram.
         
-        FilePath fp = new FilePath(Path.Combine(MediaPath, update.Message.VideoNote.FileUniqueId + ".mp4"));
+        FilePath fp = new FilePath(Path.Combine(MediaDirectory, update.Message.VideoNote.FileUniqueId + ".mp4"));
         await BotMediaHelper.DownloadAndSaveTelegramFileAsync(BotClient, update.Message.VideoNote.FileId, fp);
         InputOnlineFile iofLocal = new InputOnlineFile(await BotMediaHelper.GetFileByPathAsync(fp)); // Получаем файл из диска.
 

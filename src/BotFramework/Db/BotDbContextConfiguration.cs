@@ -30,6 +30,7 @@ public class BotDbContextConfiguration
         builder.Entity<BotUser>().ToTable("users", schema);
         builder.Entity<BotChat>().ToTable("chats", schema);
         builder.Entity<BotUpdate>().ToTable("updates", schema);
+        builder.Entity<BotException>().ToTable("exceptions", schema);
     }
     
     /// <summary>

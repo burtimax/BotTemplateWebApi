@@ -1,15 +1,21 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using BotFramework.Db;
 using BotFramework.Db.Entity;
+using BotFramework.Models;
+using BotFramework.Options;
+using BotFramework.Other.ReportGenerator;
 using BotFramework.Repository;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
+using File = System.IO.File;
 
 namespace BotFramework.Other;
 
@@ -22,14 +28,17 @@ public class BotExceptionHandler
     /// Отправляет отчет об ошибке тех поддержке.
     /// </summary>
     /// <param name="e"></param>
-    public async Task Handle(Exception e, Update update, BotUser user, BotChat chat, IServiceProvider serviceProvider)
+    public async Task Handle(Exception e, Update update, BotUpdate botUpdate, BotUser user, BotChat chat, IServiceProvider serviceProvider)
     {
         // Получим сервисы из DI
         ITelegramBotClient botClient = serviceProvider.GetRequiredService<ITelegramBotClient>();
         IBotUpdateRepository botUpdateRepository = serviceProvider.GetRequiredService<IBotUpdateRepository>();
+        BotDbContext db = serviceProvider.GetRequiredService<BotDbContext>();
+        BotConfiguration botConfig = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        BotOptions botOptions = serviceProvider.GetRequiredService<IOptions<BotOptions>>()?.Value ?? new();
             
-        ExceptionMessageGenerator generator = new();
-        string messageReport = await generator.GenerateExceptionMessage(e, update, user, chat, botUpdateRepository);
+        ExceptionMessageReportGenerator reportGenerator = new();
+        string messageReport = await reportGenerator.GenerateExceptionMessage(e, update, user, chat, botUpdateRepository);
 
         using (Stream stream = StreamHelper.GenerateStreamFromString(messageReport))
         {
@@ -57,7 +66,35 @@ public class BotExceptionHandler
                 caption = caption.Substring(0, BotConstants.Bounds.MaxDocumentCaption);
             }
             
+            // Отправляем модератору.
             await botClient.SendDocumentAsync(chat.ChatId, fileException, caption: caption, parseMode: ParseMode.Html);
+            
+            // Добавляем в БД.
+            DateTimeOffset now = DateTime.Now;
+            string exceptionFileName = $"{botConfig.Name} {now.ToString("yyyy.MM.dd hh.mm.ss")}.txt";
+            
+            if (botOptions.SaveExceptionsInDatabase)
+            {
+                BotException botException = new BotException()
+                {
+                    ChatId = chat.Id,
+                    UserId = user.Id,
+                    UpdateId = botUpdate.Id,
+                    CreatedAt = now,
+                    ExceptionMessage = e.Message,
+                    StackTrace = e.StackTrace,
+                    ReportDescription = messageReport,
+                    ReportFileName = exceptionFileName,
+                };
+                db.Exceptions.Add(botException);
+                await db.SaveChangesAsync();
+            }
+            
+            // Сохраняем в файл если указанная директория существует.
+            if (botOptions.SaveExceptionsInDirectory && Directory.Exists(botConfig.ExceptionDirectory))
+            {
+                await File.WriteAllTextAsync(Path.Combine(botConfig.ExceptionDirectory, exceptionFileName), messageReport);
+            }
         }
     }
 }

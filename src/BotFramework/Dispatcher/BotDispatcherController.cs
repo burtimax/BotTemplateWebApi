@@ -10,7 +10,6 @@ using BotFramework.Options;
 using BotFramework.Other;
 using BotFramework.Repository;
 using BotFramework.Services;
-using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,23 +26,23 @@ public class BotDispatcherController : BaseBotController
     private static int t = 0;
 
     private readonly ILogger _logger;
-    private readonly IMapper _mapper;
     private readonly IBaseBotRepository _botRepository;
     private readonly HttpContext _context;
     private readonly Assembly _assembly;
     private readonly BotOptions _botOptions;
     private readonly ISaveUpdateService _saveUpdateService;
+    private readonly BotConfiguration _botConfiguration;
 
-    public BotDispatcherController(IMapper mapper,
+    public BotDispatcherController(
         IBaseBotRepository botRepository,
         IHttpContextAccessor contextAccessor,
         Assembly assembly)
     {
         _assembly = assembly;
-        _mapper = mapper;
         _botRepository = botRepository;
         _context = contextAccessor.HttpContext;
         _saveUpdateService = _context.RequestServices.GetRequiredService<ISaveUpdateService>();
+        _botConfiguration = _context.RequestServices.GetRequiredService<IOptions<BotConfiguration>>().Value;
         var loggerFactory = _context.RequestServices.GetRequiredService<ILoggerFactory>();
         _botOptions = (_context.RequestServices.GetRequiredService<IOptions<BotOptions>>())?.Value ?? new();
         _logger = loggerFactory.CreateLogger("Bot");
@@ -75,7 +74,7 @@ public class BotDispatcherController : BaseBotController
             }
             
             // Сохраняем чат, если еще не существует. 
-            BotChat? existedChat = await _botRepository.GetChat(telegramChat?.Id ?? user.Id);
+            BotChat? existedChat = await _botRepository.GetChat(user.Id);
             chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
             
             // Сохраняем запрос в истории бота.
@@ -120,11 +119,11 @@ public class BotDispatcherController : BaseBotController
         }
         catch (Exception e)
         {
-            _logger.LogError(LogFormat.ExceptionUpdate, savedUpdate.Id, e.Message);
+            _logger.LogError(LogFormat.ExceptionUpdate, savedUpdate?.Id.ToString() ?? "null", e.Message);
             
             BotExceptionHandler exceptionHandler = new();
-            await exceptionHandler.Handle(e, update, user, chat, HttpContext.RequestServices);
-
+            await exceptionHandler.Handle(e, update, savedUpdate, user, chat, HttpContext.RequestServices);
+            
             return Ok();
         }
 

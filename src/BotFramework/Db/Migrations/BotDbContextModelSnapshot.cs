@@ -75,6 +75,70 @@ namespace BotFramework.Db.Migrations
                     b.ToTable("chats", "bot");
                 });
 
+            modelBuilder.Entity("BotFramework.Db.Entity.BotException", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("ChatId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("chat_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("ExceptionMessage")
+                        .HasColumnType("text")
+                        .HasColumnName("exception_message");
+
+                    b.Property<string>("ReportDescription")
+                        .HasColumnType("text")
+                        .HasColumnName("report_description");
+
+                    b.Property<string>("ReportFileName")
+                        .HasColumnType("text")
+                        .HasColumnName("report_file_name");
+
+                    b.Property<string>("StackTrace")
+                        .HasColumnType("text")
+                        .HasColumnName("stack_trace");
+
+                    b.Property<Guid?>("UpdateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("update_id");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_exceptions");
+
+                    b.HasIndex("ChatId")
+                        .HasDatabaseName("ix_exceptions_chat_id");
+
+                    b.HasIndex("UpdateId")
+                        .HasDatabaseName("ix_exceptions_update_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_exceptions_user_id");
+
+                    b.ToTable("exceptions", "bot");
+                });
+
             modelBuilder.Entity("BotFramework.Db.Entity.BotUpdate", b =>
                 {
                     b.Property<Guid>("Id")
@@ -197,6 +261,30 @@ namespace BotFramework.Db.Migrations
                         .HasConstraintName("fk_chats_users_bot_user_id");
 
                     b.Navigation("BotUser");
+                });
+
+            modelBuilder.Entity("BotFramework.Db.Entity.BotException", b =>
+                {
+                    b.HasOne("BotFramework.Db.Entity.BotChat", "Chat")
+                        .WithMany()
+                        .HasForeignKey("ChatId")
+                        .HasConstraintName("fk_exceptions_chats_chat_id");
+
+                    b.HasOne("BotFramework.Db.Entity.BotUpdate", "Update")
+                        .WithMany()
+                        .HasForeignKey("UpdateId")
+                        .HasConstraintName("fk_exceptions_updates_update_id");
+
+                    b.HasOne("BotFramework.Db.Entity.BotUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_exceptions_users_user_id");
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("Update");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BotFramework.Db.Entity.BotUpdate", b =>
