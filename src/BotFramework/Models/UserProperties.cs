@@ -8,13 +8,17 @@ using Newtonsoft.Json;
 namespace BotFramework.Models;
 
 /// <summary>
-/// Класс работы с данными чата.
+/// Cловарь различных типов данных.
 /// </summary>
-public class UserProperties
+/// <remarks>
+/// Реализовано безопасное получение данных из словаря.
+/// Реализована возможность хранить объекты любого типа данных.
+/// </remarks>
+public class ComplexDictionary
 {
     private Dictionary<string, string> _data;
 
-    public UserProperties(Dictionary<string, string> data)
+    public ComplexDictionary(Dictionary<string, string> data)
     {
         _data = data;
     }
@@ -34,7 +38,7 @@ public class UserProperties
             throw new UserPropertiesHasNotValueByKeyException(key);
         }
 
-        return value;
+        return JsonConvert.DeserializeObject<string>(value);
     }
 
     public void Set(string key, object value)

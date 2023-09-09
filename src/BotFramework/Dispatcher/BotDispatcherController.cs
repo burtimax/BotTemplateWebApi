@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -32,6 +33,7 @@ public class BotDispatcherController : BaseBotController
     private readonly BotOptions _botOptions;
     private readonly ISaveUpdateService _saveUpdateService;
     private readonly BotConfiguration _botConfiguration;
+    private readonly ITelegramBotClient _botClient;
 
     public BotDispatcherController(
         IBaseBotRepository botRepository,
@@ -44,6 +46,7 @@ public class BotDispatcherController : BaseBotController
         _saveUpdateService = _context.RequestServices.GetRequiredService<ISaveUpdateService>();
         _botConfiguration = _context.RequestServices.GetRequiredService<IOptions<BotConfiguration>>().Value;
         var loggerFactory = _context.RequestServices.GetRequiredService<ILoggerFactory>();
+        _botClient = _context.RequestServices.GetRequiredService<ITelegramBotClient>();
         _botOptions = (_context.RequestServices.GetRequiredService<IOptions<BotOptions>>())?.Value ?? new();
         _logger = loggerFactory.CreateLogger("Bot");
     }
@@ -88,9 +91,14 @@ public class BotDispatcherController : BaseBotController
             {
                 // Ищем обработчик команды.
                 string command = update.Message.Text;
-                BotCommandHandlerResolver commandHandlerResolver = new(_assembly);
-                Type commandHandler = commandHandlerResolver.GetPriorityCommandHandlerType(command, user.Role)
-                    ?? throw new NotFoundHandlerForCommandException(command, _assembly.GetName().Name);
+                BotCommandHandlerResolver commandHandlerResolver = new(_assembly, Assembly.GetExecutingAssembly());
+                Type? commandHandler = commandHandlerResolver.GetPriorityCommandHandlerType(command, user);
+
+                if (commandHandler == null)
+                {
+                    await _botClient.SendTextMessageAsync(chat.ChatId, "Не понимаю 🤷‍♂️");
+                    throw new NotFoundHandlerForCommandException(command, _assembly.GetName().Name);
+                }
                 
                 // Обрабатываем команду.
                 await ProcessRequestByHandler<BaseBotCommand>(commandHandler, update, chat, user);
@@ -158,8 +166,10 @@ public class BotDispatcherController : BaseBotController
     private Task ProcessRequestByHandler<T>(Type handlerType, Update update, BotChat chat, BotUser user) where T : IBaseBotHandler
     {
         if (handlerType == null) throw new ArgumentNullException(nameof(handlerType));
+
+        Assembly handlerTypeAssembly = handlerType.Assembly;
         
-        T handlerInstance = (T) _assembly.CreateInstance(handlerType.FullName, true, BindingFlags.Default, null,
+        T handlerInstance = (T) handlerTypeAssembly.CreateInstance(handlerType.FullName, true, BindingFlags.Default, null,
             new object[] { HttpContext.RequestServices }, null, null);
 
         if (handlerInstance == null)

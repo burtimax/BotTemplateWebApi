@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BotFramework.Db.Migrations
 {
     [DbContext(typeof(BotDbContext))]
-    [Migration("20230827195613_Init")]
+    [Migration("20230909142916_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,10 +58,10 @@ namespace BotFramework.Db.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Dictionary<string, string>>("_data")
+                    b.Property<Dictionary<string, string>>("_dataDatabaseDictionary")
                         .IsRequired()
                         .HasColumnType("hstore")
-                        .HasColumnName("__data");
+                        .HasColumnName("__data_database_dictionary");
 
                     b.Property<List<string>>("_states")
                         .IsRequired()
@@ -239,10 +239,15 @@ namespace BotFramework.Db.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Dictionary<string, string>>("_data")
+                    b.Property<Dictionary<string, string>>("_claimsDatabaseDictionary")
                         .IsRequired()
                         .HasColumnType("hstore")
-                        .HasColumnName("__data");
+                        .HasColumnName("__claims_database_dictionary");
+
+                    b.Property<Dictionary<string, string>>("_propertiesDatabaseDictionary")
+                        .IsRequired()
+                        .HasColumnType("hstore")
+                        .HasColumnName("__properties_database_dictionary");
 
                     b.HasKey("Id")
                         .HasName("pk_users");

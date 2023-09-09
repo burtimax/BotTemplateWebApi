@@ -18,7 +18,7 @@ namespace BotFramework.Db
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //Определение провайдера необходимо для создания миграции, поэтому пусть пока побудет здесь.
-            // string mockString = "Host=127.0.0.1;Port=5432;Database=bot_framework;Username=postgres;Password=123";
+            // string mockString = "Host=127.0.0.1;Port=5432;Database=test_bot_db;Username=postgres;Password=123";
             // optionsBuilder.UseNpgsql(mockString);
             base.OnConfiguring(optionsBuilder);
         }

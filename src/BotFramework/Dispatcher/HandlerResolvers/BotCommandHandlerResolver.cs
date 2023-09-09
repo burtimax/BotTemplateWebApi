@@ -4,18 +4,19 @@ using System.Linq;
 using System.Reflection;
 using BotFramework.Attributes;
 using BotFramework.Base;
+using BotFramework.Db.Entity;
 
 namespace BotFramework.Dispatcher.HandlerResolvers;
 
 public class BotCommandHandlerResolver
-{ private readonly Assembly _assembly;
+{ private readonly Assembly[] _assemblies;
     private readonly Type _baseBotCommandType = typeof(BaseBotCommand);
 
-    public BotCommandHandlerResolver(Assembly assembly)
+    public BotCommandHandlerResolver(params Assembly[] assemblies)
     {
-        if (assembly is null) throw new ArgumentNullException(nameof(assembly));
+        if (assemblies is null) throw new ArgumentNullException(nameof(assemblies));
         
-        _assembly = assembly;
+        _assemblies = assemblies;
     }
 
     /// <summary>
@@ -23,18 +24,27 @@ public class BotCommandHandlerResolver
     /// </summary>
     /// <param name="command">Наименование состояния чата.</param>
     /// <returns></returns>
-    public Type? GetPriorityCommandHandlerType(string command, string userRole)
+    public Type? GetPriorityCommandHandlerType(string command, BotUser user)
     {
-        IEnumerable<Type>? handlerTypes = FilterBotCommandTypes(_assembly.GetTypes());
+        List<Type>? assembliesTypes = new List<Type>();
+
+        foreach (var assembly in _assemblies)
+        {
+            assembliesTypes.AddRange(assembly.GetTypes());
+        }
+        
+        IEnumerable<Type>? handlerTypes = FilterBotCommandTypes(assembliesTypes);
 
         if (handlerTypes.Any() == false)
         {
             return null;
         }
         
-        IEnumerable<Type> commandHandlerTypes = handlerTypes.Where(t => IsCommandHandler(t, command));
+        IEnumerable<Type> commandHandlerTypes = handlerTypes.Where(t => IsCommandHandler(t, command, user));
 
-        Type? handlerType = GetHandlerTypeWithHighestPriority(commandHandlerTypes, command, userRole);
+        if (commandHandlerTypes == null || commandHandlerTypes.Any() == false) return null;
+        
+        Type? handlerType = GetHandlerTypeWithHighestPriority(commandHandlerTypes, command, user);
 
         return handlerType;
     }
@@ -44,7 +54,7 @@ public class BotCommandHandlerResolver
     /// </summary>
     /// <param name="handlerTypes">Список типов обработчиков команд.</param>
     /// <returns>Наиболее приоритетный обработчик.</returns>
-    private Type GetHandlerTypeWithHighestPriority(IEnumerable<Type> types, string command, string userRole)
+    private Type? GetHandlerTypeWithHighestPriority(IEnumerable<Type> types, string command, BotUser user)
     {
         if (types == null || types.Any() == false)
         {
@@ -54,16 +64,16 @@ public class BotCommandHandlerResolver
         IEnumerable<Type> handlerTypes = FilterBotCommandTypes(types);
         
         List<Type> handlersWithBotCommandAttribute = handlerTypes
-            .Where(t => IsCommandHandler(t, command))
+            .Where(t => IsCommandHandler(t, command, user))
             ?.ToList();
 
         // Если нет обработчиков с атрибутами, тогда вернуть любой.
         if (handlersWithBotCommandAttribute == null || handlersWithBotCommandAttribute.Any() == false)
         {
-            return types.First();
+            return handlerTypes.FirstOrDefault();
         }
         
-        FilterStateHandlersForUserRole(userRole, ref handlersWithBotCommandAttribute);
+        FilterStateHandlersForUser(user, ref handlersWithBotCommandAttribute);
 
         handlersWithBotCommandAttribute.Sort((t1, t2) =>
         {
@@ -84,26 +94,51 @@ public class BotCommandHandlerResolver
     /// Фильтруем обработчики для пользователя.
     /// </summary>
     /// <param name="stateHandlers"></param>
-    void FilterStateHandlersForUserRole(string userRole, ref List<Type> stateHandlers)
+    void FilterStateHandlersForUser(BotUser user, ref List<Type> stateHandlers)
     {
         List<Type> userHandlers = new();
 
+        /// Фильтруем обработчики для пользователя.
         foreach (var type in stateHandlers)
         {
             Attribute[] attributes = Attribute.GetCustomAttributes(type, typeof(BotCommandAttribute));
         
-            bool hasUserRoleAttr = attributes.Any(attr =>
+            // Проверка наличия у пользователя роли для команды
+            bool hasUserRoleAttr = attributes.All(attr =>
             {
                 if (attr is BotCommandAttribute attribute 
-                    && string.Equals(attribute.UserRole,userRole, StringComparison.OrdinalIgnoreCase))
+                    && (string.IsNullOrEmpty(attribute.RequiredUserRole) || string.Equals(attribute.RequiredUserRole,user.Role, StringComparison.OrdinalIgnoreCase)))
                 {
                     return true;
                 }
 
                 return false;
             });
+            
+            // Проверяем что у пользователя есть все требуемые разрешения для этого обработчика
+            bool hasUserClaimsAttr = attributes.All(attr =>
+            {
+                if (attr is BotCommandAttribute attribute)
+                {
+                    if (attribute.RequiredUserClaims == null) return true;
+                    
+                    foreach (var claim in attribute.RequiredUserClaims)
+                    {
+                        if (user.Claims.Contains(claim) == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    return false;
+                }
 
-            if (hasUserRoleAttr)
+                return true;
+            });
+
+            if (hasUserRoleAttr && hasUserClaimsAttr)
             {
                 userHandlers.Add(type);
             }
@@ -138,7 +173,7 @@ public class BotCommandHandlerResolver
     /// <param name="handlerType">Тип обработчика.</param>
     /// <param name="command">Команда от пользователя.</param>
     /// <returns></returns>
-    private bool IsCommandHandler(Type handlerType, string command)
+    private bool IsCommandHandler(Type handlerType, string command, BotUser user)
     {
         Attribute[] attributes = Attribute.GetCustomAttributes(handlerType, typeof(BotCommandAttribute));
         

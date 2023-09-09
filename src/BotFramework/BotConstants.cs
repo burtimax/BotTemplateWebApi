@@ -2,9 +2,22 @@
 {
     public class BotConstants
     {
+        /// <summary>
+        /// Основные пользовательские роли.
+        /// </summary>
         public class UserRoles
         {
             public const string User = "user";
+            public const string Admin = "admin";
+            public const string Moderator = "moderator";
+        }
+
+        /// <summary>
+        /// Пользовательские свойства администратора.
+        /// </summary>
+        public class AdminClaims
+        {
+            public const string LastPasswordClaim = "last_password";
         }
 
         /// <summary>

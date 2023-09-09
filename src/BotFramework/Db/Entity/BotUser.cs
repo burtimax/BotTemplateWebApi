@@ -53,16 +53,37 @@ namespace BotFramework.Db.Entity
         /// <remarks>
         /// Не переименовывать свойство, потому что оно в модели БД <seealso cref="BotDbContext.OnModelCreating"/>
         /// </remarks>
-        private Dictionary<string, string> _data = new ();
+        private Dictionary<string, string> _propertiesDatabaseDictionary = new ();
+        
+        /// <summary>
+        /// Словарь для хранения разрешений пользователя (динамически).
+        /// </summary>
+        /// <remarks>
+        /// Не переименовывать свойство, потому что оно в модели БД <seealso cref="BotDbContext.OnModelCreating"/>
+        /// </remarks>
+        private Dictionary<string, string> _claimsDatabaseDictionary = new ();
 
         #region NotMappedData
         
-        private UserProperties? _userProperties = null;
+        private ComplexDictionary? _optionalProperties = null;
 
         /// <summary>
-        /// Свойство для работы с временными данными чата.
+        /// Свойство для работы c динамическими полями пользователя.
         /// </summary>
-        [NotMapped] public UserProperties UserProperties => _userProperties ??= new UserProperties(_data);
+        /// <remarks>
+        /// Для того, чтобы динамически можно было расширять информацию по пользователю.
+        /// </remarks>
+        [NotMapped] public ComplexDictionary OptionalProperties => _optionalProperties ??= new ComplexDictionary(_propertiesDatabaseDictionary);
+        
+        private ComplexDictionary? _claims = null;
+        
+        /// <summary>
+        /// Свойство для работы c динамическими разрешениями пользователя.
+        /// </summary>
+        /// <remarks>
+        /// Для того, чтобы динамически можно было управлять разрешениями пользователя.
+        /// </remarks>
+        [NotMapped] public ComplexDictionary Claims => _optionalProperties ??= new ComplexDictionary(_claimsDatabaseDictionary);
         
         #endregion
         

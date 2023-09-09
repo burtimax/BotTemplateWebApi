@@ -41,16 +41,16 @@ namespace BotFramework.Db.Entity
         /// <remarks>
         /// Не переименовывать свойство, потому что оно в модели БД <seealso cref="BotDbContext.OnModelCreating"/>
         /// </remarks>
-        private Dictionary<string, string> _data = new ();
+        private Dictionary<string, string> _dataDatabaseDictionary = new ();
     
         #region NotMappedData
         
-        private ChatData? _chatData = null;
+        private ComplexDictionary? _chatData = null;
 
         /// <summary>
         /// Свойство для работы с временными данными чата.
         /// </summary>
-        [NotMapped] public ChatData Data =>  _chatData ??= new ChatData(_data);
+        [NotMapped] public ComplexDictionary Data =>  _chatData ??= new ComplexDictionary(_dataDatabaseDictionary);
 
         private ChatStates? _chatStates;
         

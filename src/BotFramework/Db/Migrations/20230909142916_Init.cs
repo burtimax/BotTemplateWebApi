@@ -31,7 +31,8 @@ namespace BotFramework.Db.Migrations
                     status = table.Column<string>(type: "text", nullable: true),
                     telegram_firstname = table.Column<string>(type: "text", nullable: true),
                     telegram_lastname = table.Column<string>(type: "text", nullable: true),
-                    __data = table.Column<Dictionary<string, string>>(type: "hstore", nullable: false),
+                    __claims_database_dictionary = table.Column<Dictionary<string, string>>(type: "hstore", nullable: false),
+                    __properties_database_dictionary = table.Column<Dictionary<string, string>>(type: "hstore", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
@@ -51,7 +52,7 @@ namespace BotFramework.Db.Migrations
                     telegram_id = table.Column<long>(type: "bigint", nullable: true),
                     telegram_username = table.Column<string>(type: "text", nullable: true),
                     bot_user_id = table.Column<long>(type: "bigint", nullable: false),
-                    __data = table.Column<Dictionary<string, string>>(type: "hstore", nullable: false),
+                    __data_database_dictionary = table.Column<Dictionary<string, string>>(type: "hstore", nullable: false),
                     __states = table.Column<List<string>>(type: "text[]", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),

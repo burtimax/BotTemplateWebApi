@@ -94,13 +94,14 @@ public class BotDbContextConfiguration
         // <see href="https://learn.microsoft.com/ru-ru/ef/core/modeling/backing-field?tabs=data-annotations">
         modelBuilder.Entity<BotChat>(entity =>
         {
-            entity.Property("_data");
+            entity.Property("_dataDatabaseDictionary");
         });
 
         // Хранение свойств пользователя.
         modelBuilder.Entity<BotUser>(entity =>
         {
-            entity.Property("_data");
+            entity.Property("_propertiesDatabaseDictionary");
+            entity.Property("_claimsDatabaseDictionary");
         });
         
         modelBuilder.Entity<BotChat>()

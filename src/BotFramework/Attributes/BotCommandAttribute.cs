@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BotFramework.Attributes;
 
@@ -6,12 +8,18 @@ public class BotCommandAttribute : Attribute
 {
     public string Command { get; set; }
     public double Version { get; set; }
-    public string UserRole { get; set; }
-
-    public BotCommandAttribute(string command, string userRole = null, double version = 0.0D)
+    public string? RequiredUserRole { get; set; }
+    
+    public List<string>? RequiredUserClaims { get; set; }
+    
+    public BotCommandAttribute(string command, 
+        string requiredUserRole = null,
+        string[]? requiredUserClaims = null,
+        double version = 0.0D)
     {
         this.Command = command;
-        UserRole = userRole;
+        this.RequiredUserRole = requiredUserRole;
+        this.RequiredUserClaims = requiredUserClaims != null && requiredUserClaims.Any() ? requiredUserClaims?.ToList() : null;
         this.Version = version;
     }
 }
