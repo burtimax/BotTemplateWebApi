@@ -1,10 +1,9 @@
 ﻿using BotFramework.Attributes;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
+using BotTemplateWebApi.States;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace BotTemplateWebApi.States.TestBot;
+namespace BotTemplateWebApi.BotHandlers.States.TestBot;
 
 [BotState("test")]
 public class TestBotState : BotState

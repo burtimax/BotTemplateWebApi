@@ -23,7 +23,10 @@ namespace BotFramework.Repository
         /// <inheritdoc />
         public Task<BotUser> GetUser(long userId)
         {
-            return _db.Users.SingleAsync(u => u.TelegramId == userId);
+            return _db.Users
+                .Include(u => u.UserClaims)
+                .ThenInclude(uc => uc.Claim)
+                .SingleAsync(u => u.TelegramId == userId);
         }
 
         private async Task<bool> IsUserExists(long userId)

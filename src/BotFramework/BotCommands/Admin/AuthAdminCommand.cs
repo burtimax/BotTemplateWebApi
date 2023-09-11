@@ -46,10 +46,11 @@ public class AuthAdminCommand: BaseBotCommand
         if (string.Equals(password, _botConfiguration.Password) == false)
         {
             await BotClient.SendTextMessageAsync(Chat.ChatId, "Неверный пароль.");
+            return;
         }
 
         this.User.Role = BotConstants.UserRoles.Admin;
-        this.User.Claims.Set(BotConstants.AdminClaims.LastPasswordClaim, password);
+        this.User.AdditionalProperties.Set(BotConstants.AdminProperties.LastPasswordProperty, password);
         await this.BotDbContext.SaveChangesAsync();
         await BotClient.SendTextMessageAsync(Chat.ChatId, "Успешно.\n" +
                                                               "Вы получили роль администратора бота.\n" +

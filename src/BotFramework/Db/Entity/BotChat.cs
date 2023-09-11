@@ -1,38 +1,44 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using BotFramework.Models;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types;
 
 namespace BotFramework.Db.Entity
 {
     /// <summary>
-    /// Сущность чата
+    /// Сущность чата.
     /// </summary>
+    [Comment("Сущность чата.")]
     public class BotChat : BaseBotEntity<long>
     {
         /// <summary>
-        /// Идентификатор чата в телеграм
+        /// Идентификатор чата в телеграм.
         /// </summary>
+        [Comment("Идентификатор чата в Telegram.")]
         public long? TelegramId { get; set; }
 
         /// <summary>
-        /// Идентификатор чата в телеграм
+        /// Идентификатор чата в телеграм.
         /// </summary>
         /// <remarks>Некоторые чаты вместо long идентификатора имеют username идентификатор</remarks>
+        [Comment("Строковый идентификатор чата в телеграм. Некоторые чаты вместо long идентификатора имеют username идентификатор.")]
         public string? TelegramUsername { get; set; }
 
         /// <summary>
-        /// Внешний ключ на пользователя
+        /// Внешний ключ на пользователя.
         /// </summary>
+        [Comment("Внешний ключ на пользователя.")]
         public long BotUserId { get; set; }
         public BotUser BotUser { get; set; }
 
         /// <summary>
-        /// Состояние чата 
+        /// Состояние чата.
         /// </summary>
         /// <remarks>
         /// Не переименовывать свойство, потому что оно в модели БД <seealso cref="BotDbContext.OnModelCreating"/>
         /// </remarks>
+        [Comment("Состояние чата.")]
         private List<string> _states = new ();
 
         /// <summary>

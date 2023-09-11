@@ -12,14 +12,15 @@ namespace BotFramework.Db
         public DbSet<BotUser> Users { get; set; }
         public DbSet<BotChat> Chats { get; set; }
         public DbSet<BotUpdate> Updates { get; set; }
-        
+        public DbSet<BotClaim> Claims { get; set; }
+        public DbSet<BotUserClaim> UserClaims { get; set; }
         public DbSet<BotException> Exceptions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //Определение провайдера необходимо для создания миграции, поэтому пусть пока побудет здесь.
-            // string mockString = "Host=127.0.0.1;Port=5432;Database=test_bot_db;Username=postgres;Password=123";
-            // optionsBuilder.UseNpgsql(mockString);
+            string mockString = "Host=127.0.0.1;Port=5432;Database=test_bot_db;Username=postgres;Password=123";
+            optionsBuilder.UseNpgsql(mockString);
             base.OnConfiguring(optionsBuilder);
         }
 

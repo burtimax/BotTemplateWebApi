@@ -124,7 +124,7 @@ public class BotCommandHandlerResolver
                     
                     foreach (var claim in attribute.RequiredUserClaims)
                     {
-                        if (user.Claims.Contains(claim) == false)
+                        if (user.UserClaims.Select(c => c.Claim.Name).Contains(claim) == false)
                         {
                             return false;
                         }

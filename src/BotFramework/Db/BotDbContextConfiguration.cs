@@ -30,6 +30,8 @@ public class BotDbContextConfiguration
         builder.Entity<BotUser>().ToTable("users", schema);
         builder.Entity<BotChat>().ToTable("chats", schema);
         builder.Entity<BotUpdate>().ToTable("updates", schema);
+        builder.Entity<BotClaim>().ToTable("claims", schema);
+        builder.Entity<BotUserClaim>().ToTable("user_claims", schema);
         builder.Entity<BotException>().ToTable("exceptions", schema);
     }
     
@@ -101,11 +103,15 @@ public class BotDbContextConfiguration
         modelBuilder.Entity<BotUser>(entity =>
         {
             entity.Property("_propertiesDatabaseDictionary");
-            entity.Property("_claimsDatabaseDictionary");
         });
         
         modelBuilder.Entity<BotChat>()
-            .Property("_states");   
+            .Property("_states");
+
+        // Ограничение Unique на разрешения пользователя. 
+        modelBuilder.Entity<BotUserClaim>()
+            .HasIndex(uc => new { uc.UserId, uc.ClaimId })
+            .IsUnique();
     }
 
     private static void SetIndexes(ModelBuilder modelBuilder)

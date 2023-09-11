@@ -15,9 +15,9 @@
         /// <summary>
         /// Пользовательские свойства администратора.
         /// </summary>
-        public class AdminClaims
+        public class AdminProperties
         {
-            public const string LastPasswordClaim = "last_password";
+            public const string LastPasswordProperty = "last_password";
         }
 
         /// <summary>
