@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using BotFramework.Db;
 using BotFramework.Db.Entity;
+using BotFramework.Dto;
 using BotFramework.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +23,7 @@ public abstract class BaseBotState : ControllerBase, IBaseBotHandler
 {
     /// <inheritdoc/>
     public BotUser User { get; set; }
-    
+
     /// <inheritdoc/>
     public BotChat Chat { get; set; }
     
@@ -32,6 +36,9 @@ public abstract class BaseBotState : ControllerBase, IBaseBotHandler
     /// <inheritdoc/>
     public ITelegramBotClient BotClient { get; set; }
     
+    /// <inheritdoc/>
+    public IReadOnlyList<ClaimValue> UserClaims { get; set; }
+
     public BaseBotState(IServiceProvider serviceProvider)
     {
         BotClient = serviceProvider.GetRequiredService<ITelegramBotClient>();

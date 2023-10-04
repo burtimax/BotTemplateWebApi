@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Claims;
 using BotFramework.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -62,13 +63,7 @@ namespace BotFramework.Db.Entity
         /// </summary>
         [Comment("Фамилия пользователя в Telegram.")]
         public string? TelegramLastname { get; set; }
-
-        /// <summary>
-        /// Разрешения пользователя.
-        /// Связь с сущностями <see cref="BotUserClaim"/>.
-        /// </summary>
-        public virtual List<BotUserClaim> UserClaims { get; set; }
-
+        
         /// <summary>
         /// Словарь для хранения свойств пользователя (динамически).
         /// </summary>

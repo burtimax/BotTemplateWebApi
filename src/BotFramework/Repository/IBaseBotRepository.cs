@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using BotFramework.Db.Entity;
 using BotFramework.Dto;
 using TelegramModel = Telegram.Bot.Types;
@@ -45,5 +47,39 @@ namespace BotFramework.Repository
         /// Добавить сообщение.
         /// </summary>
         Task<BotUpdate> AddUpdate(SaveUpdateDto updateDto);
+
+        /// <summary>
+        /// Получить разрешения пользователя.
+        /// </summary>
+        /// <param name="userId">ИД пользователя.</param>
+        /// <returns>Список разрешений пользователя.</returns>
+        Task<IEnumerable<BotClaim>?> GetUserClaims(long userId);
+        
+        /// <summary>
+        /// Добавить разрешение пользователю.
+        /// </summary>
+        /// <remarks>
+        /// Если разрешение уже есть, то добавлять не следует.
+        /// </remarks>
+        /// <param name="userId">ИД пользователя.</param>
+        /// <param name="claim">Наименование разрешения.</param>
+        /// <returns></returns>
+        Task AddClaimToUser(long userId, string claim);
+        
+        /// <summary>
+        /// Отменить разрешение у пользователя.
+        /// </summary>
+        /// <param name="userId">ИД пользователя.</param>
+        /// <param name="claim">Наименование разрешения.</param>
+        /// <returns></returns>
+        Task RemoveClaimFromUser(long userId, string claim);
+
+        /// <summary>
+        /// Проверка доступности разрешений у пользователя.
+        /// </summary>
+        /// <param name="userId">ИД пользователя.</param>
+        /// <param name="claims">Наименования разрешений.</param>
+        /// <returns></returns>
+        Task<bool> HasUserClaims(long userId, params string[] claims);
     }
 }

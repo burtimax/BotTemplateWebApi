@@ -1,6 +1,9 @@
-﻿using BotFramework.Attributes;
+﻿using BotFramework;
+using BotFramework.Attributes;
+using BotFramework.Db.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

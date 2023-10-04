@@ -36,4 +36,19 @@
     <Folder Include="Db\Migrations" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="BotConstants.Claims.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BotConstants.Constraints.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BotConstants.UserProperties.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BotConstants.UserRoles.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

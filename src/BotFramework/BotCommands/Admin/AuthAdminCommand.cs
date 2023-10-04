@@ -6,6 +6,7 @@ using BotFramework.Base;
 using BotFramework.Db;
 using BotFramework.Options;
 using BotFramework.Other.ReportGenerator;
+using BotFramework.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
@@ -24,10 +25,12 @@ public class AuthAdminCommand: BaseBotCommand
     internal const string AUTH = "/auth";
 
     private readonly BotConfiguration _botConfiguration;
+    private readonly IBaseBotRepository _botRepository;
     
     public AuthAdminCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        _botRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
     }
 
     public override async Task HandleBotRequest(Update update)
@@ -49,7 +52,7 @@ public class AuthAdminCommand: BaseBotCommand
             return;
         }
 
-        this.User.Role = BotConstants.UserRoles.Admin;
+        await _botRepository.AddClaimToUser(User.Id, BotConstants.BaseBotClaims.IAmBruceAlmighty);
         this.User.AdditionalProperties.Set(BotConstants.AdminProperties.LastPasswordProperty, password);
         await this.BotDbContext.SaveChangesAsync();
         await BotClient.SendTextMessageAsync(Chat.ChatId, "Успешно.\n" +

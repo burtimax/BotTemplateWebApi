@@ -61,9 +61,9 @@ public class BotExceptionHandler
 
             string caption = captionBuilder.ToString();
 
-            if (caption.Length > BotConstants.Bounds.MaxDocumentCaption)
+            if (caption.Length > BotConstants.Constraints.MaxDocumentCaption)
             {
-                caption = caption.Substring(0, BotConstants.Bounds.MaxDocumentCaption);
+                caption = caption.Substring(0, BotConstants.Constraints.MaxDocumentCaption);
             }
             
             // Отправляем модератору.
