@@ -42,7 +42,7 @@ public static class IServiceCollectionExtension
             
             IEnumerable<ClaimValue> baseClaims = BotConstants.BaseBotClaims.GetBaseBotClaims();
             
-            DatabaseBootstrapper.InitializeClaimsIfNeed(botDbContext, 
+            DatabaseBootstrapper.InitializeClaims(botDbContext, 
                     (claims == null || claims.Any() == false) ? baseClaims : baseClaims.Concat(claims))
                 .ConfigureAwait(false)
                 .GetAwaiter()

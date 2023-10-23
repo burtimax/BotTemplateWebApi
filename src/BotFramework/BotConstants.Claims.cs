@@ -68,8 +68,16 @@ namespace BotFramework
             /// </summary>
             public const string BotCommandGet = "base.bot.command.get";
             public const string BotCommandGetDescription = "Получение списка доступных команд управления.";
-
-
+            
+            /// <summary>
+            /// Получение списка всех разрешений бота.
+            /// </summary>
+            /// <remarks>
+            /// Удобно использовать админу, как подсказка.
+            /// </remarks>
+            public const string BotClaimsGet = "base.bot.claims.get";
+            public const string BotClaimsGetDescription = "Получение списка всех разрешений бота.";
+            
             /// <summary>
             /// Получить все базовые клэймы бота.
             /// </summary>

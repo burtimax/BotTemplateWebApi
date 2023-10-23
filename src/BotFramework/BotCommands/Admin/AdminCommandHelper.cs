@@ -8,7 +8,7 @@ namespace BotFramework.BotCommands.Admin;
 
 public class AdminCommandHelper
 {
-    public static async Task<bool> HasUserAccessToCommand(BotUser user, ITelegramBotClient botClient, ChatId chatId, BotConfiguration botConfig)
+    public static async Task<bool> HasUserAccessToCommand(BotUser user, ITelegramBotClient botClient, ChatId chatId, string botPassword)
     {
         if (user.AdditionalProperties.Contains(BotConstants.AdminProperties.LastPasswordProperty) == false)
         {
@@ -18,9 +18,9 @@ public class AdminCommandHelper
         
         string password = user.AdditionalProperties.Get(BotConstants.AdminProperties.LastPasswordProperty);
         
-        if (string.Equals(password, botConfig.Password) == false)
+        if (string.Equals(password, botPassword) == false)
         {
-            await botClient.SendTextMessageAsync(chatId, $"Необходимо авторизоваться. Введите команду {AuthAdminCommand.AUTH}.");
+            await botClient.SendTextMessageAsync(chatId, $"Необходимо авторизоваться. Введите команду {AuthCommand.Name}.");
             return false;
         }
 

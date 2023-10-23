@@ -16,7 +16,14 @@ namespace BotFramework.Repository
         /// <summary>
         /// Получить пользователя по ИД.
         /// </summary>
-        Task<BotUser> GetUser(long userId);
+        Task<BotUser?> GetUser(long userId);
+        
+        /// <summary>
+        /// Получить пользователя по @username.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        Task<BotUser?> GetUser(string username);
 
         /// <summary>
         /// Добавить пользователя или обновить информацию по нему.
@@ -81,5 +88,24 @@ namespace BotFramework.Repository
         /// <param name="claims">Наименования разрешений.</param>
         /// <returns></returns>
         Task<bool> HasUserClaims(long userId, params string[] claims);
+
+        /// <summary>
+        /// Получить все разрешения имеющиеся у бота.
+        /// </summary>
+        public Task<IEnumerable<BotClaim>> GetAllClaims(bool hideBruceClaim = false);
+
+        /// <summary>
+        /// Получение claim по наименованию.
+        /// </summary>
+        /// <param name="name">Наименование клэйма.</param>
+        /// <returns></returns>
+        public Task<BotClaim?> GetClaimByName(string name);
+
+        /// <summary>
+        /// Получение claim по ИД.
+        /// </summary>
+        /// <param name="name">Идентификатор клэйма.</param>
+        /// <returns></returns>
+        public Task<BotClaim?> GetClaimById(long id);
     }
 }

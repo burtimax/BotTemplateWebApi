@@ -19,7 +19,7 @@ public class DatabaseBootstrapper
     /// </summary>
     /// <param name="db"></param>
     /// <param name="claims"></param>
-    public static async Task InitializeClaimsIfNeed(BotDbContext db, IEnumerable<ClaimValue> claims)
+    public static async Task InitializeClaims(BotDbContext db, IEnumerable<ClaimValue> claims)
     {
         if (claims == null || claims.Any() == false) throw new ArgumentNullException(nameof(claims));
         

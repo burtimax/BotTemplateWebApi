@@ -23,10 +23,17 @@ namespace BotFramework.Repository
         }
         
         /// <inheritdoc />
-        public Task<BotUser> GetUser(long userId)
+        public Task<BotUser?> GetUser(long userId)
         {
             return _db.Users
-                .SingleAsync(u => u.TelegramId == userId);
+                .SingleOrDefaultAsync(u => u.TelegramId == userId);
+        }
+
+        /// <inheritdoc />
+        public async Task<BotUser?> GetUser(string username)
+        {
+            username = username.Trim('@');
+            return await _db.Users.SingleOrDefaultAsync(u => u.TelegramUsername == username);
         }
 
         private async Task<bool> IsUserExists(long userId)
@@ -115,6 +122,12 @@ namespace BotFramework.Repository
                 .Select(uc => uc.Claim)
                 .ToListAsync();
 
+            // У Брюса Всемогущего есть все разрешения.
+            if (HasBruceAlmightyClaim(claims))
+            {
+                return await GetAllClaims();
+            }
+            
             if (claims.Any() == false) return null;
 
             return claims;
@@ -165,6 +178,12 @@ namespace BotFramework.Repository
             if (userClaims == null) return false;
             if (userClaims.Count > claims.Length) throw new Exception();
 
+            // У брюса всемогущего есть все разрешения.
+            if (HasBruceAlmightyClaim(userClaims.Select(uc => uc.Claim)))
+            {
+                return true;
+            }
+            
             foreach (string claim in claims)
             {
                 bool found = userClaims.Any(uc => uc.Claim.Name == claim);
@@ -174,15 +193,38 @@ namespace BotFramework.Repository
 
             return true;
         }
+        
+        /// <inheritdoc />
+        public async Task<IEnumerable<BotClaim>> GetAllClaims(bool hideBruceClaim = false)
+        {
+            var claims = _db.Claims.Where(c => true);
 
-        /// <summary>
-        /// Получение claim по наименованию.
-        /// </summary>
-        /// <param name="name">Наименование клэйма.</param>
-        /// <returns></returns>
-        private Task<BotClaim?> GetClaimByName(string name)
+            if (hideBruceClaim)
+            {
+                claims = claims.Where(c => c.Name != BotConstants.BaseBotClaims.IAmBruceAlmighty);
+            }
+
+            return await claims.ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public Task<BotClaim?> GetClaimByName(string name)
         {
             return _db.Claims.SingleOrDefaultAsync(c => c.Name == name);
         }
+        
+        /// <inheritdoc />
+        public Task<BotClaim?> GetClaimById(long id)
+        {
+            return _db.Claims.SingleOrDefaultAsync(c => c.Id == id);
+        }
+
+        /// <summary>
+        /// Если это Брюс Всемогущий????
+        /// </summary>
+        /// <param name="claims"></param>
+        /// <returns>TRUE - если пользователь - Брюс Всемогущий!!!!</returns>
+        private bool HasBruceAlmightyClaim(IEnumerable<BotClaim> claims) =>
+            claims.Any(c => c.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty);
     }
 }

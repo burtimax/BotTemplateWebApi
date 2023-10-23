@@ -19,15 +19,15 @@ namespace BotFramework.BotCommands.Admin;
 /// Админов может быть несколько.
 /// Пример команды: [/auth {ПАРОЛЬ БОТА}]
 /// </summary>
-[BotCommand(AUTH, BotConstants.UserRoles.Moderator)]
-public class AuthAdminCommand: BaseBotCommand
+[BotCommand(Name, BotConstants.UserRoles.Moderator)]
+public class AuthCommand: BaseBotCommand
 {
-    internal const string AUTH = "/auth";
+    internal const string Name = "/auth";
 
     private readonly BotConfiguration _botConfiguration;
     private readonly IBaseBotRepository _botRepository;
     
-    public AuthAdminCommand(IServiceProvider serviceProvider) : base(serviceProvider)
+    public AuthCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
         _botRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
@@ -40,7 +40,7 @@ public class AuthAdminCommand: BaseBotCommand
         {
             await BotClient.SendTextMessageAsync(Chat.ChatId,
                 $"Команда не правильна, введите пароль админа.\n" +
-                    $"Например: [{AUTH} ПАРОЛЬ]");
+                    $"Например: [{Name} ПАРОЛЬ]");
             return;
         }
 
@@ -57,6 +57,6 @@ public class AuthAdminCommand: BaseBotCommand
         await this.BotDbContext.SaveChangesAsync();
         await BotClient.SendTextMessageAsync(Chat.ChatId, "Успешно.\n" +
                                                               "Вы получили роль администратора бота.\n" +
-                                                              $"Список команд администратора {InfoAdminCommand.ADMININFO}");
+                                                              $"Список команд администратора {ClaimsCommand.Name}");
     }
 }

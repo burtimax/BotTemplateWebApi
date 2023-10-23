@@ -15,10 +15,10 @@ public class BotActivityReportGenerator
     /// 1 - Общее кол-во запросов
     /// 2 - Общее кол-во ошибок
     /// </summary>
-    private string botReport = "Данные по боту:\n" +
-                               "Кол-во польователей: {0}\n" +
-                               "Кол-во запросов: {1}\n" +
-                               "Кол-во ошибок: {2}\n";
+    private string botReport = "<b>Данные по боту</b>:\n" +
+                               "<i>Кол-во польователей</i>: {0}\n" +
+                               "<i>Кол-во запросов</i>: {1}\n" +
+                               "<i>Кол-во ошибок</i>: {2}\n";
 
     /// <summary>
     /// 0 - Дата начала периода
@@ -28,11 +28,12 @@ public class BotActivityReportGenerator
     /// 4 - Кол-во запросов за период
     /// 5 - Кол-во ошибок за период
     /// </summary>
-    private string periodBotReport = "{0} - {1}\n" +
-                                     "Новые пользователи: {2}\n" +
-                                     "Активные пользователи: {3}\n" +
-                                     "Кол-во запросов: {4}\n" +
-                                     "Кол-во ошибок: {5}\n";
+    private string periodBotReport = "<i>Начало</i> <b>{0}</b>\n" +
+                                     "<i>Конец</i> <b>{1}</b>\n" +
+                                     "<i>Новые пользователи</i>: {2}\n" +
+                                     "<i>Активные пользователи</i>: {3}\n" +
+                                     "<i>Кол-во запросов</i>: {4}\n" +
+                                     "<i>Кол-во ошибок</i>: {5}\n";
     
     /// <summary>
     /// Формируем отчет по активности бота.
@@ -44,6 +45,8 @@ public class BotActivityReportGenerator
     public async Task<string> GetReport(BotDbContext db, DateTime start, DateTime end)
     {
         StringBuilder sb = new();
+
+        int hours = (end - start).Hours;
 
         int summaryUsersCount = await db.Users.CountAsync();
         int summaryUpdatesCount = await db.Updates.CountAsync();
