@@ -18,7 +18,7 @@ namespace BotFramework.BotCommands;
 
 /// <summary>
 /// Команда для отображения всех возможных разрешений бота.
-/// Доступна только суперадмину.
+/// /claims
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotClaimsGet})]
 public class ClaimsCommand: BaseBotCommand

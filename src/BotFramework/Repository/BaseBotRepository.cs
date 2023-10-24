@@ -36,6 +36,63 @@ namespace BotFramework.Repository
             return await _db.Users.SingleOrDefaultAsync(u => u.TelegramUsername == username);
         }
 
+        /// <inheritdoc />
+        public async Task<IEnumerable<BotUser>?> SearchUsers(string searchStr, int skip, int limit)
+        {
+            if (searchStr == null) return null;
+
+            string[] words = searchStr
+                .ToLower()
+                .Trim(' ', '.')
+                .Split(' ', ',', ' ');
+
+            IQueryable<BotUser> query = _db.Users.AsQueryable();
+            foreach (var word in words)
+            {
+                query = query.Where(u => EF.Functions.Like(
+                    u.TelegramId.ToString() + " " + u.TelegramFirstname.ToLower() + " " + u.TelegramLastname.ToLower() + " " + u.TelegramUsername.ToLower(), 
+                    $"%{word.Trim(' ', ',', '@')}%"))
+                    .AsQueryable();
+            }
+
+            return await query.Skip(skip).Take(limit).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<BotUser?> GetUserByIdentity(string userIdentity)
+        {
+            if (long.TryParse(userIdentity, out var numberId))
+            {
+                return await GetUser(numberId);
+            }
+
+            return await GetUser(userIdentity);
+        }
+
+        /// <inheritdoc />
+        public async Task BlockUsers(params long[] userIds)
+        {
+            var users = await _db.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
+            foreach (var user in users)
+            {
+                user.IsBlocked = true;
+            }
+
+            await _db.SaveChangesAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task UnblockUsers(params long[] userIds)
+        {
+            var users = await _db.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
+            foreach (var user in users)
+            {
+                user.IsBlocked = false;
+            }
+
+            await _db.SaveChangesAsync();
+        }
+
         private async Task<bool> IsUserExists(long userId)
         {
             BotUser? u = await _db.Users.FirstOrDefaultAsync(u => u.TelegramId == userId);

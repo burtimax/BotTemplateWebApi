@@ -26,6 +26,38 @@ namespace BotFramework.Repository
         Task<BotUser?> GetUser(string username);
 
         /// <summary>
+        /// Поиск пользователей по строке.
+        /// </summary>
+        /// <param name="searchStr">строка поиска.</param>
+        /// <param name="skip">Параметр пагинации.</param>
+        /// <param name="limit">Параметр пагинации.</param>
+        /// <returns>Пользователи удовлетворяющие строке поиска.</returns>
+        Task<IEnumerable<BotUser>?> SearchUsers(string searchStr, int skip, int limit);
+        
+        /// <summary>
+        /// Получить пользователя по @username или по ИД.
+        /// </summary>
+        /// <param name="userIdentity">Строковое представление @username или по ИД.</param>
+        /// <returns>Пользователь.</returns>
+        Task<BotUser?> GetUserByIdentity(string userIdentity);
+
+        /// <summary>
+        /// Заблокировать пользователей.
+        /// Установить значение параметра <see cref="BotUser.IsBlocked"/> true.
+        /// </summary>
+        /// <param name="userIds">Список ИД пользователей.</param>
+        /// <returns></returns>
+        Task BlockUsers(params long[] userIds);
+        
+        /// <summary>
+        /// Разблокировать пользователей.
+        /// Установить значение параметра <see cref="BotUser.IsBlocked"/> false.
+        /// </summary>
+        /// <param name="userIds">Список ИД пользователей.</param>
+        /// <returns></returns>
+        Task UnblockUsers(params long[] userIds);
+        
+        /// <summary>
         /// Добавить пользователя или обновить информацию по нему.
         /// Обновляет информацию (Firstname, Lastname, Username)
         /// Потому что с прошествием времени может поменяться эта информация.

@@ -19,6 +19,7 @@ namespace BotFramework.BotCommands;
 
 /// <summary>
 /// Команда для отображения всех доступных базовых Telegram команд с учетом разрешений.
+/// /commands
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotClaimsGet})]
 public class CommandsCommand: BaseBotCommand
@@ -51,7 +52,23 @@ public class CommandsCommand: BaseBotCommand
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserClaimCreate))
         {
-            sb.AppendLine($"{SetClaimsCommand.Name} - <i>Установить разрешения пользователю.</i>");
+            sb.AppendLine($"{SetClaimsCommand.Name} - <i>Добавить разрешения пользователю.</i>");
+        }
+        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserClaimDelete))
+        {
+            sb.AppendLine($"{ResetClaimsCommand.Name} - <i>Удалить разрешения у пользователя.</i>");
+        }
+        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserBlock))
+        {
+            sb.AppendLine($"{BlockUserCommand.Name} - <i>Заблокировать пользователей.</i>");
+        }
+        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserUnblock))
+        {
+            sb.AppendLine($"{UnblockUserCommand.Name} - <i>Разблокировать пользователей.</i>");
+        }
+        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserGet))
+        {
+            sb.AppendLine($"{FindUserCommand.Name} - <i>Искать пользователей.</i>");
         }
 
         await BotClient.SendTextMessageAsync(Chat.ChatId, sb.ToString(), ParseMode.Html);

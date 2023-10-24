@@ -11,6 +11,10 @@ using Telegram.Bot.Types.Enums;
 
 namespace BotFramework.BotCommands;
 
+/// <summary>
+/// Команда для получения отчета по работе бота за последние N часов.
+/// /report {number_hours}
+/// </summary>
 [BotCommand(Name, version: 1, 
     RequiredUserClaims = new[] { BotConstants.BaseBotClaims.BotReportGet })]
 public class ReportCommand : BaseBotCommand
