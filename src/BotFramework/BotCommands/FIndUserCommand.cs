@@ -59,7 +59,17 @@ public class FindUserCommand: BaseBotCommand
             return;
         }
         
-        // ToDo сделать вывод пользователей (/uId / Id / @username / Firstname / Lastname)
-        await BotClient.SendTextMessageAsync(Chat.ChatId, string.Join(", ", users.Select(u => u.TelegramId.ToString())));
+        await BotClient.SendTextMessageAsync(Chat.ChatId, $"<b>Найденные пользователи:</b>\n" + GetUsersString(users), ParseMode.Html);
+    }
+
+    private string GetUsersString(IEnumerable<BotUser> users)
+    {
+        StringBuilder sb = new();
+        foreach (BotUser user in users)
+        {
+            sb.AppendLine($"<code>{user.TelegramId}</code> {user.GetUsernameLink()} {user.TelegramFirstname} {user.TelegramLastname}");
+        }
+
+        return sb.ToString();
     }
 }

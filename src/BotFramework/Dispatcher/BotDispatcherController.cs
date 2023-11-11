@@ -69,6 +69,12 @@ public class BotDispatcherController : BaseBotController
 
             if (update == null) throw new NullUpdateModelInMiddleWareException();
 
+            // Необходимо обработать Poll тип запроса, потому что у него нет данных о пользователе и чате.
+            if (update.Type == UpdateType.Poll)
+            {
+                return Ok(); // ToDo добавить делегат обработчик.
+            }
+            
             User? telegramUser = update.GetUser();
             Chat? telegramChat = update.GetChat();
 
@@ -76,12 +82,6 @@ public class BotDispatcherController : BaseBotController
             user = await _botRepository.UpsertUser(telegramUser);
             userClaims = (await _botRepository.GetUserClaims(user.Id))?.Select(c => new ClaimValue(c.Id, c.Name, c.Description));
 
-            // Если пользователь заблокирован, тогда ему не отвечаем!!!
-            if (user.IsBlocked)
-            {
-                // ToDo перенаправить на состояние блокированного пользователя!!!
-            }
-            
             if (user == null)
             {
                 // ToDo добавить отдельный обработчик для типов обновлений с нулевым пользователем.
@@ -92,6 +92,14 @@ public class BotDispatcherController : BaseBotController
             BotChat? existedChat = await _botRepository.GetChat(user.Id);
             chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
             
+            // Если пользователь заблокирован, тогда ему не отвечаем!!!
+            if (user.IsBlocked)
+            {
+                // ToDo перенаправить на состояние блокированного пользователя!!!
+                await _botClient.SendTextMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
+                return Ok();
+            }
+
             // Сохраняем запрос в истории бота.
             if (_botOptions.SaveUpdatesInDatabase)
             {
@@ -127,7 +135,7 @@ public class BotDispatcherController : BaseBotController
                 $"{chat?.States?.CurrentState ?? "_"}",
                 update.Type.ToString()
             );
-    BotStateHandlerResolver resolver = new(_assembly);
+            BotStateHandlerResolver resolver = new(_assembly);
             Type handlerType = resolver.GetPriorityStateHandlerType(currentState, user.Role)
                 ?? throw new NotFoundHandlerForStateException(currentState, _assembly.GetName().Name);
             

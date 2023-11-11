@@ -44,7 +44,7 @@ public class ClaimsCommand: BaseBotCommand
             return;
         }
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, GenerateClaimsListString("Разрешения бота", claims), ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, GenerateClaimsListString(claims, "Разрешения бота"), ParseMode.Html);
     }
 
     /// <summary>
@@ -52,12 +52,16 @@ public class ClaimsCommand: BaseBotCommand
     /// </summary>
     /// <param name="claims">Список разрешений</param>
     /// <returns></returns>
-    public static string GenerateClaimsListString(string title, IEnumerable<BotClaim>? claims)
+    public static string GenerateClaimsListString(IEnumerable<BotClaim>? claims, string title = null)
     {
         if (claims == null) return "<b>Нет разрешений</b>";
         
         StringBuilder sb = new();
-        sb.AppendLine($"<b>{title}:</b>");
+
+        if (string.IsNullOrEmpty(title) == false)
+        {
+            sb.AppendLine($"<b>{title}:</b>");
+        }
 
         foreach (BotClaim claim in claims)
         {

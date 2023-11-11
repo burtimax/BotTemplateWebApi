@@ -19,7 +19,7 @@ namespace BotFramework.BotCommands.Admin;
 /// Админов может быть несколько.
 /// Пример команды: [/auth {ПАРОЛЬ БОТА}]
 /// </summary>
-[BotCommand(Name, BotConstants.UserRoles.Moderator)]
+[BotCommand(Name)]
 public class AuthCommand: BaseBotCommand
 {
     internal const string Name = "/auth";

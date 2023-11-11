@@ -39,7 +39,7 @@ public class SetClaimsCommand: BaseBotCommand
     public override async Task HandleBotRequest(Update update)
     {
         string command = update.Message.Text?.Trim(' ', '.');
-        string[] words = command.Split(' ', ',', '.')[1..];
+        string[] words = command.Split(' ', ',')[1..];
 
         if (words == null || words.Any() == false)
         {
@@ -48,12 +48,12 @@ public class SetClaimsCommand: BaseBotCommand
             return;
         }
 
-        string userParam = words[0];
-        BotUser? user = await _baseBotRepository.GetUserByIdentity(userParam);
+        string userIdentity = words[0];
+        BotUser? user = await _baseBotRepository.GetUserByIdentity(userIdentity);
 
         if (user == null)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найден пользователь [{userParam}].\n" + 
+            await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найден пользователь [{userIdentity}].\n" + 
                                                         "Необходимо указать параметры команды.\n" +
                                                         "Например [/set {@user} {число|строка} {число|строка} ...]");
             return;
@@ -72,25 +72,32 @@ public class SetClaimsCommand: BaseBotCommand
         
         foreach (var claimId in claims)
         {
+            BotClaim? existed;
             if (long.TryParse(claimId, out var numberId))
             {
-                BotClaim? existed = await _baseBotRepository.GetClaimById(numberId);
-                existed ??= await _baseBotRepository.GetClaimByName(claimId);
-
-                if (existed == null)
-                {
-                    await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
-                    throw new NotFoundBotClaim(claimId);
-                }
-
-                claimsToAdd.Add(existed);
+                existed = await _baseBotRepository.GetClaimById(numberId);
             }
+            else
+            {
+                existed = await _baseBotRepository.GetClaimByName(claimId);
+            }
+            
+            if (existed == null)
+            {
+                await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
+                throw new NotFoundBotClaim(claimId);
+            }
+
+            // Нельзя добавлять супер разрешение другим. Оно только у админа.
+            if(existed.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty) continue;
+            
+            claimsToAdd.Add(existed);
         }
 
         await AddClaimsToUser(user.Id, claimsToAdd);
         
         IEnumerable<BotClaim>? userAllClaims = await _baseBotRepository.GetUserClaims(user.Id);
-        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString("Текущие разрешения пользователя", userAllClaims), ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, $"Текущие разрешения пользователя {userIdentity}"), ParseMode.Html);
     }
 
     /// <summary>

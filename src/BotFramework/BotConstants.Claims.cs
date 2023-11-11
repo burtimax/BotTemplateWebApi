@@ -79,6 +79,12 @@ namespace BotFramework
             public const string BotClaimsGetDescription = "Получение списка всех разрешений бота.";
             
             /// <summary>
+            /// Получение отчетов по ошибкам бота.
+            /// </summary>
+            public const string BotExceptionsGet = "base.bot.exception.get";
+            public const string BotExceptionsGetDescription = "Получение отчетов по ошибкам бота.";
+            
+            /// <summary>
             /// Получить все базовые клэймы бота.
             /// </summary>
             /// <returns>Возвращает все константные значения клэймов в виде списка <see cref="ClaimValue"/>.</returns>

@@ -88,7 +88,7 @@ public class BotCommandHandlerResolver
             };
         });
 
-        return handlersWithBotCommandAttribute.First();
+        return handlersWithBotCommandAttribute.FirstOrDefault();
     }
 
     /// <summary>
@@ -145,10 +145,7 @@ public class BotCommandHandlerResolver
             }
         }
 
-        if (userHandlers != null && userHandlers.Any())
-        {
-            stateHandlers = userHandlers;
-        }
+        stateHandlers = userHandlers ?? new List<Type>();
     }
 
     /// <summary>

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +11,7 @@ using BotFramework.Models;
 using BotFramework.Options;
 using BotFramework.Other.ReportGenerator;
 using BotFramework.Repository;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
@@ -66,9 +69,19 @@ public class BotExceptionHandler
                 caption = caption.Substring(0, BotConstants.Constraints.MaxDocumentCaption);
             }
             
-            // Отправляем модератору.
-            await botClient.SendDocumentAsync(chat.ChatId, fileException, caption: caption, parseMode: ParseMode.Html);
-            
+            // Отправляем модераторам и админу.
+            IEnumerable<long> moderatorUserIds = await db.UserClaims.Include(uc => uc.Claim)
+                .Where(uc => uc.Claim.Name == BotConstants.BaseBotClaims.BotExceptionsGet || uc.Claim.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty)
+                .Select(uc => uc.UserId)
+                .ToListAsync();
+            IEnumerable<BotChat> moderatorChats =
+                await db.Chats.Where(c => moderatorUserIds.Contains(c.BotUserId)).ToListAsync();
+
+            foreach (BotChat ch in moderatorChats)
+            {
+                await botClient.SendDocumentAsync(ch.ChatId, fileException, caption: caption, parseMode: ParseMode.Html);
+            }
+
             // Добавляем в БД.
             DateTimeOffset now = DateTime.Now;
             string exceptionFileName = $"{botConfig.Name} {now.ToString("yyyy.MM.dd hh.mm.ss")}.txt";

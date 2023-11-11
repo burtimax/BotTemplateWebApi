@@ -23,10 +23,10 @@ namespace BotFramework.Repository
         }
         
         /// <inheritdoc />
-        public Task<BotUser?> GetUser(long userId)
+        public Task<BotUser?> GetUser(long userTelegramId)
         {
             return _db.Users
-                .SingleOrDefaultAsync(u => u.TelegramId == userId);
+                .SingleOrDefaultAsync(u => u.TelegramId == userTelegramId);
         }
 
         /// <inheritdoc />
@@ -204,6 +204,7 @@ namespace BotFramework.Repository
             };
 
             await _db.UserClaims.AddAsync(botUserClaim);
+            await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />

@@ -14,10 +14,10 @@ namespace BotFramework.Repository
     public interface IBaseBotRepository
     {
         /// <summary>
-        /// Получить пользователя по ИД.
+        /// Получить пользователя по ИД Telegram.
         /// </summary>
-        Task<BotUser?> GetUser(long userId);
-        
+        Task<BotUser?> GetUser(long userTelegramId);
+
         /// <summary>
         /// Получить пользователя по @username.
         /// </summary>

@@ -37,7 +37,7 @@ public class ResetClaimsCommand: BaseBotCommand
     public override async Task HandleBotRequest(Update update)
     {
         string command = update.Message.Text?.Trim(' ', '.');
-        string[] words = command.Split(' ', ',', '.')[1..];
+        string[] words = command.Split(' ', ',')[1..];
 
         if (words == null || words.Any() == false)
         {
@@ -70,25 +70,31 @@ public class ResetClaimsCommand: BaseBotCommand
 
         foreach (var claimId in claims)
         {
+            BotClaim? existed;
             if (long.TryParse(claimId, out var numberId))
             {
-                BotClaim? existed = await _baseBotRepository.GetClaimById(numberId);
-                existed ??= await _baseBotRepository.GetClaimByName(claimId);
-
-                if (existed == null)
-                {
-                    await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
-                    throw new NotFoundBotClaim(claimId);
-                }
-
-                claimsToDelete.Add(existed);
+                existed = await _baseBotRepository.GetClaimById(numberId);
             }
+            else
+            {
+                existed = await _baseBotRepository.GetClaimByName(claimId);
+            }
+            if (existed == null)
+            {
+                await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
+                throw new NotFoundBotClaim(claimId);
+            }
+
+            // Нельзя удалять супер ращрешение у других. Оно только у админа.
+            if(existed.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty) continue;
+            
+            claimsToDelete.Add(existed);
         }
 
         await RemoveClaimsFromUser(user.Id, claimsToDelete);
         
         IEnumerable<BotClaim>? userAllClaims = await _baseBotRepository.GetUserClaims(user.Id);
-        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString("Текущие разрешения пользователя", userAllClaims), ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, "Текущие разрешения пользователя"), ParseMode.Html);
     }
 
     /// <summary>

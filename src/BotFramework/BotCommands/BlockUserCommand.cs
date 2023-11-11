@@ -53,6 +53,14 @@ public class BlockUserCommand: BaseBotCommand
         foreach (string userIdentity in users)
         {
             BotUser? user = await _baseBotRepository.GetUserByIdentity(userIdentity);
+            IEnumerable<BotClaim> userClaims = await _baseBotRepository.GetUserClaims(user.Id);
+            
+            // Админов нельзя блокировать.
+            if (userClaims!= null && 
+                userClaims.Any(uc => uc.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty))
+            {
+                continue;
+            }
 
             if (user == null)
             {
@@ -65,6 +73,8 @@ public class BlockUserCommand: BaseBotCommand
             usersToBlock.Add(user);
         }
 
+        
+        
         await _baseBotRepository.BlockUsers(usersToBlock.Select(u => u.Id).ToArray());
 
         await BotClient.SendTextMessageAsync(Chat.ChatId, "Пользователи заблокированы.");

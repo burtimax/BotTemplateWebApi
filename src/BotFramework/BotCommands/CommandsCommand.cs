@@ -21,7 +21,7 @@ namespace BotFramework.BotCommands;
 /// Команда для отображения всех доступных базовых Telegram команд с учетом разрешений.
 /// /commands
 /// </summary>
-[BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotClaimsGet})]
+[BotCommand(Name, version: 1.0f)]
 public class CommandsCommand: BaseBotCommand
 {
     internal const string Name = "/commands";
