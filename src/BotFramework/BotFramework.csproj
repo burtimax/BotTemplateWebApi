@@ -6,7 +6,7 @@
     <RootNamespace>BotFramework</RootNamespace>
     <Nullable>enable</Nullable>
     <PackageId>Burtimax.TelegramBot.Framework</PackageId>
-    <PackageVersion>1.0.1</PackageVersion>
+    <PackageVersion>1.1.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,6 +34,21 @@
 
   <ItemGroup>
     <Folder Include="Db\Migrations" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="BotConstants.Claims.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BotConstants.Constraints.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BotConstants.UserProperties.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BotConstants.UserRoles.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

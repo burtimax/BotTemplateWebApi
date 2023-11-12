@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using BotFramework.Db;
+using BotFramework.Dto;
 using BotFramework.Options;
 using BotFramework.Other;
 using BotFramework.Repository;
@@ -17,7 +20,7 @@ namespace BotFramework.Extensions;
 public static class IServiceCollectionExtension
 {
     public static IServiceCollection AddBot(this IServiceCollection services, BotConfiguration botConfiguration,
-        Action<BotOptions> botOptions = null)
+        IEnumerable<ClaimValue>? claims = null, Action<BotOptions> botOptions = null)
     {
         TelegramBotClient botClient = new(botConfiguration.TelegramToken);
         botClient.SetWebhookAsync(botConfiguration.Webhook).Wait();
@@ -36,6 +39,14 @@ public static class IServiceCollectionExtension
         using (BotDbContext botDbContext = new BotDbContext(ob.Options))
         {
             botDbContext.Database.Migrate();
+            
+            IEnumerable<ClaimValue> baseClaims = BotConstants.BaseBotClaims.GetBaseBotClaims();
+            
+            DatabaseBootstrapper.InitializeClaims(botDbContext, 
+                    (claims == null || claims.Any() == false) ? baseClaims : baseClaims.Concat(claims))
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult();
         }
         
         // Регистрируем сервисы.

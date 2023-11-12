@@ -1,12 +1,12 @@
 ﻿{
-  "Hello" : "Hellosha",
+  "Hello" : "Привет",
   "Common" : {
-    "DefaultAnswer" : "Ответ по умолчанию :)" // Ответ по умолчанию для бота.
+    "DefaultAnswer" : "Ответ по умолчанию :)"
   },
-  "Test" : { // Тестовое состояние
-    "Introduction" : "Привет, бро, {{Test.Farewell}})",
-    "Farewell" : "shit nigga",
+  "Test" : { 
+    "Introduction" : "Привет, {{Test.Farewell}})",
+    "Farewell" : "Пока",
     "Keyboard" : "[{{Test.Introduction}}] [{{Common.DefaultAnswer}}] [ ] \n [ ] [ ] [ ] ",
-    "Goodbye" : "Goodbye {{Test.Farewell}}"
+    "Goodbye" : "До свидания {{Test.Farewell}}"
   }
 }

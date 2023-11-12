@@ -10,16 +10,16 @@ public class BotCommandAttribute : Attribute
     public double Version { get; set; }
     public string? RequiredUserRole { get; set; }
     
-    public List<string>? RequiredUserClaims { get; set; }
+    public string[] RequiredUserClaims { get; set; }
     
     public BotCommandAttribute(string command, 
         string requiredUserRole = null,
-        string[]? requiredUserClaims = null,
+        string[] requiredUserClaims = null,
         double version = 0.0D)
     {
         this.Command = command;
         this.RequiredUserRole = requiredUserRole;
-        this.RequiredUserClaims = requiredUserClaims != null && requiredUserClaims.Any() ? requiredUserClaims?.ToList() : null;
+        this.RequiredUserClaims = requiredUserClaims != null && requiredUserClaims.Any() ? requiredUserClaims : null;
         this.Version = version;
     }
 }

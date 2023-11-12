@@ -5,6 +5,7 @@ using System.Reflection;
 using BotFramework.Attributes;
 using BotFramework.Base;
 using BotFramework.Db.Entity;
+using BotFramework.Dto;
 
 namespace BotFramework.Dispatcher.HandlerResolvers;
 
@@ -24,7 +25,7 @@ public class BotCommandHandlerResolver
     /// </summary>
     /// <param name="command">Наименование состояния чата.</param>
     /// <returns></returns>
-    public Type? GetPriorityCommandHandlerType(string command, BotUser user)
+    public Type? GetPriorityCommandHandlerType(string command, BotUser user, IEnumerable<ClaimValue>? userClaims)
     {
         List<Type>? assembliesTypes = new List<Type>();
 
@@ -44,7 +45,7 @@ public class BotCommandHandlerResolver
 
         if (commandHandlerTypes == null || commandHandlerTypes.Any() == false) return null;
         
-        Type? handlerType = GetHandlerTypeWithHighestPriority(commandHandlerTypes, command, user);
+        Type? handlerType = GetHandlerTypeWithHighestPriority(commandHandlerTypes, command, user, userClaims);
 
         return handlerType;
     }
@@ -54,7 +55,7 @@ public class BotCommandHandlerResolver
     /// </summary>
     /// <param name="handlerTypes">Список типов обработчиков команд.</param>
     /// <returns>Наиболее приоритетный обработчик.</returns>
-    private Type? GetHandlerTypeWithHighestPriority(IEnumerable<Type> types, string command, BotUser user)
+    private Type? GetHandlerTypeWithHighestPriority(IEnumerable<Type> types, string command, BotUser user, IEnumerable<ClaimValue>? userClaims)
     {
         if (types == null || types.Any() == false)
         {
@@ -73,7 +74,7 @@ public class BotCommandHandlerResolver
             return handlerTypes.FirstOrDefault();
         }
         
-        FilterStateHandlersForUser(user, ref handlersWithBotCommandAttribute);
+        FilterStateHandlersForUser(user, userClaims, ref handlersWithBotCommandAttribute);
 
         handlersWithBotCommandAttribute.Sort((t1, t2) =>
         {
@@ -87,14 +88,14 @@ public class BotCommandHandlerResolver
             };
         });
 
-        return handlersWithBotCommandAttribute.First();
+        return handlersWithBotCommandAttribute.FirstOrDefault();
     }
 
     /// <summary>
     /// Фильтруем обработчики для пользователя.
     /// </summary>
     /// <param name="stateHandlers"></param>
-    void FilterStateHandlersForUser(BotUser user, ref List<Type> stateHandlers)
+    void FilterStateHandlersForUser(BotUser user, IEnumerable<ClaimValue>? userClaims, ref List<Type> stateHandlers)
     {
         List<Type> userHandlers = new();
 
@@ -124,7 +125,7 @@ public class BotCommandHandlerResolver
                     
                     foreach (var claim in attribute.RequiredUserClaims)
                     {
-                        if (user.Claims.Contains(claim) == false)
+                        if (userClaims == null || userClaims.Select(c => c.Name).Contains(claim) == false)
                         {
                             return false;
                         }
@@ -144,10 +145,7 @@ public class BotCommandHandlerResolver
             }
         }
 
-        if (userHandlers != null && userHandlers.Any())
-        {
-            stateHandlers = userHandlers;
-        }
+        stateHandlers = userHandlers ?? new List<Type>();
     }
 
     /// <summary>

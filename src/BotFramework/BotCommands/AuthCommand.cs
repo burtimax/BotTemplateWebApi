@@ -6,6 +6,7 @@ using BotFramework.Base;
 using BotFramework.Db;
 using BotFramework.Options;
 using BotFramework.Other.ReportGenerator;
+using BotFramework.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
@@ -18,16 +19,18 @@ namespace BotFramework.BotCommands.Admin;
 /// Админов может быть несколько.
 /// Пример команды: [/auth {ПАРОЛЬ БОТА}]
 /// </summary>
-[BotCommand(AUTH, BotConstants.UserRoles.Moderator)]
-public class AuthAdminCommand: BaseBotCommand
+[BotCommand(Name)]
+public class AuthCommand: BaseBotCommand
 {
-    internal const string AUTH = "/auth";
+    internal const string Name = "/auth";
 
     private readonly BotConfiguration _botConfiguration;
+    private readonly IBaseBotRepository _botRepository;
     
-    public AuthAdminCommand(IServiceProvider serviceProvider) : base(serviceProvider)
+    public AuthCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        _botRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
     }
 
     public override async Task HandleBotRequest(Update update)
@@ -37,7 +40,7 @@ public class AuthAdminCommand: BaseBotCommand
         {
             await BotClient.SendTextMessageAsync(Chat.ChatId,
                 $"Команда не правильна, введите пароль админа.\n" +
-                    $"Например: [{AUTH} ПАРОЛЬ]");
+                    $"Например: [{Name} ПАРОЛЬ]");
             return;
         }
 
@@ -46,13 +49,14 @@ public class AuthAdminCommand: BaseBotCommand
         if (string.Equals(password, _botConfiguration.Password) == false)
         {
             await BotClient.SendTextMessageAsync(Chat.ChatId, "Неверный пароль.");
+            return;
         }
 
-        this.User.Role = BotConstants.UserRoles.Admin;
-        this.User.Claims.Set(BotConstants.AdminClaims.LastPasswordClaim, password);
+        await _botRepository.AddClaimToUser(User.Id, BotConstants.BaseBotClaims.IAmBruceAlmighty);
+        this.User.AdditionalProperties.Set(BotConstants.AdminProperties.LastPasswordProperty, password);
         await this.BotDbContext.SaveChangesAsync();
         await BotClient.SendTextMessageAsync(Chat.ChatId, "Успешно.\n" +
                                                               "Вы получили роль администратора бота.\n" +
-                                                              $"Список команд администратора {InfoAdminCommand.ADMININFO}");
+                                                              $"Список команд администратора {ClaimsCommand.Name}");
     }
 }

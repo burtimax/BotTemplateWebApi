@@ -37,9 +37,6 @@ public static class IServiceCollectionExtensions
         BotResourcesBuilder resourcesBuilder = new(json);
         json = resourcesBuilder.Build();
 
-        // var resourcesConfigBuilder = new ConfigurationBuilder().AddJsonFile(resourcesFilePath, false, true);
-        // IConfiguration resourcesConfiguration = resourcesConfigBuilder.Build();
-
         Stream jsonStream = StreamHelper.GenerateStreamFromString(json);
         var resourcesConfigBuilder = new ConfigurationBuilder().AddJsonStream(jsonStream);
         IConfiguration resourcesConfiguration = resourcesConfigBuilder.Build();

@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BotFramework.Db;
 using BotFramework.Db.Entity;
+using BotFramework.Dto;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -12,7 +14,7 @@ public interface IBaseBotHandler
     /// Сущность пользователя (отслеживаемая EF core).
     /// </summary>
     public BotUser User { get; set; }
-    
+
     /// <summary>
     /// Сущность чата (отслеживаемая EF core).
     /// </summary>
@@ -32,6 +34,11 @@ public interface IBaseBotHandler
     /// Клиент телеграм АПИ.
     /// </summary>
     public ITelegramBotClient BotClient { get; set; }
+    
+    /// <summary>
+    /// Разрешения пользователя.
+    /// </summary>
+    public IReadOnlyList<ClaimValue> UserClaims { get; set; }
     
     /// <summary>
     /// Метод-обработчик запроса.

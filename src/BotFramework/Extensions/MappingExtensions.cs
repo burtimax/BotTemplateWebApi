@@ -22,7 +22,7 @@ namespace BotFramework.Extensions
                 TelegramId = user.Id,
                 TelegramUsername = user.Username,
                 Role = role,
-                Status = status
+                LanguageCode = user.LanguageCode,
             };
         }
         

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BotFramework.Db;
 using BotFramework.Db.Entity;
+using BotFramework.Dto;
 using BotFramework.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,8 @@ public abstract class BaseBotCommand : ControllerBase, IBaseBotHandler
         var botConfig = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
         MediaDirectory = botConfig.MediaDirectory;
     }
+
+    public IReadOnlyList<ClaimValue> UserClaims { get; set; }
 
     /// <inheritdoc/>
     public abstract Task HandleBotRequest(Update update);

@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BotFramework.Base;
 using BotFramework.Db.Entity;
 using BotFramework.Dispatcher.HandlerResolvers;
+using BotFramework.Dto;
 using BotFramework.Exceptions;
 using BotFramework.Extensions;
 using BotFramework.Options;
@@ -56,6 +60,7 @@ public class BotDispatcherController : BaseBotController
         // Объявим здесь. Инициализируем далее.
         BotUser user = null;
         BotChat chat = null;
+        IEnumerable<ClaimValue>? userClaims;
         BotUpdate savedUpdate = null;
         
         try
@@ -64,11 +69,18 @@ public class BotDispatcherController : BaseBotController
 
             if (update == null) throw new NullUpdateModelInMiddleWareException();
 
+            // Необходимо обработать Poll тип запроса, потому что у него нет данных о пользователе и чате.
+            if (update.Type == UpdateType.Poll)
+            {
+                return Ok(); // ToDo добавить делегат обработчик.
+            }
+            
             User? telegramUser = update.GetUser();
             Chat? telegramChat = update.GetChat();
 
             // Сохраняем или обновляем информацию о пользователе.
             user = await _botRepository.UpsertUser(telegramUser);
+            userClaims = (await _botRepository.GetUserClaims(user.Id))?.Select(c => new ClaimValue(c.Id, c.Name, c.Description));
 
             if (user == null)
             {
@@ -80,6 +92,14 @@ public class BotDispatcherController : BaseBotController
             BotChat? existedChat = await _botRepository.GetChat(user.Id);
             chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
             
+            // Если пользователь заблокирован, тогда ему не отвечаем!!!
+            if (user.IsBlocked)
+            {
+                // ToDo перенаправить на состояние блокированного пользователя!!!
+                await _botClient.SendTextMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
+                return Ok();
+            }
+
             // Сохраняем запрос в истории бота.
             if (_botOptions.SaveUpdatesInDatabase)
             {
@@ -92,7 +112,7 @@ public class BotDispatcherController : BaseBotController
                 // Ищем обработчик команды.
                 string command = update.Message.Text;
                 BotCommandHandlerResolver commandHandlerResolver = new(_assembly, Assembly.GetExecutingAssembly());
-                Type? commandHandler = commandHandlerResolver.GetPriorityCommandHandlerType(command, user);
+                Type? commandHandler = commandHandlerResolver.GetPriorityCommandHandlerType(command, user, userClaims);
 
                 if (commandHandler == null)
                 {
@@ -101,12 +121,12 @@ public class BotDispatcherController : BaseBotController
                 }
                 
                 // Обрабатываем команду.
-                await ProcessRequestByHandler<BaseBotCommand>(commandHandler, update, chat, user);
+                await ProcessRequestByHandler<BaseBotCommand>(commandHandler, update, chat, user, userClaims);
                 return Ok();
             }
             
             // Получаем текушее состояние чата. 
-            string currentState = chat.States.CurrentState;
+            string currentState = chat.States?.CurrentState ?? BotConstants.StartState;
 
             _logger.LogInformation(LogFormat.ReceiveUpdate, 
                 savedUpdate.Id.ToString(), 
@@ -115,11 +135,11 @@ public class BotDispatcherController : BaseBotController
                 $"{chat?.States?.CurrentState ?? "_"}",
                 update.Type.ToString()
             );
-    BotStateHandlerResolver resolver = new(_assembly);
+            BotStateHandlerResolver resolver = new(_assembly);
             Type handlerType = resolver.GetPriorityStateHandlerType(currentState, user.Role)
                 ?? throw new NotFoundHandlerForStateException(currentState, _assembly.GetName().Name);
             
-            await ProcessRequestByHandler<BaseBotState>(handlerType, update, chat, user);
+            await ProcessRequestByHandler<BaseBotState>(handlerType, update, chat, user, userClaims);
             
             _logger.LogInformation(LogFormat.ProcessedUpdate, savedUpdate.Id.ToString());
 
@@ -163,7 +183,7 @@ public class BotDispatcherController : BaseBotController
     /// <returns></returns>
     /// <exception cref="NotFoundHandlerForStateException">Не найден тип обработчика запроса.</exception>
     /// <exception cref="NotFoundHandlerMethodException">Не найден метод обработчика запроса.</exception>
-    private Task ProcessRequestByHandler<T>(Type handlerType, Update update, BotChat chat, BotUser user) where T : IBaseBotHandler
+    private Task ProcessRequestByHandler<T>(Type handlerType, Update update, BotChat chat, BotUser user, IEnumerable<ClaimValue>? userClaims) where T : IBaseBotHandler
     {
         if (handlerType == null) throw new ArgumentNullException(nameof(handlerType));
 
@@ -180,6 +200,8 @@ public class BotDispatcherController : BaseBotController
         // Инициализируем свойства класса базового состояния бота. 
         handlerInstance.Chat = chat;
         handlerInstance.User = user;
+        handlerInstance.UserClaims = userClaims?.ToList()?.AsReadOnly() 
+                                     ?? new List<ClaimValue>().AsReadOnly();
         
         // Каждое состояние должно быть наследником типа BaseBotState и реализовывать метод HandleBotRequest
 
