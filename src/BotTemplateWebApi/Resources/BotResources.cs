@@ -7,6 +7,5 @@ public partial class BotResources
 {
     public string Hello { get; set; }
     public CommonResources Common { get; set; }
-
     public TestResources Test { get; set; }
 }
