@@ -200,6 +200,7 @@ public class BotDispatcherController : BaseBotController
         // Инициализируем свойства класса базового состояния бота. 
         handlerInstance.Chat = chat;
         handlerInstance.User = user;
+        handlerInstance.Update = update;
         handlerInstance.UserClaims = userClaims?.ToList()?.AsReadOnly() 
                                      ?? new List<ClaimValue>().AsReadOnly();
         

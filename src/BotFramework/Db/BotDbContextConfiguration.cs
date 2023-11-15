@@ -8,6 +8,7 @@ using BotFramework.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Query;
 
 namespace BotFramework.Db;
@@ -16,12 +17,17 @@ public class BotDbContextConfiguration
 {
     private const string schema = "bot";
     
-    public static void ConfigureContext(ModelBuilder builder)
+    internal static void ConfigureContext(ModelBuilder builder)
     {
         SetTableAndSchema(builder);
-        SetFilters(builder);
-        SetOtherConfigs(builder);
         SetIndexes(builder);
+        SetOtherConfigs(builder);
+        SetBaseConfiguration(builder);
+    }
+
+    public static void SetBaseConfiguration(ModelBuilder builder)
+    {
+        SetFilters(builder);
         SetAllTableNamesToSnakeCase(builder);
     }
 
