@@ -25,6 +25,9 @@ public abstract class BaseBotCommand : ControllerBase, IBaseBotHandler
     public BotChat Chat { get; set; }
     
     /// <inheritdoc/>
+    public Update Update { get; set; }
+
+    /// <inheritdoc/>
     public BotDbContext BotDbContext { get; set; }
     
     /// <inheritdoc/>

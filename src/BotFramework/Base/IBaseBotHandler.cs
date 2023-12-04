@@ -19,6 +19,11 @@ public interface IBaseBotHandler
     /// Сущность чата (отслеживаемая EF core).
     /// </summary>
     public BotChat Chat { get; set; }
+
+    /// <summary>
+    /// Запрос.
+    /// </summary>
+    public Update Update { get; set; }
     
     /// <summary>
     /// Контекст базы данных бота.

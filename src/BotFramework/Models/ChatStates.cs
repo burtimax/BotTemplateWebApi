@@ -51,7 +51,7 @@ public class ChatStates
     /// </summary>
     /// <param name="stateName"></param>
     /// <param name="setterType"></param>
-    public void Set(string stateName, ChatStateSetterType setterType)
+    public void Set(string stateName, ChatStateSetterType setterType = ChatStateSetterType.ChangeCurrent)
     {
         switch (setterType)
         {

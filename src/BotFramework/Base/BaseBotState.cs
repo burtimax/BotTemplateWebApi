@@ -28,14 +28,17 @@ public abstract class BaseBotState : ControllerBase, IBaseBotHandler
     public BotChat Chat { get; set; }
     
     /// <inheritdoc/>
+    public Update Update { get; set; }
+
+    /// <inheritdoc/>
     public BotDbContext BotDbContext { get; set; }
-    
+
     /// <inheritdoc/>
     public string MediaDirectory { get; set; }
-    
+
     /// <inheritdoc/>
     public ITelegramBotClient BotClient { get; set; }
-    
+
     /// <inheritdoc/>
     public IReadOnlyList<ClaimValue> UserClaims { get; set; }
 
@@ -49,5 +52,4 @@ public abstract class BaseBotState : ControllerBase, IBaseBotHandler
 
     /// <inheritdoc/>
     public abstract Task HandleBotRequest(Update update);
-   
 }
