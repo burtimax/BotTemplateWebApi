@@ -93,6 +93,19 @@ namespace BotFramework.Repository
             await _db.SaveChangesAsync();
         }
 
+        /// <inheritdoc />
+        public async Task<IEnumerable<BotUser>> GetUsersByClaim(string claimName)
+        {
+            BotClaim claim = await GetClaimByName(claimName) ?? throw new NotFoundBotClaim(claimName);
+            BotClaim superClaim = await GetClaimByName(BotConstants.BaseBotClaims.IAmBruceAlmighty) ?? throw new NotFoundBotClaim(claimName);
+
+            return (await _db.UserClaims
+                .Include(uc => uc.User)
+                .Where(uc => uc.ClaimId == claim.Id || uc.ClaimId == superClaim.Id)
+                .Select(uc => uc.User)
+                .ToListAsync());
+        }
+
         private async Task<bool> IsUserExists(long userId)
         {
             BotUser? u = await _db.Users.FirstOrDefaultAsync(u => u.TelegramId == userId);

@@ -40,6 +40,12 @@ namespace BotFramework
             public const string BotUserClaimGetDescription = "Получение данных по разрешениям пользователей.";
 
             /// <summary>
+            /// Получение данных по разрешениям пользователей.
+            /// </summary>
+            public const string BotUserNotificationSend = "base.bot.user.notification.send";
+            public const string BotUserNotificationSendDescription = "Рассылка уведомлений для пользователей.";
+            
+            /// <summary>
             /// Получение информации по пользователям.
             /// </summary>
             public const string BotUserGet = "base.bot.user.get";

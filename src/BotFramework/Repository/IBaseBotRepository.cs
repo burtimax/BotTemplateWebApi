@@ -56,6 +56,13 @@ namespace BotFramework.Repository
         /// <param name="userIds">Список ИД пользователей.</param>
         /// <returns></returns>
         Task UnblockUsers(params long[] userIds);
+
+        /// <summary>
+        /// Получить пользователей, у которых есть разрешение.
+        /// </summary>
+        /// <param name="claimName">Наименование разрешения.</param>
+        /// <returns>Список пользователей.</returns>
+        Task<IEnumerable<BotUser>> GetUsersByClaim(string claimName);
         
         /// <summary>
         /// Добавить пользователя или обновить информацию по нему.

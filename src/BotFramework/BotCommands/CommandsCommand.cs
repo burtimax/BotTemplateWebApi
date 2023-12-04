@@ -70,12 +70,24 @@ public class CommandsCommand: BaseBotCommand
         {
             sb.AppendLine($"{FindUserCommand.Name} - <i>Искать пользователей.</i>");
         }
+        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserGet))
+        {
+            sb.AppendLine($"{MeCommand.Name} - <i>Получить информацию обо мне.</i>");
+        }
+        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserNotificationSend))
+        {
+            sb.AppendLine($"{NotifyCommand.Name} - <i>Отправить уведомление всем пользователям.</i>");
+        }
+        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserNotificationSend))
+        {
+            sb.AppendLine($"{NotifyTestCommand.Name} - <i>Тестовое уведомление для меня.</i>");
+        }
 
         await BotClient.SendTextMessageAsync(Chat.ChatId, sb.ToString(), ParseMode.Html);
     }
 
     private bool HasUserClaim(string claimName)
     {
-        return UserClaims.Any(uc => uc.Name == claimName);
+        return UserClaims.Any(uc => uc.Name == claimName || uc.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty);
     }
 }
