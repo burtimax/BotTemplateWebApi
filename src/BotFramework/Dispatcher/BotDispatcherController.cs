@@ -69,10 +69,9 @@ public class BotDispatcherController : BaseBotController
 
             if (update == null) throw new NullUpdateModelInMiddleWareException();
 
-            // Необходимо обработать Poll тип запроса, потому что у него нет данных о пользователе и чате.
-            if (update.Type == UpdateType.Poll)
+            if (await HandleSpecifiedRequests(update))
             {
-                return Ok(); // ToDo добавить делегат обработчик.
+                return Ok();
             }
             
             User? telegramUser = update.GetUser();
@@ -160,6 +159,23 @@ public class BotDispatcherController : BaseBotController
         // Отправляем ответ пользователю
     }
 
+    /// <summary>
+    /// Обрабатываем специфичные запросы.
+    /// </summary>
+    /// <param name="update"></param>
+    /// <returns></returns>
+    private async Task<bool> HandleSpecifiedRequests(Update update)
+    {
+        // Необходимо обработать Poll тип запроса, потому что у него нет данных о пользователе и чате.
+        if (update.Type == UpdateType.Poll)
+        {
+            //await (_botOptions?.PollHandler?.Invoke(update.Poll) ?? DefaultHandlers.DefaultPoll.Handler(update.Poll));
+            return true;
+        }
+
+        return false;
+    }
+    
     /// <summary>
     /// Является ли запрос командой бота.
     /// </summary>

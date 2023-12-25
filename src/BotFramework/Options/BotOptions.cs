@@ -1,4 +1,7 @@
-﻿namespace BotFramework.Options;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types;
+
+namespace BotFramework.Options;
 
 public class BotOptions
 {
@@ -16,4 +19,14 @@ public class BotOptions
     /// Нужно ли отчеты по ошибкам в директорию.
     /// </summary>
     public bool SaveExceptionsInDirectory { get; set; } = true;
+    
+    /// <summary>
+    /// Задаем обработчик для Poll запроса.
+    /// </summary>
+    public BotHandlerDelegates.BotPollHandler PollHandler { get; set; }
+    
+    /// <summary>
+    /// Задаем обработчик для запроса удаления бота у пользователя
+    /// </summary>
+    public BotHandlerDelegates.BotDeleteHandler BotDeleteHandler { get; set; }
 }

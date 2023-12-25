@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace BotTemplateWebApi.States.TestBot;
 
@@ -21,7 +22,9 @@ public class TestBotStateV2 : BotState
         int t = 0;
         var r = new Random(DateTime.Now.Millisecond);
         string message = r.Next() % 2 == 0 ? R.Test.Introduction : R.Test.Goodbye;
-        await BotClient.SendTextMessageAsync(Chat.ChatId, message);
+        //await BotClient.SendTextMessageAsync(Chat.ChatId, message);
+        await BotClient.SendPollAsync(Chat.ChatId, "Сколько тебе лет?",
+            new[] {"0-10", "10-20", "20-30", "30-40", "+40"}, false);
         return Ok();
     }
 }

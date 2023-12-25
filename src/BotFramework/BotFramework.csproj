@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <Folder Include="Db\Migrations" />
+    <Folder Include="DefaultHandlers\" />
   </ItemGroup>
 
   <ItemGroup>
