@@ -99,6 +99,15 @@ public class BotDispatcherController : BaseBotController
                 return Ok();
             }
 
+            // Если есть глобальные обработчики запроса, тогда перенаправляем на них.
+            BotPriorityHandlerResolver priorityHandler = new(_assembly, Assembly.GetExecutingAssembly());
+            Type? updateHandler = priorityHandler.GetPriorityTypeHandler(update.Type);
+            if (updateHandler != null)
+            {
+                await ProcessRequestByHandler<BaseBotPriorityHandler>(updateHandler, update, chat, user, savedUpdate, userClaims);
+                return Ok();
+            }
+
             // Сохраняем запрос в истории бота.
             if (_botOptions.SaveUpdatesInDatabase)
             {
@@ -120,27 +129,18 @@ public class BotDispatcherController : BaseBotController
                 }
                 
                 // Обрабатываем команду.
-                await ProcessRequestByHandler<BaseBotCommand>(commandHandler, update, chat, user, userClaims);
+                await ProcessRequestByHandler<BaseBotCommand>(commandHandler, update, chat, user, savedUpdate, userClaims);
                 return Ok();
             }
             
             // Получаем текушее состояние чата. 
             string currentState = chat.States?.CurrentState ?? BotConstants.StartState;
-
-            _logger.LogInformation(LogFormat.ReceiveUpdate, 
-                savedUpdate.Id.ToString(), 
-                $"{user?.TelegramId.ToString() ?? "UnknownUser"}/@{user?.TelegramUsername ?? "_"}",
-                $"{chat?.TelegramId.ToString() ?? "_"}",
-                $"{chat?.States?.CurrentState ?? "_"}",
-                update.Type.ToString()
-            );
+            
             BotStateHandlerResolver resolver = new(_assembly);
             Type handlerType = resolver.GetPriorityStateHandlerType(currentState, user.Role)
                 ?? throw new NotFoundHandlerForStateException(currentState, _assembly.GetName().Name);
             
-            await ProcessRequestByHandler<BaseBotState>(handlerType, update, chat, user, userClaims);
-            
-            _logger.LogInformation(LogFormat.ProcessedUpdate, savedUpdate.Id.ToString());
+            await ProcessRequestByHandler<BaseBotState>(handlerType, update, chat, user, savedUpdate, userClaims);
 
             return Ok();
         }
@@ -199,10 +199,18 @@ public class BotDispatcherController : BaseBotController
     /// <returns></returns>
     /// <exception cref="NotFoundHandlerForStateException">Не найден тип обработчика запроса.</exception>
     /// <exception cref="NotFoundHandlerMethodException">Не найден метод обработчика запроса.</exception>
-    private Task ProcessRequestByHandler<T>(Type handlerType, Update update, BotChat chat, BotUser user, IEnumerable<ClaimValue>? userClaims) where T : IBaseBotHandler
+    private Task ProcessRequestByHandler<T>(Type handlerType, Update update, BotChat chat, BotUser user, BotUpdate? savedUpdate, IEnumerable<ClaimValue>? userClaims) where T : IBaseBotHandler
     {
         if (handlerType == null) throw new ArgumentNullException(nameof(handlerType));
 
+        _logger.LogInformation(LogFormat.ReceiveUpdate, 
+            savedUpdate != null ? savedUpdate.Id.ToString() : "NULL", 
+            $"{user?.TelegramId.ToString() ?? "UnknownUser"}/@{user?.TelegramUsername ?? "_"}",
+            $"{chat?.TelegramId.ToString() ?? "_"}",
+            $"{chat?.States?.CurrentState ?? "_"}",
+            update.Type.ToString()
+        );
+        
         Assembly handlerTypeAssembly = handlerType.Assembly;
         
         T handlerInstance = (T) handlerTypeAssembly.CreateInstance(handlerType.FullName, true, BindingFlags.Default, null,
@@ -230,6 +238,11 @@ public class BotDispatcherController : BaseBotController
             throw new NotFoundHandlerMethodException(handlerMethodName, handlerType?.Name, _assembly.GetName().Name);
         }
         
-        return (Task)handler?.Invoke(handlerInstance, new[] { update });
+        Task result = (Task)handler?.Invoke(handlerInstance, new[] { update });
+        
+        _logger.LogInformation(LogFormat.ProcessedUpdate, 
+            savedUpdate != null ? savedUpdate.Id.ToString() : "NULL");
+
+        return result;
     }
 }
