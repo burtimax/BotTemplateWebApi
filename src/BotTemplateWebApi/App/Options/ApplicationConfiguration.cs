@@ -8,7 +8,4 @@ public class ApplicationConfiguration
     /// Конфигурации бота.
     /// </summary>
     public BotConfiguration Bot { get; set; }
-
-
-    
 }

@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace BotFramework.Attributes;
 
+[AttributeUsage(AttributeTargets.Class)]
 public class BotCommandAttribute : Attribute
 {
     public string Command { get; set; }

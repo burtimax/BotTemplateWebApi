@@ -3,6 +3,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace BotFramework.Attributes;
 
+[AttributeUsage(AttributeTargets.Class)]
 public class BotPriorityHandlerAttribute : Attribute
 {
     public UpdateType UpdateType { get; set; }

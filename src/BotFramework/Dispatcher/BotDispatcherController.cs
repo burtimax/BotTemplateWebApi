@@ -68,11 +68,6 @@ public class BotDispatcherController : BaseBotController
             HttpRequest request = _context.Request;
 
             if (update == null) throw new NullUpdateModelInMiddleWareException();
-
-            if (await HandleSpecifiedRequests(update))
-            {
-                return Ok();
-            }
             
             User? telegramUser = update.GetUser();
             Chat? telegramChat = update.GetChat();
