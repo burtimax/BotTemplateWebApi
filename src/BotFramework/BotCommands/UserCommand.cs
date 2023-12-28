@@ -57,7 +57,7 @@ public class UserCommand : BaseBotCommand
             return;
         }
 
-        BotChat? userChat = await _baseBotRepository.GetChat(user.Id);
+        BotChat? userChat = await _baseBotRepository.GetChat(Chat.ChatId, user.Id);
         IEnumerable<BotClaim>? claims = await _baseBotRepository.GetUserClaims(user.Id);
         string userData = GetUserDataString(user!, userChat, claims);
 

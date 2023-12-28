@@ -137,22 +137,22 @@ namespace BotFramework.Repository
         }
 
         /// <inheritdoc />
-        public Task<BotChat?> GetChat(ChatId chatId)
+        public Task<BotChat?> GetChat(ChatId chatId, long botUserId)
         {
             if (chatId.Username != null)
             {
-                return _db.Chats.SingleOrDefaultAsync(c => c.TelegramUsername == chatId.Username);
+                return _db.Chats.SingleOrDefaultAsync(c => c.TelegramUsername == chatId.Username && c.BotUserId == botUserId);
             }
             else
             {
-                return _db.Chats.SingleOrDefaultAsync(c => c.TelegramId == chatId.Identifier);
+                return _db.Chats.SingleOrDefaultAsync(c => c.TelegramId == chatId.Identifier && c.BotUserId == botUserId);
             }
         }
 
         /// <inheritdoc />
         public Task<BotChat?> GetChat(long botUserId)
         {
-            return _db.Chats.SingleOrDefaultAsync(c => c.BotUserId == botUserId);
+            return _db.Chats.SingleOrDefaultAsync(c => c.BotUserId == botUserId && c.ChatId == botUserId);
         }
 
         /// <inheritdoc />

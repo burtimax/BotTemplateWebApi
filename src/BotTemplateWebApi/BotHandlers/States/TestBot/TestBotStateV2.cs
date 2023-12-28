@@ -24,7 +24,7 @@ public class TestBotStateV2 : BotState
         string message = r.Next() % 2 == 0 ? R.Test.Introduction : R.Test.Goodbye;
         //await BotClient.SendTextMessageAsync(Chat.ChatId, message);
         await BotClient.SendPollAsync(Chat.ChatId, "Сколько тебе лет?",
-            new[] {"0-10", "10-20", "20-30", "30-40", "+40"}, false);
+            new[] {"0-10", "10-20", "20-30", "30-40", "+40"});
         return Ok();
     }
 }

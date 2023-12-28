@@ -28,7 +28,7 @@ public class BotDbContextConfiguration
     public static void SetBaseConfiguration(ModelBuilder builder)
     {
         SetFilters(builder);
-        SetAllTableNamesToSnakeCase(builder);
+        builder.SetAllToSnakeCase();
     }
 
     private static void SetTableAndSchema(ModelBuilder builder)
@@ -45,30 +45,30 @@ public class BotDbContextConfiguration
     /// Сделать SnakeCase для всех сущностей, полей, внешних ключей, индексов и прочее...)
     /// </summary>
     /// <param name="builder"></param>
-    private static void SetAllTableNamesToSnakeCase(ModelBuilder builder)
-    {
-        foreach (var entityType in builder.Model.GetEntityTypes())
-        {
-            entityType.SetTableName(entityType.GetTableName().ToSnakeCase());
-
-            foreach (var property in entityType.GetProperties())
-            {
-                var schema = entityType.GetSchema();
-                var tableName = entityType.GetTableName();
-                var storeObjectIdentifier = StoreObjectIdentifier.Table(tableName, schema);
-                property.SetColumnName(property.GetColumnName(storeObjectIdentifier).ToSnakeCase());
-            }
-
-            foreach (var key in entityType.GetKeys())
-                key.SetName(key.GetName().ToSnakeCase());
-
-            foreach (var key in entityType.GetForeignKeys())
-                key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
-
-            foreach (var index in entityType.GetIndexes())
-                index.SetDatabaseName(index.GetDatabaseName().ToSnakeCase());
-        }
-    }
+    // private static void SetAllTableNamesToSnakeCase(ModelBuilder builder)
+    // {
+    //     foreach (var entityType in builder.Model.GetEntityTypes())
+    //     {
+    //         entityType.SetTableName(entityType.GetTableName().ToSnakeCase());
+    //
+    //         foreach (var property in entityType.GetProperties())
+    //         {
+    //             var schema = entityType.GetSchema();
+    //             var tableName = entityType.GetTableName();
+    //             var storeObjectIdentifier = StoreObjectIdentifier.Table(tableName, schema);
+    //             property.SetColumnName(property.GetColumnName(storeObjectIdentifier).ToSnakeCase());
+    //         }
+    //
+    //         foreach (var key in entityType.GetKeys())
+    //             key.SetName(key.GetName().ToSnakeCase());
+    //
+    //         foreach (var key in entityType.GetForeignKeys())
+    //             key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
+    //
+    //         foreach (var index in entityType.GetIndexes())
+    //             index.SetDatabaseName(index.GetDatabaseName().ToSnakeCase());
+    //     }
+    // }
     
     private static void SetFilters(ModelBuilder modelBuilder)
     {

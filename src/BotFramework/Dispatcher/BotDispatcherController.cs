@@ -83,7 +83,16 @@ public class BotDispatcherController : BaseBotController
             }
             
             // Сохраняем чат, если еще не существует. 
-            BotChat? existedChat = await _botRepository.GetChat(user.Id);
+            BotChat? existedChat = null;
+            if (telegramChat != null && telegramChat.Id != 0)
+            {
+                existedChat = await _botRepository.GetChat(new ChatId(telegramChat.Id), user.Id);
+            }
+            else
+            {
+                existedChat = await _botRepository.GetChat(user.Id);
+            }
+            
             chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
             
             // Если пользователь заблокирован, тогда ему не отвечаем!!!
@@ -91,15 +100,6 @@ public class BotDispatcherController : BaseBotController
             {
                 // ToDo перенаправить на состояние блокированного пользователя!!!
                 await _botClient.SendTextMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
-                return Ok();
-            }
-
-            // Если есть глобальные обработчики запроса, тогда перенаправляем на них.
-            BotPriorityHandlerResolver priorityHandler = new(_assembly, Assembly.GetExecutingAssembly());
-            Type? updateHandler = priorityHandler.GetPriorityTypeHandler(update.Type);
-            if (updateHandler != null)
-            {
-                await ProcessRequestByHandler<BaseBotPriorityHandler>(updateHandler, update, chat, user, savedUpdate, userClaims);
                 return Ok();
             }
 
@@ -125,6 +125,15 @@ public class BotDispatcherController : BaseBotController
                 
                 // Обрабатываем команду.
                 await ProcessRequestByHandler<BaseBotCommand>(commandHandler, update, chat, user, savedUpdate, userClaims);
+                return Ok();
+            }
+            
+            // Если есть глобальные обработчики запроса, тогда перенаправляем на них.
+            BotPriorityHandlerResolver priorityHandler = new(_assembly, Assembly.GetExecutingAssembly());
+            Type? updateHandler = priorityHandler.GetPriorityTypeHandler(update.Type);
+            if (updateHandler != null)
+            {
+                await ProcessRequestByHandler<BaseBotPriorityHandler>(updateHandler, update, chat, user, savedUpdate, userClaims);
                 return Ok();
             }
             

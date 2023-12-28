@@ -74,7 +74,7 @@ namespace BotFramework.Repository
         /// <summary>
         /// Получить чат по ИД.
         /// </summary>
-        Task<BotChat?> GetChat(TelegramModel.ChatId chatId);
+        Task<BotChat?> GetChat(TelegramModel.ChatId chatId, long botUserId);
 
         /// <summary>
         /// Получить чат пользователя.

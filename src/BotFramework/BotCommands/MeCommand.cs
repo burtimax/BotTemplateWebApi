@@ -38,7 +38,7 @@ public class MeCommand : BaseBotCommand
 
     public override async Task HandleBotRequest(Update update)
     {
-        BotChat? userChat = await _baseBotRepository.GetChat(User.Id);
+        BotChat? userChat = await _baseBotRepository.GetChat(Chat.ChatId, User.Id);
         IEnumerable<BotClaim>? claims = await _baseBotRepository.GetUserClaims(User.Id);
         string userData = UserCommand.GetUserDataString(User!, userChat, claims);
 
