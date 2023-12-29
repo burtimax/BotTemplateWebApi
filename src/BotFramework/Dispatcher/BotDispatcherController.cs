@@ -120,6 +120,7 @@ public class BotDispatcherController : BaseBotController
                 if (commandHandler == null)
                 {
                     await _botClient.SendTextMessageAsync(chat.ChatId, "Не понимаю 🤷‍♂️");
+                    return Ok(); // Сделать так чтобы логировалось и не было ошибок.
                     throw new NotFoundHandlerForCommandException(command, _assembly.GetName().Name);
                 }
                 
