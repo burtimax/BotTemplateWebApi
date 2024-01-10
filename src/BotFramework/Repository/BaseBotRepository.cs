@@ -113,8 +113,10 @@ namespace BotFramework.Repository
         }
 
         /// <inheritdoc />
-        public async Task<BotUser> UpsertUser(User user)
+        public async Task<BotUser?> UpsertUser(User? user)
         {
+            if (user == null) return null;
+            
             bool isUserExisted = await IsUserExists(user.Id);
 
             if (isUserExisted == false)
@@ -150,14 +152,10 @@ namespace BotFramework.Repository
         }
 
         /// <inheritdoc />
-        public Task<BotChat?> GetChat(long botUserId)
+        public async Task<BotChat?> AddChat(Chat? chat, BotUser? chatOwner)
         {
-            return _db.Chats.SingleOrDefaultAsync(c => c.BotUserId == botUserId && c.ChatId == botUserId);
-        }
-
-        /// <inheritdoc />
-        public async Task<BotChat> AddChat(Chat chat, BotUser chatOwner)
-        {
+            if (chat == null || chatOwner == null) return null;
+            
             BotChat newChat = chat.ToBotChatEntity(chatOwner.Id);
             newChat.States.CurrentState = BotConstants.StartState;
             newChat.CreatedAt = DateTimeOffset.Now;

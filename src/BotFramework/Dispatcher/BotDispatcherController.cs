@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BotFramework.Base;
+using BotFramework.Db;
 using BotFramework.Db.Entity;
 using BotFramework.Dispatcher.HandlerResolvers;
 using BotFramework.Dto;
@@ -19,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -38,6 +40,7 @@ public class BotDispatcherController : BaseBotController
     private readonly ISaveUpdateService _saveUpdateService;
     private readonly BotConfiguration _botConfiguration;
     private readonly ITelegramBotClient _botClient;
+    private readonly BotDbContext _db;
 
     public BotDispatcherController(
         IBaseBotRepository botRepository,
@@ -49,6 +52,7 @@ public class BotDispatcherController : BaseBotController
         _context = contextAccessor.HttpContext;
         _saveUpdateService = _context.RequestServices.GetRequiredService<ISaveUpdateService>();
         _botConfiguration = _context.RequestServices.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        _db = _context.RequestServices.GetRequiredService<BotDbContext>();
         var loggerFactory = _context.RequestServices.GetRequiredService<ILoggerFactory>();
         _botClient = _context.RequestServices.GetRequiredService<ITelegramBotClient>();
         _botOptions = (_context.RequestServices.GetRequiredService<IOptions<BotOptions>>())?.Value ?? new();
@@ -58,8 +62,8 @@ public class BotDispatcherController : BaseBotController
     public override async Task<IActionResult> HandleBotRequest(Update update)
     {
         // Объявим здесь. Инициализируем далее.
-        BotUser user = null;
-        BotChat chat = null;
+        BotUser? user = null;
+        BotChat? chat = null;
         IEnumerable<ClaimValue>? userClaims;
         BotUpdate savedUpdate = null;
         
@@ -74,32 +78,18 @@ public class BotDispatcherController : BaseBotController
 
             // Сохраняем или обновляем информацию о пользователе.
             user = await _botRepository.UpsertUser(telegramUser);
-            userClaims = (await _botRepository.GetUserClaims(user.Id))?.Select(c => new ClaimValue(c.Id, c.Name, c.Description));
-
-            if (user == null)
-            {
-                // ToDo добавить отдельный обработчик для типов обновлений с нулевым пользователем.
-                throw new NotImplementedException("Сейчас пока типы обновлений, у которых User == null не обрабатываются");
-            }
+            userClaims = (await _botRepository.GetUserClaims(user?.Id ?? -1))?.Select(c => new ClaimValue(c.Id, c.Name, c?.Description ?? ""));
             
             // Сохраняем чат, если еще не существует. 
-            BotChat? existedChat = null;
-            if (telegramChat != null && telegramChat.Id != 0)
-            {
-                existedChat = await _botRepository.GetChat(new ChatId(telegramChat.Id), user.Id);
-            }
-            else
-            {
-                existedChat = await _botRepository.GetChat(user.Id);
-            }
-            
+            BotChat? existedChat = await _botRepository.GetChat(new ChatId(telegramChat?.Id ?? -1), user?.Id ?? -1);
             chat = existedChat ?? await _botRepository.AddChat(telegramChat, user);
             
             // Если пользователь заблокирован, тогда ему не отвечаем!!!
-            if (user.IsBlocked)
+            if (user != null && user.IsBlocked)
             {
                 // ToDo перенаправить на состояние блокированного пользователя!!!
-                await _botClient.SendTextMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
+                if(chat != null)
+                    await _botClient.SendTextMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
                 return Ok();
             }
 
@@ -110,10 +100,10 @@ public class BotDispatcherController : BaseBotController
             }
 
             // Команды бота обрабатываются вне очереди, вне состояний.
-            if (IsBotCommandUpdate(update))
+            if (user != null && chat != null && IsCommand(update))
             {
                 // Ищем обработчик команды.
-                string command = update.Message.Text;
+                string command = update!.Message!.Text!;
                 BotCommandHandlerResolver commandHandlerResolver = new(_assembly, Assembly.GetExecutingAssembly());
                 Type? commandHandler = commandHandlerResolver.GetPriorityCommandHandlerType(command, user, userClaims);
 
@@ -137,17 +127,20 @@ public class BotDispatcherController : BaseBotController
                 await ProcessRequestByHandler<BaseBotPriorityHandler>(updateHandler, update, chat, user, savedUpdate, userClaims);
                 return Ok();
             }
-            
-            // Получаем текушее состояние чата. 
-            string currentState = chat.States?.CurrentState ?? BotConstants.StartState;
-            
-            BotStateHandlerResolver resolver = new(_assembly);
-            Type handlerType = resolver.GetPriorityStateHandlerType(currentState, user.Role)
-                ?? throw new NotFoundHandlerForStateException(currentState, _assembly.GetName().Name);
-            
-            await ProcessRequestByHandler<BaseBotState>(handlerType, update, chat, user, savedUpdate, userClaims);
 
-            return Ok();
+            if (user != null && chat != null)
+            {
+                // Получаем текушее состояние чата. 
+                string currentState = chat.States?.CurrentState ?? BotConstants.StartState;
+            
+                BotStateHandlerResolver resolver = new(_assembly);
+                Type handlerType = resolver.GetPriorityStateHandlerType(currentState, user.Role)
+                                   ?? throw new NotFoundHandlerForStateException(currentState, _assembly.GetName().Name);
+            
+                await ProcessRequestByHandler<BaseBotState>(handlerType, update, chat, user, savedUpdate, userClaims);
+
+                return Ok();
+            }
         }
         catch (Exception e)
         {
@@ -159,11 +152,24 @@ public class BotDispatcherController : BaseBotController
             return Ok();
         }
 
+        await SendUnprocessedUpdateToModerators(update);
         return Ok();
 
         // Отправляем ответ пользователю
     }
 
+    /// <summary>
+    /// Отправить необработанный запрос модератору.
+    /// </summary>
+    private async Task SendUnprocessedUpdateToModerators(Update update)
+    {
+        await BotHelper.ExecuteFor(_db, BotConstants.BaseBotClaims.BotExceptionsGet, async (tuple) =>
+        {
+            await _botClient.SendTextMessageAsync(tuple.chat.ChatId,
+                $"Бот не может найти обработчик для запроса\n<code>{JsonConvert.SerializeObject(update, Formatting.Indented)}</code>", ParseMode.Html);
+        });
+    }
+    
     /// <summary>
     /// Обрабатываем специфичные запросы.
     /// </summary>
@@ -190,7 +196,7 @@ public class BotDispatcherController : BaseBotController
     /// </remarks>
     /// <param name="update">Запрос бота.</param>
     /// <returns>Является или не является командой.</returns>
-    private bool IsBotCommandUpdate(Update update) =>
+    private bool IsCommand(Update update) =>
         update.Type == UpdateType.Message && 
         update.Message.Type == MessageType.Text &&
         update.Message.Text.StartsWith("/");
@@ -204,7 +210,7 @@ public class BotDispatcherController : BaseBotController
     /// <returns></returns>
     /// <exception cref="NotFoundHandlerForStateException">Не найден тип обработчика запроса.</exception>
     /// <exception cref="NotFoundHandlerMethodException">Не найден метод обработчика запроса.</exception>
-    private Task ProcessRequestByHandler<T>(Type handlerType, Update update, BotChat chat, BotUser user, BotUpdate? savedUpdate, IEnumerable<ClaimValue>? userClaims) where T : IBaseBotHandler
+    private Task ProcessRequestByHandler<T>(Type handlerType, Update update, BotChat? chat, BotUser? user, BotUpdate? savedUpdate, IEnumerable<ClaimValue>? userClaims) where T : IBaseBotHandler
     {
         if (handlerType == null) throw new ArgumentNullException(nameof(handlerType));
 

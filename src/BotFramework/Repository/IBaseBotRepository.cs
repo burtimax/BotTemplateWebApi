@@ -69,25 +69,18 @@ namespace BotFramework.Repository
         /// Обновляет информацию (Firstname, Lastname, Username)
         /// Потому что с прошествием времени может поменяться эта информация.
         /// </summary>
-        Task<BotUser> UpsertUser(TelegramModel.User user);
+        Task<BotUser?> UpsertUser(TelegramModel.User? user);
 
         /// <summary>
         /// Получить чат по ИД.
         /// </summary>
         Task<BotChat?> GetChat(TelegramModel.ChatId chatId, long botUserId);
-
-        /// <summary>
-        /// Получить чат пользователя.
-        /// </summary>
-        /// <param name="botUserId">ИД пользователя в системе</param>
-        /// <returns></returns>
-        Task<BotChat?> GetChat(long botUserId);
         
         /// <summary>
         /// Добавить чат пользователя.
         /// </summary>
         /// <param name="chat">Telegram Chat object</param>
-        Task<BotChat> AddChat(TelegramModel.Chat chat, BotUser chatOwner);
+        Task<BotChat?> AddChat(TelegramModel.Chat? chat, BotUser? chatOwner);
 
         /// <summary>
         /// Добавить сообщение.
