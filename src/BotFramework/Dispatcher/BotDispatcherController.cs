@@ -92,7 +92,7 @@ public class BotDispatcherController : BaseBotController
                     await _botClient.SendTextMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
                 return Ok();
             }
-
+            
             // Сохраняем запрос в истории бота.
             if (_botOptions.SaveUpdatesInDatabase)
             {

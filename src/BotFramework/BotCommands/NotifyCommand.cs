@@ -54,6 +54,7 @@ public class NotifyCommand : BaseBotCommand
                     {
                         await BotClient.CopyMessageAsync(tuple.chat.ChatId, Chat.ChatId,
                             update.Message.ReplyToMessage.MessageId);
+                        await Task.Delay(100); // Чтобы не выйти за лимиты бота и его не заблокировали.
                     }
                     catch (ApiRequestException e) when (e.ErrorCode == 403)
                     {

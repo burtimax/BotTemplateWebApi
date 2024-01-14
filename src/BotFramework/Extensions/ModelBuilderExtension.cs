@@ -1,5 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
+using BotFramework.Db.Entity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace BotFramework.Extensions;
 
@@ -31,6 +36,34 @@ public static class ModelBuilderExtension
 
             foreach (var index in entityType.GetIndexes())
                 index.SetDatabaseName(index.GetDatabaseName().ToSnakeCase());
+        }
+    }
+    
+    /// <summary>
+    /// Установить фильтры по умолчанию, чтобы удаленные объекты не попадали в выборку.
+    /// </summary>
+    /// <param name="modelBuilder"></param>
+    public static void SetFilters(this ModelBuilder modelBuilder)
+    {
+        var entities = modelBuilder.Model
+            .GetEntityTypes()
+            .Where(e => e.ClrType.BaseType == typeof(BaseBotEntity<long>))
+            .Select(e => e.ClrType);
+
+        Expression<Func<BaseBotEntity<long>, bool>> 
+            expression = del => del.DeletedAt == null;
+
+        foreach (var e in entities)
+        {
+            ParameterExpression p = Expression.Parameter(e);
+            Expression body =
+                ReplacingExpressionVisitor
+                    .Replace(expression.Parameters.Single(),
+                        p, expression.Body);
+
+            modelBuilder.Entity(e)
+                .HasQueryFilter(
+                    Expression.Lambda(body, p));
         }
     }
 }

@@ -27,7 +27,7 @@ public class BotDbContextConfiguration
 
     public static void SetBaseConfiguration(ModelBuilder builder)
     {
-        SetFilters(builder);
+        builder.SetFilters();
         builder.SetAllToSnakeCase();
     }
 
@@ -69,30 +69,6 @@ public class BotDbContextConfiguration
     //             index.SetDatabaseName(index.GetDatabaseName().ToSnakeCase());
     //     }
     // }
-    
-    private static void SetFilters(ModelBuilder modelBuilder)
-    {
-        var entities = modelBuilder.Model
-            .GetEntityTypes()
-            .Where(e => e.ClrType.BaseType == typeof(BaseBotEntity<long>))
-            .Select(e => e.ClrType);
-
-        Expression<Func<BaseBotEntity<long>, bool>> 
-            expression = del => del.DeletedAt == null;
-
-        foreach (var e in entities)
-        {
-            ParameterExpression p = Expression.Parameter(e);
-            Expression body =
-                ReplacingExpressionVisitor
-                    .Replace(expression.Parameters.Single(),
-                        p, expression.Body);
-
-            modelBuilder.Entity(e)
-                .HasQueryFilter(
-                    Expression.Lambda(body, p));
-        }
-    }
     
     private static void SetOtherConfigs(ModelBuilder modelBuilder)
     {
