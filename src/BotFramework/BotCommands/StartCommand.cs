@@ -19,18 +19,17 @@ using Telegram.Bot.Types.Enums;
 namespace BotFramework.BotCommands;
 
 /// <summary>
-/// Команда для отображения информации по мне.
-/// /me
+/// Обязательная команда бота (по умолчанию)
 /// </summary>
-[BotCommand(Name, version: 1.0f, RequiredUserClaims = new[] { BotConstants.BaseBotClaims.BotUserGet })]
-public class MeCommand : BaseBotCommand
+[BotCommand(Name, version: 0.1f)]
+public class StartCommand : BaseBotCommand
 {
-    internal const string Name = "/me";
+    internal const string Name = "/start";
 
     private readonly BotConfiguration _botConfiguration;
     private readonly IBaseBotRepository _baseBotRepository;
 
-    public MeCommand(IServiceProvider serviceProvider) : base(serviceProvider)
+    public StartCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
         _baseBotRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
@@ -38,10 +37,6 @@ public class MeCommand : BaseBotCommand
 
     public override async Task HandleBotRequest(Update update)
     {
-        BotChat? userChat = await _baseBotRepository.GetChat(Chat.ChatId, User.Id);
-        IEnumerable<BotClaim>? claims = await _baseBotRepository.GetUserClaims(User.Id);
-        string userData = UserCommand.GetUserDataString(User!, userChat, claims);
-
-        await BotClient.SendTextMessageAsync(Chat.ChatId, userData, parseMode:ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, "Default framework handler", parseMode:ParseMode.Html);
     }
 }

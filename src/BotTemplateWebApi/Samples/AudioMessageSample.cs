@@ -5,7 +5,6 @@ using BotFramework.Other;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
 
 namespace BotTemplateWebApi.Samples;
 
@@ -33,17 +32,19 @@ public class AudioMessageSample : BaseBotState
         // Можно сохранить файл локально на компьютер, а можно загрузить файл из серверов Telegram.
         
         FilePath fp = new FilePath(Path.Combine(MediaDirectory, update.Message.Voice.FileUniqueId + ".burtimax"));
-        InputOnlineFile iofLocal = new InputOnlineFile(await BotMediaHelper.GetFileByPathAsync(fp)); // Получаем файл из диска.
+        Stream content = await BotMediaHelper.GetFileByPathAsync(fp);
+        InputFileStream iofLocal = new InputFileStream(content); // Получаем файл из диска.
 
         var file = await BotMediaHelper.GetFileFromTelegramAsync(BotClient, update.Message.Voice.FileId); // Качаем файл из серверов Telegram.
         
-        InputOnlineFile iofFromServer = new InputOnlineFile(file.fileData);
+        InputFile iofFromServer = new InputFileStream(file.fileData);
         
         await BotClient.SendVoiceAsync(
             chatId: Chat.ChatId,
-            iofFromServer, "Hello");
+            iofFromServer, 
+            caption: "Hello");
 
-        if (iofFromServer.Content != null) await iofFromServer.Content.DisposeAsync();
+        if (content != null) await content.DisposeAsync();
 
         await BotClient.SendTextMessageAsync(Chat.ChatId, "Вот держи свое голосовое обратно)");
     }

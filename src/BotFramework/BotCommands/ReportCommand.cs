@@ -48,6 +48,6 @@ public class ReportCommand : BaseBotCommand
 
         BotActivityReportGenerator reportGenerator = new();
         string report = await reportGenerator.GetReport(BotDbContext, DateTime.Now.AddHours(-hours), DateTime.Now);
-        await BotClient.SendTextMessageAsync(Chat.ChatId, report, ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, report, parseMode:ParseMode.Html);
     }
 }

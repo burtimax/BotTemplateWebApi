@@ -59,7 +59,7 @@ public class FindUserCommand: BaseBotCommand
             return;
         }
         
-        await BotClient.SendTextMessageAsync(Chat.ChatId, $"<b>Найденные пользователи:</b>\n" + GetUsersString(users), ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, $"<b>Найденные пользователи:</b>\n" + GetUsersString(users), parseMode:ParseMode.Html);
     }
 
     private string GetUsersString(IEnumerable<BotUser> users)

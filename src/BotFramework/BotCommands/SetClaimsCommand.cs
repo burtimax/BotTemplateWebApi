@@ -97,7 +97,7 @@ public class SetClaimsCommand: BaseBotCommand
         await AddClaimsToUser(user.Id, claimsToAdd);
         
         IEnumerable<BotClaim>? userAllClaims = await _baseBotRepository.GetUserClaims(user.Id);
-        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, $"Текущие разрешения пользователя {userIdentity}"), ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, $"Текущие разрешения пользователя {userIdentity}"), parseMode:ParseMode.Html);
     }
 
     /// <summary>

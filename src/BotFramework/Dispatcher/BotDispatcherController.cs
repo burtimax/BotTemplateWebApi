@@ -166,7 +166,7 @@ public class BotDispatcherController : BaseBotController
         await BotHelper.ExecuteFor(_db, BotConstants.BaseBotClaims.BotExceptionsGet, async (tuple) =>
         {
             await _botClient.SendTextMessageAsync(tuple.chat.ChatId,
-                $"Бот не может найти обработчик для запроса\n<code>{JsonConvert.SerializeObject(update, Formatting.Indented)}</code>", ParseMode.Html);
+                $"Бот не может найти обработчик для запроса\n<code>{JsonConvert.SerializeObject(update, Formatting.Indented)}</code>", parseMode:ParseMode.Html);
         });
     }
     

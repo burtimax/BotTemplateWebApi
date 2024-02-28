@@ -61,7 +61,7 @@ public class UserCommand : BaseBotCommand
         IEnumerable<BotClaim>? claims = await _baseBotRepository.GetUserClaims(user.Id);
         string userData = GetUserDataString(user!, userChat, claims);
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, userData, ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, userData, parseMode:ParseMode.Html);
     }
 
     /// <summary>

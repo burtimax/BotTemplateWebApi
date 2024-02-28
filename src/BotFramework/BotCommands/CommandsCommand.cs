@@ -83,7 +83,7 @@ public class CommandsCommand: BaseBotCommand
             sb.AppendLine($"{NotifyTestCommand.Name} - <i>Тестовое уведомление для меня.</i>");
         }
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, sb.ToString(), ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, sb.ToString(), parseMode:ParseMode.Html);
     }
 
     private bool HasUserClaim(string claimName)

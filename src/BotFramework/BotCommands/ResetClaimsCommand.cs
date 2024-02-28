@@ -94,7 +94,7 @@ public class ResetClaimsCommand: BaseBotCommand
         await RemoveClaimsFromUser(user.Id, claimsToDelete);
         
         IEnumerable<BotClaim>? userAllClaims = await _baseBotRepository.GetUserClaims(user.Id);
-        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, "Текущие разрешения пользователя"), ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, "Текущие разрешения пользователя"), parseMode:ParseMode.Html);
     }
 
     /// <summary>

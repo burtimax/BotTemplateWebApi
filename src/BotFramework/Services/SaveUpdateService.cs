@@ -46,7 +46,7 @@ public class SaveUpdateService : ISaveUpdateService
             UpdateType.EditedChannelPost => $"{update.EditedChannelPost?.Caption} \n {update.EditedChannelPost?.Text}",
             UpdateType.MyChatMember => $"{update.MyChatMember?.From?.Id} : {update.MyChatMember?.From?.Username}",
             UpdateType.PreCheckoutQuery => update.PreCheckoutQuery?.InvoicePayload,
-            UpdateType.Unknown => null,
+            UpdateType.Unknown => "UNKNOWN UPDATE",
         };
 
         return await _botRepository.AddUpdate(saveUpdateDto);
@@ -67,7 +67,7 @@ public class SaveUpdateService : ISaveUpdateService
     /// </summary>
     /// <param name="message">Сообщение.</param>
     /// <returns></returns>
-    private object GetObjectByMessageType(Message message)
+    private object? GetObjectByMessageType(Message message)
     {
         return message.Type switch
         {
@@ -107,6 +107,8 @@ public class SaveUpdateService : ISaveUpdateService
             MessageType.WebAppData => message.WebAppData,
             MessageType.VideoChatParticipantsInvited => message.VideoChatParticipantsInvited,
             MessageType.MessageAutoDeleteTimerChanged => message.MessageAutoDeleteTimerChanged,
+            MessageType.WriteAccessAllowed => new { Value = message.WriteAccessAllowed?.WebAppName ?? "NULL" },
+            _ => new{ Value = "UNKNOWN MESSAGE TYPE" },
         };
     }
         

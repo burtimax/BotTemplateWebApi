@@ -17,7 +17,6 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
 using File = System.IO.File;
 
 namespace BotFramework.Other;
@@ -46,7 +45,7 @@ public class BotExceptionHandler
         using (Stream stream = StreamHelper.GenerateStreamFromString(messageReport))
         {
             string errorFileName = $"{DateTime.Now.Ticks.ToString()}.txt";
-            InputOnlineFile fileException = new InputOnlineFile(stream, errorFileName);
+            InputFileStream fileException = InputFile.FromStream(stream, errorFileName);
             StringBuilder captionBuilder = new();
             captionBuilder.AppendLine($"<b>Ошибка программы</b>")
                 .AppendLine()

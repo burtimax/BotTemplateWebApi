@@ -40,11 +40,11 @@ public class ClaimsCommand: BaseBotCommand
 
         if (claims == null || claims.Any() == false)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "У бота нет зарегистрированных разрешений!", ParseMode.Html);
+            await BotClient.SendTextMessageAsync(Chat.ChatId, "У бота нет зарегистрированных разрешений!", parseMode:ParseMode.Html);
             return;
         }
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, GenerateClaimsListString(claims, "Разрешения бота"), ParseMode.Html);
+        await BotClient.SendTextMessageAsync(Chat.ChatId, GenerateClaimsListString(claims, "Разрешения бота"), parseMode:ParseMode.Html);
     }
 
     /// <summary>
