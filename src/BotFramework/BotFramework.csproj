@@ -9,7 +9,7 @@
     <Description>Framework для Telegram ботов. Пакет, который помогает создавать Telegram ботов быстро и качественно. Для правильного использования пакета смотри руководство README.md в репозитории (https://github.com/burtimax/BotTemplateWebApi).</Description>
     <RepositoryUrl>https://github.com/burtimax/BotTemplateWebApi</RepositoryUrl>
     <PackageTags>telegram bot telegrambot framework</PackageTags>
-    <PackageVersion>1.2.1</PackageVersion>
+    <PackageVersion>2.0.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
