@@ -53,6 +53,7 @@ public static class IServiceCollectionExtension
         services.AddTransient<IBaseBotRepository, BaseBotRepository>();
         services.AddTransient<IBotUpdateRepository, BotUpdateRepository>();
         services.AddTransient<ISaveUpdateService, SaveUpdateService>();
+        services.AddTransient<ISavedMessageService, SavedMessageService>();
 
         return services;
     }

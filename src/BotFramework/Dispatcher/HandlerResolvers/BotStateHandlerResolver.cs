@@ -9,14 +9,14 @@ namespace BotFramework.Dispatcher.HandlerResolvers;
 
 public class BotStateHandlerResolver
 {
-    private readonly Assembly _assembly;
+    private readonly Assembly[] _assemblies;
     private readonly Type _baseBotStateType = typeof(BaseBotState);
 
-    public BotStateHandlerResolver(Assembly assembly)
+    public BotStateHandlerResolver(params Assembly[] assemblies)
     {
-        if (assembly is null) throw new ArgumentNullException(nameof(assembly));
+        if (assemblies is null) throw new ArgumentNullException(nameof(assemblies));
         
-        _assembly = assembly;
+        _assemblies = assemblies;
     }
 
     /// <summary>
@@ -26,7 +26,14 @@ public class BotStateHandlerResolver
     /// <returns></returns>
     public Type? GetPriorityStateHandlerType(string stateName, string userRole)
     {
-        IEnumerable<Type>? handlerTypes = FilterBotHandlerTypes(_assembly.GetTypes());
+        List<Type> allTypes = new List<Type>();
+
+        foreach (var assembly in _assemblies)
+        {
+            allTypes.AddRange(assembly.GetTypes());
+        }
+        
+        IEnumerable<Type>? handlerTypes = FilterBotHandlerTypes(allTypes);
 
         if (handlerTypes.Any() == false)
         {

@@ -41,6 +41,7 @@ public class BotDispatcherController : BaseBotController
     private readonly BotConfiguration _botConfiguration;
     private readonly ITelegramBotClient _botClient;
     private readonly BotDbContext _db;
+    private readonly ISavedMessageService _savedMessageService;
 
     public BotDispatcherController(
         IBaseBotRepository botRepository,
@@ -56,6 +57,7 @@ public class BotDispatcherController : BaseBotController
         var loggerFactory = _context.RequestServices.GetRequiredService<ILoggerFactory>();
         _botClient = _context.RequestServices.GetRequiredService<ITelegramBotClient>();
         _botOptions = (_context.RequestServices.GetRequiredService<IOptions<BotOptions>>())?.Value ?? new();
+        _savedMessageService = _context.RequestServices.GetRequiredService<ISavedMessageService>();
         _logger = loggerFactory.CreateLogger("Bot");
     }
 
@@ -99,6 +101,17 @@ public class BotDispatcherController : BaseBotController
                 savedUpdate = await _saveUpdateService.SaveUpdateInBotHistory(user, chat, update);
             }
 
+            // Если пришло сообщение из медиа группы сохраненного сообщения, то просто сохранить и ничего не делать.
+            // Когда мы сохраняем в бота сообщение с несколькими медиа, то запросы по каждому медиа приходят поотдельности.
+            // Нужно собрать все вместе. Вставляем в Диспетчер метод сохранения и сохраняем другие медиа рядом.
+            if (update.Type == UpdateType.Message &&
+                string.IsNullOrEmpty(update.Message.MediaGroupId) == false &&
+                await _savedMessageService.HasSavedMessageWithMediaType(chat.TelegramId.Value, user.TelegramId, update.Message.MediaGroupId))
+            {
+                await _savedMessageService.SaveMessageFromUpdate(chat, user, update.Message);
+                return Ok();
+            }
+
             // Команды бота обрабатываются вне очереди, вне состояний.
             if (user != null && chat != null && IsCommand(update))
             {
@@ -133,7 +146,7 @@ public class BotDispatcherController : BaseBotController
                 // Получаем текушее состояние чата. 
                 string currentState = chat.States?.CurrentState ?? BotConstants.StartState;
             
-                BotStateHandlerResolver resolver = new(_assembly);
+                BotStateHandlerResolver resolver = new(_assembly, Assembly.GetExecutingAssembly());
                 Type handlerType = resolver.GetPriorityStateHandlerType(currentState, user.Role)
                                    ?? throw new NotFoundHandlerForStateException(currentState, _assembly.GetName().Name);
             

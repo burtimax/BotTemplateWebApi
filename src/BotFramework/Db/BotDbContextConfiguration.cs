@@ -39,6 +39,7 @@ public class BotDbContextConfiguration
         builder.Entity<BotClaim>().ToTable("claims", schema);
         builder.Entity<BotUserClaim>().ToTable("user_claims", schema);
         builder.Entity<BotException>().ToTable("exceptions", schema);
+        builder.Entity<BotSavedMessage>().ToTable("saved_messages", schema);
     }
     
     /// <summary>
