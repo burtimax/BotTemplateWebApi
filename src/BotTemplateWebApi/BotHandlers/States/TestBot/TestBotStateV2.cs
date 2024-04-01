@@ -20,11 +20,20 @@ public class TestBotStateV2 : BotState
 
     public override async Task<IActionResult> HandleBotRequest(Update update)
     {
-        int t = 0;
-        var r = new Random(DateTime.Now.Millisecond);
-        string message = r.Next() % 2 == 0 ? R.Test.Introduction : R.Test.Goodbye;
-        await BotClient.SendSavedMessage(Chat.ChatId, BotDbContext, 1);
-        await BotClient.SendTextMessageAsync(Chat.ChatId, "привет дружище");
+
+        // await BotClient.SendTextMessageAsync(Chat.ChatId, "ghbdtn");
+        // return Ok();
+        
+        
+        // int t = 0;
+        // var r = new Random(DateTime.Now.Millisecond);
+        // string message = r.Next() % 2 == 0 ? R.Test.Introduction : R.Test.Goodbye;
+        // await BotClient.SendSavedMessage(Chat.ChatId, BotDbContext, 1);
+        // await BotClient.SendTextMessageAsync(Chat.ChatId, "привет дружище");
+        // return Ok();
+
+        var lastSavedMessage = await BotDbContext.SavedMessages.OrderByDescending(m => m.Id).FirstAsync();
+        await BotClient.SendSavedMessage(Chat.ChatId, BotDbContext, lastSavedMessage.Id);
         return Ok();
     }
 }

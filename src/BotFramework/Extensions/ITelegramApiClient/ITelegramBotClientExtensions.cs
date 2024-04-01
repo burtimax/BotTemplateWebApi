@@ -8,12 +8,13 @@ using BotFramework.Services;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace BotFramework.Extensions;
 
-public static class ITelegramBotClientExtensions
+public static partial class ITelegramBotClientExtensions
 {
-    public static async Task<int> SendSavedMessage(this ITelegramBotClient client, ChatId chatId,
+    public static async Task<int> SendSavedMessageByCopy(this ITelegramBotClient client, ChatId chatId,
         BotDbContext db, long savedMessageId)
     {
         List<BotSavedMessage> messages = await GetSavedMessages(db, savedMessageId) ??
@@ -24,6 +25,22 @@ public static class ITelegramBotClientExtensions
             (int) messageToSend.TelegramMessageId!);
 
         return mesId.Id;
+    }
+    
+    public static async Task SendSavedMessage(this ITelegramBotClient client, ChatId chatId,
+        BotDbContext db, long savedMessageId)
+    {
+        List<BotSavedMessage> messages = await GetSavedMessages(db, savedMessageId) ??
+                                         throw new Exception($"Not found in database saved_message");
+
+        if (messages.Count > 1)
+        {
+            await SendMediaGroup(client, chatId, messages);
+        }
+        else
+        {
+            await SendOneMessage(client, chatId, messages.First());
+        }
     }
 
     private static async Task<List<BotSavedMessage>?> GetSavedMessages(BotDbContext db, long savedMessageId)
@@ -38,15 +55,5 @@ public static class ITelegramBotClientExtensions
             .OrderBy(m => m.Id)
             .ToListAsync();
     }
-
-    // private static Task<int> SendMediaGroup(ITelegramBotClient client, ChatId chatId, List<BotSavedMessage> messages)
-    // {
-    //     List<IAlbumInputMedia> mediaGroup = new List<IAlbumInputMedia>();
-    //
-    //     mediaGroup.Add(new InputMediaPhoto();
-    //     
-    //     client.SendMediaGroupAsync()
-    // }
-    //
-    // private static GetInputFileFromMessage
+    
 }

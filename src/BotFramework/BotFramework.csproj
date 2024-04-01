@@ -38,6 +38,7 @@
   <ItemGroup>
     <Folder Include="Db\Migrations" />
     <Folder Include="DefaultHandlers\" />
+    <Folder Include="Extensions\ITelegramApiClient\Messages\" />
   </ItemGroup>
 
   <ItemGroup>

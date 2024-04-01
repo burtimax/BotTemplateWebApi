@@ -96,7 +96,9 @@ namespace BotFramework.Other
             if (botClient is null) throw new ArgumentNullException(nameof(botClient));
             if (photoSizes is null || photoSizes.Any() == false) throw new ArgumentNullException(nameof(photoSizes));
             
-            return GetFileFromTelegramAsync(botClient, photoSizes.GetFileByQuality(PhotoQuality.Low).FileId);
+            int index = (int)requiredQuality - 1;
+            if (index >= photoSizes.Length) index = photoSizes.Length - 1;
+            return GetFileFromTelegramAsync(botClient, photoSizes[index].FileId);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BotFramework.Attributes;
 using BotFramework.Base;
@@ -37,6 +38,15 @@ internal class SaveMessageState : BaseBotState
             Chat.States.GoBack(ChatStateGoBackType.GoToPrevious);
             await _db.SaveChangesAsync();
         }
+
+        if (GetSupportedMessageTypes()
+                .Contains(update.Message.Type) == false)
+        {
+            await BotClient.SendTextMessageAsync(Chat.ChatId, "Не поддерживается такой тип сообщения для сохранения!\n" +
+                                                              "Сохранение отменено.");
+            Chat.States.GoBack(ChatStateGoBackType.GoToPrevious);
+            await _db.SaveChangesAsync();
+        }
         
         BotSavedMessage savedMessage = await _savedMessageService.SaveMessageFromUpdate(Chat, User, update.Message!);
         
@@ -46,4 +56,17 @@ internal class SaveMessageState : BaseBotState
         await _db.SaveChangesAsync();
         return Ok();
     }
+
+    private List<MessageType> GetSupportedMessageTypes() => new List<MessageType>()
+    {
+        MessageType.Animation,
+        MessageType.Audio,
+        MessageType.Text,
+        MessageType.Photo,
+        MessageType.Voice,
+        MessageType.Sticker,
+        MessageType.Video,
+        MessageType.VideoNote,
+        MessageType.Document,
+    };
 }
