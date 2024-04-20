@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BotFramework.Extensions;
 
@@ -28,7 +29,7 @@ public static partial class ITelegramBotClientExtensions
     }
     
     public static async Task SendSavedMessage(this ITelegramBotClient client, ChatId chatId,
-        BotDbContext db, long savedMessageId)
+        BotDbContext db, long savedMessageId, IReplyMarkup replyMarkup = null)
     {
         List<BotSavedMessage> messages = await GetSavedMessages(db, savedMessageId) ??
                                          throw new Exception($"Not found in database saved_message");
@@ -39,7 +40,7 @@ public static partial class ITelegramBotClientExtensions
         }
         else
         {
-            await SendOneMessage(client, chatId, messages.First());
+            await SendOneMessage(client, chatId, messages.First(), replyMarkup);
         }
     }
 
