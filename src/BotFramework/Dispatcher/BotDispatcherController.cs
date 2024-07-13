@@ -12,9 +12,10 @@ using BotFramework.Dto;
 using BotFramework.Exceptions;
 using BotFramework.Extensions;
 using BotFramework.Options;
-using BotFramework.Other;
 using BotFramework.Repository;
 using BotFramework.Services;
+using BotFramework.Utils;
+using BotFramework.Utils.ExceptionHandler;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -160,7 +161,14 @@ public class BotDispatcherController : BaseBotController
             _logger.LogError(LogFormat.ExceptionUpdate, savedUpdate?.Id.ToString() ?? "null", e.Message);
             
             BotExceptionHandler exceptionHandler = new();
-            await exceptionHandler.Handle(e, update, savedUpdate, user, chat, HttpContext.RequestServices);
+            BotExceptionHandlerArgs args = new(e, HttpContext.RequestServices)
+            {
+                TelegramUpdate = update,
+                BotUpdate = savedUpdate,
+                BotUser = user,
+                BotChat = chat,
+            };
+            await exceptionHandler.Handle(args);
             
             return Ok();
         }

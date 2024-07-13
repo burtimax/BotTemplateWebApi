@@ -4,9 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using BotFramework.Db;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
-namespace BotFramework.Other.ReportGenerator;
+namespace BotFramework.Utils.ReportGenerator;
 
 public class BotActivityReportGenerator
 {

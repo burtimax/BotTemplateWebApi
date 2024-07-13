@@ -6,9 +6,10 @@ using System.Linq;
 using BotFramework.Db;
 using BotFramework.Dto;
 using BotFramework.Options;
-using BotFramework.Other;
 using BotFramework.Repository;
 using BotFramework.Services;
+using BotFramework.Utils;
+using BotFramework.Utils.BotEventHadlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,12 +21,18 @@ namespace BotFramework.Extensions;
 public static class IServiceCollectionExtension
 {
     public static IServiceCollection AddBot(this IServiceCollection services, BotConfiguration botConfiguration,
-        IEnumerable<ClaimValue>? claims = null, Action<BotOptions> botOptions = null)
+        IEnumerable<ClaimValue>? claims = null, BotOptions botOptions = null)
     {
         TelegramBotClient botClient = new(botConfiguration.TelegramToken);
         botClient.SetWebhookAsync(botConfiguration.Webhook).Wait();
         services.AddSingleton<ITelegramBotClient>(botClient);
 
+        if (botOptions != null && botOptions.BoundRequestsInSecond != null)
+        {
+            OnMakingApiRequest.BoundRequestInSecond = botOptions.BoundRequestsInSecond.Value;
+            botClient.OnMakingApiRequest += OnMakingApiRequest.Handler;
+        }
+        
         // Регистрируем контекст
         services.AddDbContext<BotDbContext>(options =>
         {

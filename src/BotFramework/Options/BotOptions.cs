@@ -19,4 +19,9 @@ public class BotOptions
     /// Нужно ли отчеты по ошибкам в директорию.
     /// </summary>
     public bool SaveExceptionsInDirectory { get; set; } = true;
+    
+    /// <summary>
+    /// Ограничение по кол-ву запросов у бота.
+    /// </summary>
+    public int? BoundRequestsInSecond { get; set; } 
 }

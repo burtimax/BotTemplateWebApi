@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace BotFramework.Other;
+namespace BotFramework.Utils;
 
 public class StreamHelper
 {

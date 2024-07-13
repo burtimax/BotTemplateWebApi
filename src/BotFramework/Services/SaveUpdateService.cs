@@ -33,21 +33,23 @@ public class SaveUpdateService : ISaveUpdateService
         saveUpdateDto.Content = update.Type switch
         {
             UpdateType.Message => GetContentByMessageType(update.Message), 
-            UpdateType.CallbackQuery => update.CallbackQuery?.Data,
-            UpdateType.EditedMessage => update.EditedMessage?.Text,
-            UpdateType.Poll => update.Poll?.Question,
+            UpdateType.CallbackQuery => update.CallbackQuery?.Data ?? "",
+            UpdateType.EditedMessage => update.EditedMessage?.Text ?? "",
+            UpdateType.Poll => update.Poll?.Question ?? "",
             UpdateType.ChannelPost => $"{update.ChannelPost?.Caption} \n {update.ChannelPost?.Text}",
             UpdateType.ChatMember => $"{update.ChatMember?.From?.Id} : {update.ChatMember?.From?.Username}",
-            UpdateType.InlineQuery => update.InlineQuery?.Query,
-            UpdateType.PollAnswer => update.PollAnswer?.PollId,
-            UpdateType.ShippingQuery => update.ShippingQuery?.InvoicePayload,
-            UpdateType.ChatJoinRequest => update.ChatJoinRequest?.Bio,
-            UpdateType.ChosenInlineResult => update.ChosenInlineResult?.Query,
+            UpdateType.InlineQuery => update.InlineQuery?.Query ?? "",
+            UpdateType.PollAnswer => update.PollAnswer?.PollId ?? "",
+            UpdateType.ShippingQuery => update.ShippingQuery?.InvoicePayload ?? "",
+            UpdateType.ChatJoinRequest => update.ChatJoinRequest?.Bio ?? "",
+            UpdateType.ChosenInlineResult => update.ChosenInlineResult?.Query ?? "",
             UpdateType.EditedChannelPost => $"{update.EditedChannelPost?.Caption} \n {update.EditedChannelPost?.Text}",
             UpdateType.MyChatMember => $"{update.MyChatMember?.From?.Id} : {update.MyChatMember?.From?.Username}",
-            UpdateType.PreCheckoutQuery => update.PreCheckoutQuery?.InvoicePayload,
+            UpdateType.PreCheckoutQuery => update.PreCheckoutQuery?.InvoicePayload ?? "",
             UpdateType.Unknown => "UNKNOWN UPDATE",
         };
+        
+        saveUpdateDto.Content ??= "";
 
         return await _botRepository.AddUpdate(saveUpdateDto);
     }

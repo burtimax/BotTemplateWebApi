@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace BotFramework.Other;
+namespace BotFramework.Utils;
 
 /// <summary>
 /// Валидирует правильность json строки ресурсов бота.

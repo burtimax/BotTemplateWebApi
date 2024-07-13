@@ -2,7 +2,6 @@ using System.Reflection;
 using BotFramework.Db;
 using BotFramework.Extensions;
 using BotFramework.Options;
-using BotFramework.Other;
 using BotTemplateWebApi.App.Options;
 using BotTemplateWebApi.Extentsions;
 using BotTemplateWebApi.Resources;

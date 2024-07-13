@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BotFramework.Exceptions;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace BotFramework.Other;
+namespace BotFramework.Utils;
 
 /// <summary>
 /// Создание IReplyMarkup из строки. 

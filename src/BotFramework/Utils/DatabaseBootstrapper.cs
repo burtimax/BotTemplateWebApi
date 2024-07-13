@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ using BotFramework.Db.Entity;
 using BotFramework.Dto;
 using Microsoft.EntityFrameworkCore;
 
-namespace BotFramework.Other;
+namespace BotFramework.Utils;
 /// <summary>
 /// Инициализатор данных в БД
 /// </summary>

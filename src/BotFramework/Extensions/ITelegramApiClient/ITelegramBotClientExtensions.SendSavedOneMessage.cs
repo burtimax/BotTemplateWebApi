@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using BotFramework.Db;
 using BotFramework.Db.Entity;
 using BotFramework.Enums;
-using BotFramework.Other;
 using BotFramework.Services;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;

@@ -6,9 +6,8 @@ using BotFramework.Db;
 using BotFramework.Db.Entity;
 using BotFramework.Repository;
 using Microsoft.EntityFrameworkCore;
-using Telegram.Bot;
 
-namespace BotFramework.Extensions;
+namespace BotFramework.Utils;
 
 public class BotHelper
 {

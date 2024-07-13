@@ -208,6 +208,9 @@ namespace BotFramework.Repository
 
             if (existed == null) throw new NotFoundBotClaim(claim);
 
+            bool hasUserClaim = await HasUserClaims(userId, claim);
+            if(hasUserClaim) return;
+            
             BotUserClaim botUserClaim = new()
             {
                 UserId = userId,

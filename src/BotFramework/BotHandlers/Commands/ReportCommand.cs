@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BotFramework.Attributes;
 using BotFramework.Base;
-using BotFramework.Other.ReportGenerator;
+using BotFramework.Utils.ReportGenerator;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;

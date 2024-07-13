@@ -44,44 +44,48 @@ public class CommandsCommand: BaseBotCommand
       
         if (HasUserClaim(BotConstants.BaseBotClaims.BotClaimsGet))
         {
+            sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotClaimsGet}</code>");
             sb.AppendLine($"{ClaimsCommand.Name} - <i>Получить список всех разрешений бота.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotReportGet))
         {
-            sb.AppendLine($"{ReportCommand.Name} - <i>Получить отчет по боту.</i>");
+            sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotReportGet}</code>");
+            sb.AppendLine($"{ReportCommand.Name} <code>{{int hours}}</code> - <i>Получить отчет по боту.</i>");
+            sb.AppendLine($"{SaveMessageCommand.Name} - <i>Сохранение сообщения в БД (в ответ на сообщение).</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserClaimCreate))
         {
-            sb.AppendLine($"{SetClaimsCommand.Name} - <i>Добавить разрешения пользователю.</i>");
+            sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserClaimCreate}</code>");
+            sb.AppendLine($"{SetClaimsCommand.Name} <code>{{@user}} {{число|строка}} {{число|строка}}</code> - <i>Добавить разрешения пользователю.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserClaimDelete))
         {
-            sb.AppendLine($"{ResetClaimsCommand.Name} - <i>Удалить разрешения у пользователя.</i>");
+            sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserClaimDelete}</code>");
+            sb.AppendLine($"{ResetClaimsCommand.Name} <code>{{@user}} {{число|строка}} {{число|строка}}</code> - <i>Удалить разрешения у пользователя.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserBlock))
         {
-            sb.AppendLine($"{BlockUserCommand.Name} - <i>Заблокировать пользователей.</i>");
+            sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserBlock}</code>");
+            sb.AppendLine($"{BlockUserCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Заблокировать пользователей.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserUnblock))
         {
-            sb.AppendLine($"{UnblockUserCommand.Name} - <i>Разблокировать пользователей.</i>");
+            sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserUnblock}</code>");
+            sb.AppendLine($"{UnblockUserCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Разблокировать пользователей.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserGet))
         {
-            sb.AppendLine($"{FindUserCommand.Name} - <i>Искать пользователей.</i>");
-        }
-        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserGet))
-        {
+            sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserGet}</code>");
+            sb.AppendLine($"{FindUserCommand.Name} <code>{{string}}</code> - <i>Искать пользователей.</i>");
             sb.AppendLine($"{MeCommand.Name} - <i>Получить информацию обо мне.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserNotificationSend))
         {
-            sb.AppendLine($"{NotifyCommand.Name} - <i>Отправить уведомление всем пользователям.</i>");
+            sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserNotificationSend}</code>");
+            sb.AppendLine($"{NotifyCommand.Name} - <i>Отправить уведомление всем пользователям (в ответ на сообщение).</i>");
+            sb.AppendLine($"{NotifyTestCommand.Name} - <i>Тестовое уведомление для меня (в ответ на сообщение).</i>");
         }
-        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserNotificationSend))
-        {
-            sb.AppendLine($"{NotifyTestCommand.Name} - <i>Тестовое уведомление для меня.</i>");
-        }
+        
 
         await BotClient.SendTextMessageAsync(Chat.ChatId, sb.ToString(), parseMode:ParseMode.Html);
     }

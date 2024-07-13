@@ -3,15 +3,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BotFramework.Enums;
-using BotFramework.Extensions;
 using BotFramework.Models;
 using Telegram.Bot;
-using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using File = System.IO.File;
 
-namespace BotFramework.Other
+namespace BotFramework.Utils
 {
     public class BotMediaHelper
     {

@@ -1,7 +1,7 @@
 ﻿using BotFramework.Attributes;
 using BotFramework.Base;
 using BotFramework.Models;
-using BotFramework.Other;
+using BotFramework.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;

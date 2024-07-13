@@ -5,7 +5,6 @@ using BotFramework.Attributes;
 using BotFramework.Base;
 using BotFramework.Db;
 using BotFramework.Options;
-using BotFramework.Other.ReportGenerator;
 using BotFramework.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -57,6 +56,6 @@ public class AuthCommand: BaseBotCommand
         await this.BotDbContext.SaveChangesAsync();
         await BotClient.SendTextMessageAsync(Chat.ChatId, "Успешно.\n" +
                                                               "Вы получили роль администратора бота.\n" +
-                                                              $"Список команд администратора {ClaimsCommand.Name}");
+                                                              $"Список команд администратора {CommandsCommand.Name}");
     }
 }
