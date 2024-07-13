@@ -9,7 +9,7 @@
 // using Telegram.Bot.Types.Enums;
 // using Telegram.Bot.Types.InputFiles;
 //
-// namespace BotTemplateWebApi.Samples;
+// namespace TemplateSingleBotWebApi.Samples;
 //
 // /// <summary>
 // /// Пример получения фото и отправки фото в ответ.

@@ -2,12 +2,12 @@
 // using System.Diagnostics;
 // using BotFramework.Base;
 // using BotFramework.Options;
-// using BotTemplateWebApi.App.Options;
-// using BotTemplateWebApi.Interfaces.IServices;
+// using TemplateSingleBotWebApi.App.Options;
+// using TemplateSingleBotWebApi.Interfaces.IServices;
 // using Microsoft.Extensions.Options;
 // using Telegram.Bot;
 //
-// namespace BotTemplateWebApi.Services
+// namespace TemplateSingleBotWebApi.Services
 // {
 //     public class BotSingleton : IBotSingleton
 //     {

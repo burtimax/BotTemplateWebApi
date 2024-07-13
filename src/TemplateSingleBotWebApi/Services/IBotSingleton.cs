@@ -1,7 +1,7 @@
 ﻿// TODO REMOVE
 // using BotFramework.Base;
 //
-// namespace BotTemplateWebApi.Interfaces.IServices
+// namespace TemplateSingleBotWebApi.Interfaces.IServices
 // {
 //     /// <summary>
 //     /// Получение экземпля

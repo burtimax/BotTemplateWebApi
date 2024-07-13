@@ -4,7 +4,7 @@
 // using Telegram.Bot;
 // using Telegram.Bot.Types;
 //
-// namespace BotTemplateWebApi.BotHandlers.Commands;
+// namespace TemplateSingleBotWebApi.BotHandlers.Commands;
 //
 // [BotCommand("/report", version: 1)]
 // public class BotReportCommand : BaseBotCommand

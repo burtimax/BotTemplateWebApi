@@ -2,13 +2,15 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotFramework", "src\BotFramework\BotFramework.csproj", "{6FE4CEBB-F181-4089-A589-8DCE55175E95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotTemplateWebApi", "src\BotTemplateWebApi\BotTemplateWebApi.csproj", "{CE7946E0-8064-4191-AA62-9ED7EB0CFE75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateSingleBotWebApi", "src\TemplateSingleBotWebApi\TemplateSingleBotWebApi.csproj", "{CE7946E0-8064-4191-AA62-9ED7EB0CFE75}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotTemplate.Tests", "tests\BotTemplate.Tests\BotTemplate.Tests.csproj", "{7148D490-1D1E-494F-BBFF-1B0FD6958A7D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9AF79BB5-EDBB-45EA-912D-E89A8C0C0449}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4925A2AA-4363-4684-A115-57A08301878C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleBotFramework", "src\MultipleBotFramework\MultipleBotFramework.csproj", "{5834BA41-82D7-42BC-927D-53D1525C5DBE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,10 +30,15 @@ Global
 		{7148D490-1D1E-494F-BBFF-1B0FD6958A7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7148D490-1D1E-494F-BBFF-1B0FD6958A7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7148D490-1D1E-494F-BBFF-1B0FD6958A7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5834BA41-82D7-42BC-927D-53D1525C5DBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5834BA41-82D7-42BC-927D-53D1525C5DBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5834BA41-82D7-42BC-927D-53D1525C5DBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5834BA41-82D7-42BC-927D-53D1525C5DBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6FE4CEBB-F181-4089-A589-8DCE55175E95} = {9AF79BB5-EDBB-45EA-912D-E89A8C0C0449}
 		{CE7946E0-8064-4191-AA62-9ED7EB0CFE75} = {9AF79BB5-EDBB-45EA-912D-E89A8C0C0449}
 		{7148D490-1D1E-494F-BBFF-1B0FD6958A7D} = {4925A2AA-4363-4684-A115-57A08301878C}
+		{5834BA41-82D7-42BC-927D-53D1525C5DBE} = {9AF79BB5-EDBB-45EA-912D-E89A8C0C0449}
 	EndGlobalSection
 EndGlobal
