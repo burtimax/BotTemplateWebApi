@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 
-namespace BotFramework.Db.Entity
+namespace MultipleBotFramework.Db.Entity
 {
     /// <summary>
     /// Базовая модель сущности (базовые поля).

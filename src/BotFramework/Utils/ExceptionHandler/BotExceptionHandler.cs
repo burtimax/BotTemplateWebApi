@@ -102,20 +102,24 @@ public class BotExceptionHandler
             IEnumerable<BotChat> moderatorChats =
                 await db.Chats.Where(c => moderatorUserIds.Contains(c.BotUserId)).ToListAsync();
 
+            InputFile fileFromTelegram = null;
+            
             foreach (BotChat ch in moderatorChats)
             {
                 try
                 {
                     if (cancellationToken?.IsCancellationRequested == true) return;
                     
-                    await botClient.SendDocumentAsync(ch.ChatId, fileException, caption: caption,
+                    var message = await botClient.SendDocumentAsync(ch.ChatId, fileFromTelegram ?? fileException, caption: caption,
                         parseMode: ParseMode.Html);
+                    
+                    // Другим отрпавляем тот же документ, только по ИД.
+                    fileFromTelegram = InputFile.FromString(message.Document!.FileId);
                 }
                 catch (Exception exception)
                 {
                     // Не смогли отправить сообщение в Telegram.
                 }
-
             }
 
             // Добавляем в БД.

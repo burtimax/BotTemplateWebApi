@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text.Json;
-using BotFramework.Db.Entity;
-using BotFramework.Extensions;
+﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Query;
+using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Extensions;
 
-namespace BotFramework.Db;
+namespace MultipleBotFramework.Db;
 
 public class BotDbContextConfiguration
 {
@@ -33,13 +25,15 @@ public class BotDbContextConfiguration
 
     private static void SetTableAndSchema(ModelBuilder builder)
     {
-        builder.Entity<BotUser>().ToTable("users", schema);
-        builder.Entity<BotChat>().ToTable("chats", schema);
-        builder.Entity<BotUpdate>().ToTable("updates", schema);
-        builder.Entity<BotClaim>().ToTable("claims", schema);
-        builder.Entity<BotUserClaim>().ToTable("user_claims", schema);
-        builder.Entity<BotException>().ToTable("exceptions", schema);
-        builder.Entity<BotSavedMessage>().ToTable("saved_messages", schema);
+        builder.Entity<BotEntity>().ToTable("bots", schema);
+        builder.Entity<BotOwnerEntity>().ToTable("bot_owners", schema);
+        builder.Entity<BotUserEntity>().ToTable("users", schema);
+        builder.Entity<BotChatEntity>().ToTable("chats", schema);
+        builder.Entity<BotUpdateEntity>().ToTable("updates", schema);
+        builder.Entity<BotClaimEntity>().ToTable("claims", schema);
+        builder.Entity<BotUserClaimEntity>().ToTable("user_claims", schema);
+        builder.Entity<BotExceptionEntity>().ToTable("exceptions", schema);
+        builder.Entity<BotSavedMessageEntity>().ToTable("saved_messages", schema);
     }
     
     /// <summary>
@@ -77,32 +71,32 @@ public class BotDbContextConfiguration
         
         // Приватное свойство добавляем в модель.
         // <see href="https://learn.microsoft.com/ru-ru/ef/core/modeling/backing-field?tabs=data-annotations">
-        modelBuilder.Entity<BotChat>(entity =>
+        modelBuilder.Entity<BotChatEntity>(entity =>
         {
             entity.Property("_dataDatabaseDictionary");
         });
 
         // Хранение свойств пользователя.
-        modelBuilder.Entity<BotUser>(entity =>
+        modelBuilder.Entity<BotUserEntity>(entity =>
         {
             entity.Property("_propertiesDatabaseDictionary");
         });
         
-        modelBuilder.Entity<BotChat>()
+        modelBuilder.Entity<BotChatEntity>()
             .Property("_states");
 
         // Ограничение Unique на разрешения пользователя. 
-        modelBuilder.Entity<BotUserClaim>()
+        modelBuilder.Entity<BotUserClaimEntity>()
             .HasIndex(uc => new { uc.UserId, uc.ClaimId })
             .IsUnique();
     }
 
     private static void SetIndexes(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<BotUser>()
+        modelBuilder.Entity<BotUserEntity>()
             .HasIndex(u => u.TelegramId);
 
-        modelBuilder.Entity<BotUpdate>()
-            .HasIndex(u => u.BotChatId);
+        modelBuilder.Entity<BotUpdateEntity>()
+            .HasIndex(u => u.ChatId);
     }
 }

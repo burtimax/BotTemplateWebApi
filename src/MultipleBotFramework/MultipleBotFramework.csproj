@@ -1,17 +1,59 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+<!--    <LangVersion>9</LangVersion>-->
+    <RootNamespace>MultipleBotFramework</RootNamespace>
+    <Nullable>enable</Nullable>
+    <PackageId>Burtimax.TelegramBot.Framework</PackageId>
+    <Description>Framework для Telegram ботов. Пакет, который помогает создавать Telegram ботов быстро и качественно. Для правильного использования пакета смотри руководство README.md в репозитории (https://github.com/burtimax/BotTemplateWebApi).</Description>
+    <RepositoryUrl>https://github.com/burtimax/BotTemplateWebApi</RepositoryUrl>
+    <PackageTags>telegram bot telegrambot framework</PackageTags>
+    <PackageVersion>2.0.6</PackageVersion>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\BotFramework\BotFramework.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
+    <PackageReference Include="Telegram.Bot" Version="20.0.0-alpha.1" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Db\Migrations\" />
-    </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore">
+      <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.20\Microsoft.AspNetCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.11\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Db\Migrations" />
+    <Folder Include="DefaultHandlers\" />
+    <Folder Include="Extensions\ITelegramApiClient\Messages\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="BotConstants.Claims.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BotConstants.Constraints.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BotConstants.UserProperties.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BotConstants.UserRoles.cs">
+      <DependentUpon>BotConstants.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
 </Project>

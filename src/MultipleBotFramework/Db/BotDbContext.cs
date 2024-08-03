@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using BotFramework.Db.Entity;
-using BotFramework.Repository;
 using Microsoft.EntityFrameworkCore;
+using MultipleBotFramework.Db.Entity;
 
-namespace BotFramework.Db
+namespace MultipleBotFramework.Db
 {
     public class BotDbContext : DbContext
     {
@@ -13,19 +12,21 @@ namespace BotFramework.Db
         
         public BotDbContext(DbContextOptions<BotDbContext> options) : base(options){}
 
-        public DbSet<BotUser> Users { get; set; }
-        public DbSet<BotChat> Chats { get; set; }
-        public DbSet<BotUpdate> Updates { get; set; }
-        public DbSet<BotClaim> Claims { get; set; }
-        public DbSet<BotUserClaim> UserClaims { get; set; }
-        public DbSet<BotException> Exceptions { get; set; }
-        public DbSet<BotSavedMessage> SavedMessages { get; set; }
+        public DbSet<BotEntity> Bots { get; set; }
+        public DbSet<BotOwnerEntity> BotOwners { get; set; }
+        public DbSet<BotUserEntity> Users { get; set; }
+        public DbSet<BotChatEntity> Chats { get; set; }
+        public DbSet<BotUpdateEntity> Updates { get; set; }
+        public DbSet<BotClaimEntity> Claims { get; set; }
+        public DbSet<BotUserClaimEntity> UserClaims { get; set; }
+        public DbSet<BotExceptionEntity> Exceptions { get; set; }
+        public DbSet<BotSavedMessageEntity> SavedMessages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //Определение провайдера необходимо для создания миграции, поэтому пусть пока побудет здесь.
-            //string mockString = "Host=127.0.0.1;Port=5432;Database=test_bot_db;Username=postgres;Password=123";
-            //optionsBuilder.UseNpgsql(mockString);
+            // string mockString = "Host=127.0.0.1;Port=5432;Database=test_bot_db;Username=postgres;Password=123";
+            // optionsBuilder.UseNpgsql(mockString);
             base.OnConfiguring(optionsBuilder);
         }
 
