@@ -8,12 +8,12 @@ using Telegram.Bot.Types.Enums;
 
 namespace MultipleBotFramework.Dispatcher.HandlerResolvers;
 
-public class BotPriorityHandlerResolver
+public class BotUpdateTypeHandlerResolver
 {
     private readonly Assembly[] _assemblies;
     private readonly Type _baseHandlerType = typeof(BaseBotPriorityHandler);
 
-    public BotPriorityHandlerResolver(params Assembly[] assemblies)
+    public BotUpdateTypeHandlerResolver(params Assembly[] assemblies)
     {
         if (assemblies is null) throw new ArgumentNullException(nameof(assemblies));
         
@@ -26,19 +26,13 @@ public class BotPriorityHandlerResolver
     /// <returns></returns>
     public Type? GetPriorityTypeHandler(UpdateType updateType)
     {
-        List<Type>? assembliesTypes = new List<Type>();
+        List<Type>? assembliesTypes = _assemblies?.SelectMany(a => a.GetTypes())?.ToList();
 
-        foreach (var assembly in _assemblies)
-        {
-            assembliesTypes.AddRange(assembly.GetTypes());
-        }
+        if (assembliesTypes is null || assembliesTypes.Any() == false) return null;
         
         IEnumerable<Type>? handlerTypes = GetChildrenOfBaseType(assembliesTypes);
 
-        if (handlerTypes.Any() == false)
-        {
-            return null;
-        }
+        if (handlerTypes.Any() == false) return null;
         
         IEnumerable<Type> handlers = handlerTypes.Where(t => HasSpecifiedAttribute(t, updateType));
 
