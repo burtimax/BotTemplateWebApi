@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFrameworkUpgrade.Db;
@@ -14,8 +16,7 @@ namespace MultipleBotFrameworkUpgrade.Extensions.ITelegramApiClient;
 
 public static partial class ITelegramBotClientExtensions
 {
-    public static async Task<int> SendSavedMessageByCopy(this ITelegramBotClient client, long chatId,
-        BotDbContext db, long savedMessageId)
+    public static async Task<int> SendSavedMessageByCopy(this ITelegramBotClient client, long chatId, BotDbContext db, long savedMessageId)
     {
         List<BotSavedMessageEntity> messages = await GetSavedMessages(db, savedMessageId) ??
                                          throw new Exception($"Not found in database saved_message");
