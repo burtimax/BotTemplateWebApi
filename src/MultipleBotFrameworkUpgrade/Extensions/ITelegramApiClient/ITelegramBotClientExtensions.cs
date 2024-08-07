@@ -8,40 +8,39 @@ using MultipleBotFrameworkUpgrade.Db.Entity;
 using Telegram.BotAPI;
 using Telegram.BotAPI.GettingUpdates;
 using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFrameworkUpgrade.Extensions.ITelegramApiClient;
 
 public static partial class ITelegramBotClientExtensions
 {
-    // TODO REFACTOR
-    // public static async Task<int> SendSavedMessageByCopy(this ITelegramBotClient client, ChatId chatId,
-    //     BotDbContext db, long savedMessageId)
-    // {
-    //     List<BotSavedMessageEntity> messages = await GetSavedMessages(db, savedMessageId) ??
-    //                                      throw new Exception($"Not found in database saved_message");
-    //
-    //     BotSavedMessageEntity messageEntityToSend = messages.First();
-    //     var mesId = await client.CopyMessageAsync(chatId, messageEntityToSend.TelegramChatId!,
-    //         (int) messageEntityToSend.TelegramMessageId!);
-    //
-    //     return mesId.Id;
-    // }
-    //
-    // public static async Task SendSavedMessage(this ITelegramBotClient client, ChatId chatId,
-    //     BotDbContext db, long savedMessageId, IReplyMarkup replyMarkup = null)
-    // {
-    //     List<BotSavedMessageEntity> messages = await GetSavedMessages(db, savedMessageId) ??
-    //                                      throw new Exception($"Not found in database saved_message");
-    //
-    //     if (messages.Count > 1)
-    //     {
-    //         await SendMediaGroup(client, chatId, messages);
-    //     }
-    //     else
-    //     {
-    //         await SendOneMessage(client, chatId, messages.First(), replyMarkup);
-    //     }
-    // }
+    public static async Task<int> SendSavedMessageByCopy(this ITelegramBotClient client, long chatId,
+        BotDbContext db, long savedMessageId)
+    {
+        List<BotSavedMessageEntity> messages = await GetSavedMessages(db, savedMessageId) ??
+                                         throw new Exception($"Not found in database saved_message");
+    
+        BotSavedMessageEntity messageEntityToSend = messages.First();
+        var mesId = await client.CopyMessageAsync(chatId, messageEntityToSend.TelegramChatId!.Value, (int) messageEntityToSend.TelegramMessageId!);
+    
+        return mesId.Id;
+    }
+    
+    public static async Task SendSavedMessage(this ITelegramBotClient client, long chatId,
+        BotDbContext db, long savedMessageId, ReplyMarkup replyMarkup = null)
+    {
+        List<BotSavedMessageEntity> messages = await GetSavedMessages(db, savedMessageId) ??
+                                         throw new Exception($"Not found in database saved_message");
+    
+        if (messages.Count > 1)
+        {
+            await SendMediaGroup(client, chatId, messages);
+        }
+        else
+        {
+            await SendOneMessage(client, chatId, messages.First(), replyMarkup);
+        }
+    }
 
     private static async Task<List<BotSavedMessageEntity>?> GetSavedMessages(BotDbContext db, long savedMessageId)
     {

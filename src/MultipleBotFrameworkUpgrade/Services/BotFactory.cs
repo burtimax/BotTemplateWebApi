@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using MultipleBotFrameworkUpgrade.Db;
 using MultipleBotFrameworkUpgrade.Db.Entity;
+using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Options;
+using MultipleBotFrameworkUpgrade.Utils.BotEventHadlers;
 using Telegram.BotAPI;
 using Telegram.BotAPI.GettingUpdates;
 
@@ -25,15 +28,14 @@ public class BotFactory : IBotFactory
         {
             try
             {
-                TelegramBotClient botClient = new(bot.Token);
+                MyTelegramBotClient botClient = new(bot.Token);
                 string webhook = config.Webhook.TrimEnd('/') + '/' + bot.Id;
                 botClient.SetWebhookAsync(webhook).Wait();
                 
                 if (botOptions != null && botOptions.BoundRequestsInSecond != null)
                 {
-                    //TODO REFACTOR
-                    // OnMakingApiRequest.BoundRequestInSecond = botOptions.BoundRequestsInSecond.Value;
-                    // botClient.OnMakingApiRequest += OnMakingApiRequest.Handler; 
+                    OnMakingApiRequest.BoundRequestInSecond = botOptions.BoundRequestsInSecond.Value;
+                    botClient.OnMakingApiRequest += OnMakingApiRequest.Handler; 
                 }
                 
                 _bots.Add((bot.Id, botClient));
