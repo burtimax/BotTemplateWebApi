@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MultipleBotFrameworkUpgrade.Db;
 using MultipleBotFrameworkUpgrade.Db.Entity;
@@ -14,6 +15,11 @@ namespace MultipleBotFrameworkUpgrade.Base;
 
 public interface IBaseBotHandler
 {
+    /// <summary>
+    /// DI вервисы.
+    /// </summary>
+    public IServiceProvider ServiceProvider { get; set; }
+    
     /// <summary>
     /// Идентификатор бота.
     /// </summary>
@@ -60,7 +66,7 @@ public interface IBaseBotHandler
     /// <summary>
     /// Разрешения пользователя.
     /// </summary>
-    public IReadOnlyList<ClaimValue> UserClaims { get; set; }
+    public IReadOnlyList<ClaimValue>? UserClaims { get; set; }
 
     /// <summary>
     /// Является ли текущий пользователь владельцем бота?
@@ -73,4 +79,12 @@ public interface IBaseBotHandler
     /// <param name="update"></param>
     /// <returns></returns>
     Task HandleBotRequest(Update update);
+    
+    /// <summary>
+    /// Отправить приветственное сообщение.
+    /// Используется при переходе в состояние.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    public Task SendIntroduction();
 }

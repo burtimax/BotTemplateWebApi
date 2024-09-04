@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Repository;
@@ -18,8 +19,9 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// Админов может быть несколько.
 /// Пример команды: [/auth {ПАРОЛЬ БОТА}]
 /// </summary>
+[BotHandler(Command = Name)]
 [BotCommand(Name)]
-public class AuthCommand: BaseBotCommand
+public class AuthCommand: BaseBotHandler
 {
     internal const string Name = "/auth";
 

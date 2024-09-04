@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Constants;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Utils.ReportGenerator;
 using Telegram.BotAPI;
@@ -15,9 +16,9 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// Команда для получения отчета по работе бота за последние N часов.
 /// /report {number_hours}
 /// </summary>
-[BotCommand(Name, version: 1, 
-    RequiredUserClaims = new[] { BotConstants.BaseBotClaims.BotReportGet })]
-public class ReportCommand : BaseBotCommand
+[BotCommand(Name, version: 1, RequiredUserClaims = new[] { BotConstants.BaseBotClaims.BotReportGet })]
+[BotHandler(command: Name, version: 1, requiredUserClaims: new[] { BotConstants.BaseBotClaims.BotReportGet })]
+public class ReportCommand : BaseBotHandler
 {
     public const string Name = "/report";
 

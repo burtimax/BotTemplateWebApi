@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Constants;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Options;
 using Telegram.BotAPI;
@@ -19,7 +20,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// Команда уведомления для всех пользователей бота.
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class GetMessageInfoCommand : BaseBotCommand
+[BotHandler(command:Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
+public class GetMessageInfoCommand : BaseBotHandler
 {
     public const string Name = "/msg";
 

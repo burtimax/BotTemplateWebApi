@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Db.Entity;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Repository;
 using Telegram.BotAPI;
@@ -20,7 +21,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// /unblock {@user|user_id} {@user|user_id} ... 
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserUnblock})]
-public class UnblockUserCommand: BaseBotCommand
+[BotHandler(command: Name, version: 1.0f,requiredUserClaims: new []{BotConstants.BaseBotClaims.BotUserUnblock})]
+public class UnblockUserCommand: BaseBotHandler
 {
     internal const string Name = "/unblock";
 

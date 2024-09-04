@@ -10,11 +10,11 @@ public class BotUserClaimEntity : BaseEntity<long>
 {
     [Comment("Внешний ключ на пользователя.")]
     public long UserId { get; set; }
-    public virtual BotUserEntity User { get; set; }
+    public virtual BotUserEntity? User { get; set; }
 
     [Comment("Внешний ключ разрешения.")]
     public long ClaimId { get; set; }
-    public virtual BotClaimEntity Claim { get; set; }
+    public virtual BotClaimEntity? Claim { get; set; }
     
     /// <summary>
     /// Внешний ключ на бота.

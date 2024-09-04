@@ -9,6 +9,7 @@ using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Constants;
 using MultipleBotFrameworkUpgrade.Db.Entity;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Repository;
@@ -23,7 +24,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// /find {string}
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserGet})]
-public class FindUserCommand: BaseBotCommand
+[BotHandler(command:Name, version: 1.0f, requiredUserClaims: new []{BotConstants.BaseBotClaims.BotUserGet})]
+public class FindUserCommand: BaseBotHandler
 {
     internal const string Name = "/find";
 

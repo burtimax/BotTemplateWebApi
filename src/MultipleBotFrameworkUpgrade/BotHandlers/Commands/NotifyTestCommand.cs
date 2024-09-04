@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Db;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Utils;
@@ -21,7 +22,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// Команда уведомления (тест для проверки).
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class NotifyTestCommand : BaseBotCommand
+[BotHandler(command: Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
+public class NotifyTestCommand : BaseBotHandler
 {
     public const string Name = "/testnotify";
 

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Db.Entity;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Repository;
@@ -20,8 +21,9 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// Команда для блокировки пользователей.
 /// /block {@user|user_id} {@user|user_id} ... 
 /// </summary>
-[BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserBlock})]
-public class BlockUserCommand: BaseBotCommand
+[BotHandler(command:Name, version:1f, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserBlock})]
+[BotCommand(command:Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserBlock})]
+public class BlockUserCommand: BaseBotHandler
 {
     internal const string Name = "/block";
 

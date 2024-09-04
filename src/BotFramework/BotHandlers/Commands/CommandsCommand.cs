@@ -92,6 +92,6 @@ public class CommandsCommand: BaseBotCommand
 
     private bool HasUserClaim(string claimName)
     {
-        return UserClaims.Any(uc => uc.Name == claimName || uc.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty);
+        return UserClaims.Any(uc => uc.Name == claimName /*|| uc.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty*/);
     }
 }

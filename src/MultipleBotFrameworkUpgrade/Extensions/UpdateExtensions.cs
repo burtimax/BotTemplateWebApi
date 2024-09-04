@@ -16,7 +16,7 @@ namespace MultipleBotFrameworkUpgrade.Extensions
         /// <returns></returns>
         public static UpdateType Type(this Update update)
         {
-            return update switch
+            var updateType = update switch
             {
                 { Message: { } }            => UpdateType.Message,
                 { EditedMessage: { } }      => UpdateType.EditedMessage,
@@ -34,6 +34,12 @@ namespace MultipleBotFrameworkUpgrade.Extensions
                 { ChatJoinRequest: { } }    => UpdateType.ChatJoinRequest,
                 _                           => UpdateType.Unknown
             };
+
+            if (updateType is UpdateType.Message
+                && update.Message!.Type() == MessageType.Text
+                && update.Message!.Text!.StartsWith("/")) updateType = UpdateType.Command;
+
+            return updateType;
         }
         
         /// <summary>
@@ -46,6 +52,7 @@ namespace MultipleBotFrameworkUpgrade.Extensions
             return update.Type() switch
             {
                 UpdateType.Message => update.Message.Chat,
+                UpdateType.Command => update.Message.Chat,
                 UpdateType.CallbackQuery => update.CallbackQuery.Message.Chat,
                 UpdateType.ChannelPost => update.ChannelPost.Chat,
                 UpdateType.ChatMember => update.ChatMember.Chat,
@@ -74,6 +81,7 @@ namespace MultipleBotFrameworkUpgrade.Extensions
             return update.Type() switch
             {
                 UpdateType.Message => update.Message,
+                UpdateType.Command => update.Message,
                 UpdateType.Poll => update.Poll,
                 UpdateType.CallbackQuery => update.CallbackQuery,
                 UpdateType.ChannelPost => update.ChannelPost,
@@ -101,6 +109,7 @@ namespace MultipleBotFrameworkUpgrade.Extensions
             return update.Type() switch
             {
                 UpdateType.Message => update.Message.From,
+                UpdateType.Command => update.Message.From,
                 UpdateType.CallbackQuery => update.CallbackQuery.From,
                 UpdateType.ChannelPost => update.ChannelPost.From,
                 UpdateType.ChatMember => update.ChatMember.From,

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Constants;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Repository;
@@ -21,7 +22,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// /commands
 /// </summary>
 [BotCommand(Name, version: 1.0f)]
-public class CommandsCommand: BaseBotCommand
+[BotHandler(command:Name, version: 1.0f)]
+public class CommandsCommand: BaseBotHandler
 {
     internal const string Name = "/commands";
 

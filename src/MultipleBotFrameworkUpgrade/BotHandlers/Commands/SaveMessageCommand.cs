@@ -5,6 +5,7 @@ using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.BotHandlers.States.SaveMessage;
 using MultipleBotFrameworkUpgrade.Db;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Enums;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
@@ -16,7 +17,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// Команда уведомления для всех пользователей бота.
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class SaveMessageCommand : BaseBotCommand
+[BotHandler(command: Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
+public class SaveMessageCommand : BaseBotHandler
 {
     public const string Name = "/save_msg";
 
@@ -29,9 +31,9 @@ public class SaveMessageCommand : BaseBotCommand
 
     public override async Task HandleBotRequest(Update update)
     {
-        if (Chat.States.CurrentState != SaveMessageState.Name)
+        if (Chat.States.CurrentState != SaveMessageHandler.Name)
         {
-            Chat.States.Set(SaveMessageState.Name, ChatStateSetterType.SetNext);
+            Chat.States.Set(SaveMessageHandler.Name, ChatStateSetterType.SetNext);
             await _db.SaveChangesAsync();
         }
         

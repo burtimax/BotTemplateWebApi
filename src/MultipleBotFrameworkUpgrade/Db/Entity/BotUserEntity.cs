@@ -78,6 +78,12 @@ namespace MultipleBotFrameworkUpgrade.Db.Entity
         [Comment("Внешний ключ на бота.")]
         public long BotId { get; set; }
         public BotEntity? Bot { get; set; }
+
+        /// <summary>
+        /// Навигационное поле.
+        /// Список чатов пользователя.
+        /// </summary>
+        private List<BotChatEntity> Chats { get; set; }
         
         #region NotMappedData
         

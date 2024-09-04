@@ -7,6 +7,7 @@ using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Db;
 using MultipleBotFrameworkUpgrade.Db.Entity;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Enums;
 using MultipleBotFrameworkUpgrade.Extensions;
 using MultipleBotFrameworkUpgrade.Services;
@@ -17,14 +18,15 @@ using Telegram.BotAPI.GettingUpdates;
 namespace MultipleBotFrameworkUpgrade.BotHandlers.States.SaveMessage;
 
 [BotState(Name)]
-internal class SaveMessageState : BaseBotState
+[BotHandler(stateName:Name)]
+internal class SaveMessageHandler : BaseBotHandler
 {
     public const string Name = "__saveMessageBaseState__";
     
     private readonly BotDbContext _db;
     private readonly ISavedMessageService _savedMessageService;
     
-    public SaveMessageState(IServiceProvider serviceProvider) : base(serviceProvider)
+    public SaveMessageHandler(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _db = serviceProvider.GetRequiredService<BotDbContext>();
         _savedMessageService = serviceProvider.GetRequiredService<ISavedMessageService>();

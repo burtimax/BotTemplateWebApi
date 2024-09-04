@@ -86,7 +86,7 @@ public class ResetClaimsCommand: BaseBotCommand
             }
 
             // Нельзя удалять супер ращрешение у других. Оно только у админа.
-            if(existed.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty) continue;
+            //if(existed.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty) continue;
             
             claimsToDelete.Add(existed);
         }

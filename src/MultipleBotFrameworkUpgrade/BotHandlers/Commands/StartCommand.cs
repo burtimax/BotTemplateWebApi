@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Constants;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Repository;
 using Telegram.BotAPI;
@@ -17,7 +18,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// Обязательная команда бота (по умолчанию)
 /// </summary>
 [BotCommand(Name, version: 0.1f)]
-public class StartCommand : BaseBotCommand
+[BotHandler(command: Name, version: 0.1f)]
+public class StartCommand : BaseBotHandler
 {
     internal const string Name = "/start";
 

@@ -27,6 +27,13 @@ public class BotHelper
         var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.TelegramId == userTelegramId);
         await ExecuteFor(db, botId, new []{ user }, action);
     }
+    
+    public static async Task ExecuteForUserRole(BotDbContext db, long botId, string role, TaskAction<(BotUserEntity user, BotChatEntity chat)> action)
+    {
+        IBaseBotRepository repository = new BaseBotRepository(db);
+        var users = (await repository.GetUsersByRole(role));
+        await ExecuteFor(db, botId, users, action);
+    }
 
     public static async Task ExecuteFor(BotDbContext db, long botId, string claimName, TaskAction<(BotUserEntity user, BotChatEntity chat)> action)
     {
@@ -40,7 +47,7 @@ public class BotHelper
         if (users == null) throw new ArgumentNullException(nameof(users));
         
         var usersIds = users.Select(u => u.Id);
-        var chats = await db.Chats.Where(c => c.BotId == botId && usersIds.Contains(c.BotUserId)).ToListAsync();
+        var chats = await db.Chats.Where(c => c.BotId == botId && c.BotUserId != null && usersIds.Contains(c.BotUserId.Value)).ToListAsync();
 
         if (users.Count() != chats.Count) throw new Exception();
 

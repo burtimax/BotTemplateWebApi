@@ -35,6 +35,7 @@ public class SaveUpdateService : ISaveUpdateService
         saveUpdateDto.Content = update.Type() switch
         {
             UpdateType.Message => GetContentByMessageType(update.Message), 
+            UpdateType.Command => GetContentByMessageType(update.Message), 
             UpdateType.CallbackQuery => update.CallbackQuery?.Data ?? "",
             UpdateType.EditedMessage => update.EditedMessage?.Text ?? "",
             UpdateType.Poll => update.Poll?.Question ?? "",

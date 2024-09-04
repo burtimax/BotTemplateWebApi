@@ -64,6 +64,13 @@ namespace MultipleBotFrameworkUpgrade.Repository
         Task<IEnumerable<BotUserEntity>> GetUsersByClaim(long botId, string claimName);
         
         /// <summary>
+        /// Получить пользователей по роли.
+        /// </summary>
+        /// <param name="role"></param>
+        /// <returns></returns>
+        Task<IEnumerable<BotUserEntity>> GetUsersByRole(string role);
+        
+        /// <summary>
         /// Добавить пользователя или обновить информацию по нему.
         /// Обновляет информацию (Firstname, Lastname, Username)
         /// Потому что с прошествием времени может поменяться эта информация.
@@ -76,12 +83,17 @@ namespace MultipleBotFrameworkUpgrade.Repository
         Task<BotChatEntity?> GetChat(long botId, long chatId, long botUserId);
 
         /// <summary>
+        /// Получить чат по ИД.
+        /// </summary>
+        public Task<BotChatEntity?> GetChatById(long botId, long chatId);
+        
+        /// <summary>
         /// Добавить чат пользователя.
         /// </summary>
         /// <param name="botId"></param>
         /// <param name="chat">Telegram Chat object</param>
         /// <param name="chatOwner"></param>
-        Task<BotChatEntity?> AddChat(long botId, Chat chat, BotUserEntity? chatOwner);
+        Task<BotChatEntity?> AddChat(long botId, Chat? chat, BotUserEntity? chatOwner);
 
         /// <summary>
         /// Получить пользователя по ИД.

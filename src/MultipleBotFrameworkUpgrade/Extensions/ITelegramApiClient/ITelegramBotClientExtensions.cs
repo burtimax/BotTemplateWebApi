@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MultipleBotFrameworkUpgrade.Constants;
 using MultipleBotFrameworkUpgrade.Db;
 using MultipleBotFrameworkUpgrade.Db.Entity;
 using Telegram.BotAPI;
@@ -16,6 +17,25 @@ namespace MultipleBotFrameworkUpgrade.Extensions.ITelegramApiClient;
 
 public static partial class ITelegramBotClientExtensions
 {
+    public static async Task SendMediaAsync(this ITelegramBotClient client, long chatId, IEnumerable<InputMedia> media, string caption, string parseMode = ParseMode.Html)
+    {
+        if (media == null || media.Any() == false)
+        {
+            if (caption != null)
+            {
+                await client.SendMessageAsync(chatId: chatId, text:caption, parseMode: parseMode);
+                return;
+            }
+            return;
+        }
+
+        media.Last().Caption = caption;
+        media.Last().ParseMode = parseMode;
+
+        await client.SendMediaGroupAsync(chatId: chatId, media: media);
+    }
+    
+    
     public static async Task<int> SendSavedMessageByCopy(this ITelegramBotClient client, long chatId, BotDbContext db, long savedMessageId)
     {
         List<BotSavedMessageEntity> messages = await GetSavedMessages(db, savedMessageId) ??
@@ -55,5 +75,7 @@ public static partial class ITelegramBotClientExtensions
             .OrderBy(m => m.Id)
             .ToListAsync();
     }
+    
+    
     
 }

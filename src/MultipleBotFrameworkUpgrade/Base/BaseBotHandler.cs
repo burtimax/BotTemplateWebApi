@@ -15,19 +15,22 @@ using Telegram.BotAPI.GettingUpdates;
 namespace MultipleBotFrameworkUpgrade.Base;
 
 /// <summary>
-/// Базовый класс обработчика состояния.
+/// Базовый обработчик запроса бота.
 /// </summary>
 /// <typeparam name="TResuorces">Тип класса ресурсов. Строки, пути к файлам и т.д.</typeparam>
-public abstract class BaseBotState : ControllerBase, IBaseBotHandler
+public abstract class BaseBotHandler : ControllerBase, IBaseBotHandler
 {
+    /// <inheritdoc />
+    public IServiceProvider ServiceProvider { get; set; }
+
     /// <inheritdoc />
     public long BotId { get; set; }
 
     /// <inheritdoc/>
-    public BotUserEntity User { get; set; }
+    public BotUserEntity? User { get; set; }
 
     /// <inheritdoc/>
-    public BotChatEntity Chat { get; set; }
+    public BotChatEntity? Chat { get; set; }
     
     /// <inheritdoc/>
     public Update Update { get; set; }
@@ -42,12 +45,12 @@ public abstract class BaseBotState : ControllerBase, IBaseBotHandler
     public ITelegramBotClient BotClient { get; set; }
 
     /// <inheritdoc/>
-    public IReadOnlyList<ClaimValue> UserClaims { get; set; }
+    public IReadOnlyList<ClaimValue>? UserClaims { get; set; }
 
     /// <inheritdoc />
     public bool IsOwner { get; set; }
 
-    public BaseBotState(IServiceProvider serviceProvider)
+    public BaseBotHandler(IServiceProvider serviceProvider)
     {
         BotDbContext = serviceProvider.GetRequiredService<BotDbContext>();
         var botConfig = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
@@ -56,4 +59,10 @@ public abstract class BaseBotState : ControllerBase, IBaseBotHandler
 
     /// <inheritdoc/>
     public abstract Task HandleBotRequest(Update update);
+
+    /// <inheritdoc />
+    public virtual Task SendIntroduction()
+    {
+        return Task.CompletedTask;
+    }
 }

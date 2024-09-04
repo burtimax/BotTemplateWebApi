@@ -110,6 +110,12 @@ namespace MultipleBotFrameworkUpgrade.Repository
                 .ToListAsync());
         }
 
+        /// <inheritdoc />
+        public async Task<IEnumerable<BotUserEntity>> GetUsersByRole(string role)
+        {
+            return await _db.Users.Where(u => u.Role == role).ToListAsync();
+        }
+
         private async Task<bool> IsUserExists(long botId, long userId)
         {
             BotUserEntity? u = await _db.Users.FirstOrDefaultAsync(u => u.BotId == botId && u.TelegramId == userId);
@@ -148,13 +154,19 @@ namespace MultipleBotFrameworkUpgrade.Repository
             return _db.Chats.SingleOrDefaultAsync(c => c.BotId == botId
             && c.TelegramId == chatId && c.BotUserId == botUserId);
         }
+        
+        public Task<BotChatEntity?> GetChatById(long botId, long chatId)
+        {
+            return _db.Chats.FirstOrDefaultAsync(c => c.BotId == botId
+                                                       && c.TelegramId == chatId);
+        }
 
         /// <inheritdoc />
         public async Task<BotChatEntity?> AddChat(long botId, Chat? chat, BotUserEntity? chatOwner)
         {
-            if (chat == null || chatOwner == null) return null;
+            if (chat == null) return null;
             
-            BotChatEntity newChatEntity = chat.ToBotChatEntity(botId, chatOwner.Id);
+            BotChatEntity newChatEntity = chat.ToBotChatEntity(botId, chatOwner?.Id);
             newChatEntity.States.CurrentState = BotConstants.StartState;
             newChatEntity.CreatedAt = DateTimeOffset.Now;
             _db.Chats.Add(newChatEntity);
@@ -283,11 +295,6 @@ namespace MultipleBotFrameworkUpgrade.Repository
         public async Task<IEnumerable<BotClaimEntity>> GetAllClaims(bool hideBruceClaim = false)
         {
             var claims = _db.Claims.Where(c => true);
-
-            if (hideBruceClaim)
-            {
-                claims = claims.Where(c => c.Name != BotConstants.BaseBotClaims.IAmBruceAlmighty);
-            }
 
             return await claims.ToListAsync();
         }

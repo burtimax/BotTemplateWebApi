@@ -5,6 +5,7 @@ public enum UpdateType
 {
     Unknown = 0,
     Message,
+    Command,
     InlineQuery,
     ChosenInlineResult,
     CallbackQuery,

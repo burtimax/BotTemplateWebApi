@@ -27,7 +27,7 @@ namespace MultipleBotFrameworkUpgrade.Extensions
             };
         }
         
-        public static BotChatEntity ToBotChatEntity(this Chat chat, long botId, long botUserId)
+        public static BotChatEntity ToBotChatEntity(this Chat chat, long botId, long? botUserId)
         {
             return new BotChatEntity()
             {
@@ -35,6 +35,7 @@ namespace MultipleBotFrameworkUpgrade.Extensions
                 TelegramId = chat.Id,
                 TelegramUsername = chat.Username,
                 BotUserId = botUserId,
+                Type = chat.Type,
             };
         }
     }

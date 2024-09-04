@@ -8,6 +8,7 @@ using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Constants;
 using MultipleBotFrameworkUpgrade.Db.Entity;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Exceptions;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Repository;
@@ -22,7 +23,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// /set @user {claim_name|claim_id} {claim_name|claim_id} ...
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserClaimCreate})]
-public class SetClaimsCommand: BaseBotCommand
+[BotHandler(command: Name, version: 1.0f,requiredUserClaims: new []{BotConstants.BaseBotClaims.BotUserClaimCreate})]
+public class SetClaimsCommand: BaseBotHandler
 {
     internal const string Name = "/set";
 
@@ -86,9 +88,6 @@ public class SetClaimsCommand: BaseBotCommand
                 await BotClient.SendMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
                 throw new NotFoundBotClaim(claimId);
             }
-
-            // Нельзя добавлять супер разрешение другим. Оно только у админа.
-            if(existed.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty) continue;
             
             claimsToAdd.Add(existed);
         }

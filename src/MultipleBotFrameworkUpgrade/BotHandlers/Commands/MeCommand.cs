@@ -7,6 +7,7 @@ using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Constants;
 using MultipleBotFrameworkUpgrade.Db.Entity;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Repository;
@@ -21,7 +22,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// /me
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new[] { BotConstants.BaseBotClaims.BotUserGet })]
-public class MeCommand : BaseBotCommand
+[BotHandler(command:Name, version: 1.0f, requiredUserClaims: new[] { BotConstants.BaseBotClaims.BotUserGet })]
+public class MeCommand : BaseBotHandler
 {
     internal const string Name = "/me";
 
@@ -36,7 +38,8 @@ public class MeCommand : BaseBotCommand
 
     public override async Task HandleBotRequest(Update update)
     {
-        BotChatEntity? userChat = await _baseBotRepository.GetChat(BotId, Chat.ChatId, User.Id);
+        //BotChatEntity? userChat = await _baseBotRepository.GetChat(BotId, Chat.ChatId, User.Id);
+        BotChatEntity? userChat = await _baseBotRepository.GetChatById(BotId, Chat.ChatId);
         IEnumerable<BotClaimEntity>? claims = await _baseBotRepository.GetUserClaims(BotId, User.Id);
         string userData = UserCommand.GetUserDataString(User!, userChat, claims);
 

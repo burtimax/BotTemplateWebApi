@@ -8,6 +8,7 @@ using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Constants;
 using MultipleBotFrameworkUpgrade.Db.Entity;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Repository;
 using Telegram.BotAPI;
@@ -21,7 +22,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// /user {string}
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new[] { BotConstants.BaseBotClaims.BotUserGet })]
-public class UserCommand : BaseBotCommand
+[BotHandler(command: Name, version: 1.0f, requiredUserClaims: new[] { BotConstants.BaseBotClaims.BotUserGet })]
+public class UserCommand : BaseBotHandler
 {
     internal const string Name = "/user";
 
@@ -55,7 +57,8 @@ public class UserCommand : BaseBotCommand
             return;
         }
 
-        BotChatEntity? userChat = await _baseBotRepository.GetChat(BotId, Chat.ChatId, user.Id);
+        //BotChatEntity? userChat = await _baseBotRepository.GetChat(BotId, Chat.ChatId, user.Id);
+        BotChatEntity? userChat = await _baseBotRepository.GetChatById(BotId, Chat.ChatId);
         IEnumerable<BotClaimEntity>? claims = await _baseBotRepository.GetUserClaims(BotId, user.Id);
         string userData = GetUserDataString(user!, userChat, claims);
 

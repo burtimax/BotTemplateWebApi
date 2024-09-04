@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Db;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Models;
 using MultipleBotFrameworkUpgrade.Options;
 using MultipleBotFrameworkUpgrade.Utils;
@@ -20,7 +21,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// Команда уведомления для всех пользователей бота.
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class NotifyCommand : BaseBotCommand
+[BotHandler(command:Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
+public class NotifyCommand : BaseBotHandler
 {
     public const string Name = "/notify";
 

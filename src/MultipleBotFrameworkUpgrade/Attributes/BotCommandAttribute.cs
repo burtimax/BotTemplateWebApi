@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFrameworkUpgrade.Attributes;
 

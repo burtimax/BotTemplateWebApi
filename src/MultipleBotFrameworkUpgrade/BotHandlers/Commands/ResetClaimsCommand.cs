@@ -7,6 +7,7 @@ using MultipleBotFrameworkUpgrade.Attributes;
 using MultipleBotFrameworkUpgrade.Base;
 using MultipleBotFrameworkUpgrade.Constants;
 using MultipleBotFrameworkUpgrade.Db.Entity;
+using MultipleBotFrameworkUpgrade.Dispatcher.HandlerResolvers;
 using MultipleBotFrameworkUpgrade.Exceptions;
 using MultipleBotFrameworkUpgrade.Repository;
 using Telegram.BotAPI;
@@ -20,7 +21,8 @@ namespace MultipleBotFrameworkUpgrade.BotHandlers.Commands;
 /// /reset @user {claim_name|claim_id} {claim_name|claim_id} ...
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserClaimDelete})]
-public class ResetClaimsCommand: BaseBotCommand
+[BotHandler(command: Name, version: 1.0f, requiredUserClaims: new []{BotConstants.BaseBotClaims.BotUserClaimDelete})]
+public class ResetClaimsCommand: BaseBotHandler
 {
     internal const string Name = "/reset";
 
@@ -81,9 +83,6 @@ public class ResetClaimsCommand: BaseBotCommand
                 await BotClient.SendMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
                 throw new NotFoundBotClaim(claimId);
             }
-
-            // Нельзя удалять супер ращрешение у других. Оно только у админа.
-            if(existed.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty) continue;
             
             claimsToDelete.Add(existed);
         }

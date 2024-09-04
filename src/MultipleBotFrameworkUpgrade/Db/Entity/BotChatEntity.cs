@@ -19,6 +19,11 @@ namespace MultipleBotFrameworkUpgrade.Db.Entity
         public long? TelegramId { get; set; }
 
         /// <summary>
+        /// private, channel, group и прочие.
+        /// </summary>
+        public string? Type { get; set; }
+        
+        /// <summary>
         /// Идентификатор чата в телеграм.
         /// </summary>
         /// <remarks>Некоторые чаты вместо long идентификатора имеют username идентификатор</remarks>
@@ -29,8 +34,8 @@ namespace MultipleBotFrameworkUpgrade.Db.Entity
         /// Внешний ключ на пользователя.
         /// </summary>
         [Comment("Внешний ключ на пользователя.")]
-        public long BotUserId { get; set; }
-        public BotUserEntity BotUser { get; set; }
+        public long? BotUserId { get; set; }
+        public BotUserEntity? BotUser { get; set; }
 
         /// <summary>
         /// Состояние чата.

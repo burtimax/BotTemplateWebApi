@@ -107,7 +107,7 @@ public class BotExceptionHandler
                 .Select(uc => uc.UserId)
                 .ToListAsync();
             IEnumerable<BotChatEntity> moderatorChats =
-                await db.Chats.Where(c => moderatorUserIds.Contains(c.BotUserId)).ToListAsync();
+                await db.Chats.Where(c => c.BotUserId != null && moderatorUserIds.Contains(c.BotUserId.Value)).ToListAsync();
 
             string fileFromTelegram = null;
             
