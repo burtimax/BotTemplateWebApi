@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MultipleBotFrameworkUpgrade.Db;
+using MultipleBotFramework_Obsolete.Db;
+using MultipleBotFramework.Db;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -24,7 +25,7 @@ namespace MultipleBotFramework.Db.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "hstore");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotChatEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotChatEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,7 +40,7 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnName("bot_id")
                         .HasComment("Внешний ключ на бота.");
 
-                    b.Property<long?>("BotUserId")
+                    b.Property<long>("BotUserId")
                         .HasColumnType("bigint")
                         .HasColumnName("bot_user_id")
                         .HasComment("Внешний ключ на пользователя.");
@@ -61,10 +62,6 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnType("text")
                         .HasColumnName("telegram_username")
                         .HasComment("Строковый идентификатор чата в телеграм. Некоторые чаты вместо long идентификатора имеют username идентификатор.");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("text")
-                        .HasColumnName("type");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -96,7 +93,7 @@ namespace MultipleBotFramework.Db.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotClaimEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotClaimEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -138,7 +135,7 @@ namespace MultipleBotFramework.Db.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -183,7 +180,7 @@ namespace MultipleBotFramework.Db.Migrations
                     b.ToTable("bots", "bot");
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotExceptionEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotExceptionEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -266,7 +263,7 @@ namespace MultipleBotFramework.Db.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotOwnerEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotOwnerEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -311,13 +308,10 @@ namespace MultipleBotFramework.Db.Migrations
                     b.HasKey("Id")
                         .HasName("pk_bot_owners");
 
-                    b.HasIndex("BotId")
-                        .HasDatabaseName("ix_bot_owners_bot_id");
-
                     b.ToTable("bot_owners", "bot");
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotSavedMessageEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotSavedMessageEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -353,7 +347,7 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Property<long?>("TelegramChatId")
                         .HasColumnType("bigint")
                         .HasColumnName("telegram_chat_id")
-                        .HasComment("Telegram ID чата.");
+                        .HasComment("Внешний ключ на таблицу чатов.");
 
                     b.Property<int>("TelegramMessageId")
                         .HasColumnType("integer")
@@ -368,7 +362,7 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Property<long?>("TelegramUserId")
                         .HasColumnType("bigint")
                         .HasColumnName("telegram_user_id")
-                        .HasComment("Telegram ID пользователя.");
+                        .HasComment("Внешний ключ на таблицу чатов.");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -386,7 +380,7 @@ namespace MultipleBotFramework.Db.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotUpdateEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotUpdateEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -448,7 +442,7 @@ namespace MultipleBotFramework.Db.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotUserClaimEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotUserClaimEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -504,7 +498,7 @@ namespace MultipleBotFramework.Db.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotUserEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotUserEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -595,18 +589,20 @@ namespace MultipleBotFramework.Db.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotChatEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotChatEntity", b =>
                 {
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotEntity", "Bot")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotEntity", "Bot")
                         .WithMany()
                         .HasForeignKey("BotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_chats_bots_bot_id");
 
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotUserEntity", "BotUser")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotUserEntity", "BotUser")
                         .WithMany()
                         .HasForeignKey("BotUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_chats_users_bot_user_id");
 
                     b.Navigation("Bot");
@@ -614,24 +610,24 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Navigation("BotUser");
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotExceptionEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotExceptionEntity", b =>
                 {
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotEntity", "Bot")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotEntity", "Bot")
                         .WithMany()
                         .HasForeignKey("BotId")
                         .HasConstraintName("fk_exceptions_bots_bot_id");
 
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotChatEntity", "ChatEntity")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotChatEntity", "ChatEntity")
                         .WithMany()
                         .HasForeignKey("ChatEntityId")
                         .HasConstraintName("fk_exceptions_chats_chat_entity_id");
 
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotUpdateEntity", "UpdateEntity")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotUpdateEntity", "UpdateEntity")
                         .WithMany()
                         .HasForeignKey("UpdateEntityId")
                         .HasConstraintName("fk_exceptions_updates_update_entity_id");
 
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotUserEntity", "UserEntity")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotUserEntity", "UserEntity")
                         .WithMany()
                         .HasForeignKey("UserEntityId")
                         .HasConstraintName("fk_exceptions_users_user_entity_id");
@@ -645,21 +641,9 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Navigation("UserEntity");
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotOwnerEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotSavedMessageEntity", b =>
                 {
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotEntity", "Bot")
-                        .WithMany()
-                        .HasForeignKey("BotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_bot_owners_bots_bot_id");
-
-                    b.Navigation("Bot");
-                });
-
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotSavedMessageEntity", b =>
-                {
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotEntity", "Bot")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotEntity", "Bot")
                         .WithMany()
                         .HasForeignKey("BotId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -669,16 +653,16 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Navigation("Bot");
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotUpdateEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotUpdateEntity", b =>
                 {
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotEntity", "Bot")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotEntity", "Bot")
                         .WithMany()
                         .HasForeignKey("BotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_updates_bots_bot_id");
 
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotChatEntity", "Chat")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotChatEntity", "Chat")
                         .WithMany()
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -690,23 +674,23 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Navigation("Chat");
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotUserClaimEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotUserClaimEntity", b =>
                 {
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotEntity", "Bot")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotEntity", "Bot")
                         .WithMany()
                         .HasForeignKey("BotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_claims_bots_bot_id");
 
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotClaimEntity", "Claim")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotClaimEntity", "Claim")
                         .WithMany()
                         .HasForeignKey("ClaimId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_claims_claims_claim_id");
 
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotUserEntity", "User")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotUserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -720,21 +704,16 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotUserEntity", b =>
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotUserEntity", b =>
                 {
-                    b.HasOne("MultipleBotFrameworkUpgrade.Db.Entity.BotEntity", "Bot")
-                        .WithMany("Users")
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotEntity", "Bot")
+                        .WithMany()
                         .HasForeignKey("BotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_users_bots_bot_id");
 
                     b.Navigation("Bot");
-                });
-
-            modelBuilder.Entity("MultipleBotFrameworkUpgrade.Db.Entity.BotEntity", b =>
-                {
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

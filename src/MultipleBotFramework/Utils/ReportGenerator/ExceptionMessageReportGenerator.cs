@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Repository;
-using Newtonsoft.Json;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Utils.ReportGenerator;
@@ -20,7 +20,7 @@ public class ExceptionMessageReportGenerator
         sb.AppendLine($"# ERROR")
             .AppendLine()
             .AppendLine($"InputTelegramUpdate:")
-            .AppendLine(JsonConvert.SerializeObject(update, Formatting.Indented))
+            .AppendLine(JsonSerializer.Serialize(update, new JsonSerializerOptions(){ WriteIndented = true }))
             .AppendLine()
             .AppendLine($"ErrorMessage:")
             .AppendLine(e.Message)
