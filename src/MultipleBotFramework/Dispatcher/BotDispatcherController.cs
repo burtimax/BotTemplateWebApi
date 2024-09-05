@@ -9,10 +9,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Dto;
+using MultipleBotFramework.Enums;
 using MultipleBotFramework.Exceptions;
 using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Options;
@@ -20,10 +22,10 @@ using MultipleBotFramework.Repository;
 using MultipleBotFramework.Services;
 using MultipleBotFramework.Utils;
 using MultipleBotFramework.Utils.ExceptionHandler;
-using Newtonsoft.Json;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.AvailableTypes;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Dispatcher;
 
@@ -84,18 +86,25 @@ public class BotDispatcherController : BaseBotController
             // Сохраняем или обновляем информацию о пользователе.
             user = await _botRepository.UpsertUser(botId, telegramUser);
             userClaims = (await _botRepository.GetUserClaims(botId, user?.Id ?? -1))?.Select(c => new ClaimValue(c.Id, c.Name, c?.Description ?? ""));
-            bool isOwner = await _botRepository.IsUserOwner(botId, user.TelegramId);
+            bool isOwner = await _botRepository.IsUserOwner(botId, user?.TelegramId ?? -1);
             
             // Сохраняем чат, если еще не существует. 
-            BotChatEntity? existedChat = await _botRepository.GetChat(botId, new ChatId(telegramChat?.Id ?? -1), user?.Id ?? -1);
-            chat = existedChat ?? await _botRepository.AddChat(botId, telegramChat, user);
+            //BotChatEntity? existedChat = await _botRepository.GetChat(botId, telegramChat?.Id ?? -1, user?.Id ?? -1);
+            // BotChatEntity? existedChat = await _botRepository.GetChatById(botId, telegramChat?.Id ?? -1);
+            // chat = existedChat ?? await _botRepository.AddChat(botId, telegramChat, user);
+
+            BotChatEntity? existedChat = null;
+            if (telegramChat is not null)
+            {
+                chat = existedChat ?? await _botRepository.UpsertChat(botId, telegramChat, telegramUser);
+            }
             
             // Если пользователь заблокирован, тогда ему не отвечаем!!!
             if (user != null && user.IsBlocked)
             {
                 // ToDo перенаправить на состояние блокированного пользователя!!!
                 if(chat != null)
-                    await botClient.SendTextMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
+                    await botClient.SendMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
                 return Ok();
             }
             
@@ -108,57 +117,37 @@ public class BotDispatcherController : BaseBotController
             // Если пришло сообщение из медиа группы сохраненного сообщения, то просто сохранить и ничего не делать.
             // Когда мы сохраняем в бота сообщение с несколькими медиа, то запросы по каждому медиа приходят поотдельности.
             // Нужно собрать все вместе. Вставляем в Диспетчер метод сохранения и сохраняем другие медиа рядом.
-            if (update.Type == UpdateType.Message &&
+            if (update.Type() == UpdateType.Message &&
                 string.IsNullOrEmpty(update.Message.MediaGroupId) == false &&
-                await _savedMessageService.HasSavedMessageWithMediaType(botId, chat.TelegramId.Value, user.TelegramId, update.Message.MediaGroupId))
+                await _savedMessageService.HasSavedMessageWithMediaType(botId, chat?.TelegramId, user?.TelegramId, update.Message.MediaGroupId))
             {
                 await _savedMessageService.SaveMessageFromUpdate(botId, chat, user, update.Message);
                 return Ok();
             }
-
-            // Команды бота обрабатываются вне очереди, вне состояний.
-            if (user != null && chat != null && IsCommand(update))
-            {
-                // Ищем обработчик команды.
-                string command = update!.Message!.Text!;
-                BotCommandHandlerResolver commandHandlerResolver = new(_assembly, Assembly.GetExecutingAssembly());
-                Type? commandHandler = commandHandlerResolver.GetPriorityCommandHandlerType(command, user, userClaims);
-
-                if (commandHandler == null)
-                {
-                    await botClient.SendTextMessageAsync(chat.ChatId, "Не понимаю 🤷‍♂️");
-                    return Ok(); // Сделать так чтобы логировалось и не было ошибок.
-                    throw new NotFoundHandlerForCommandException(command, _assembly.GetName().Name);
-                }
-                
-                // Обрабатываем команду.
-                await ProcessRequestByHandler<BaseBotCommand>(commandHandler, botId, isOwner, botClient, update, chat, user, savedUpdateEntity, userClaims);
-                return Ok();
-            }
             
-            // Если есть глобальные обработчики запроса, тогда перенаправляем на них.
-            BotUpdateTypeHandlerResolver updateTypeHandlerResolver = new(_assembly, Assembly.GetExecutingAssembly());
-            Type? updateHandler = updateTypeHandlerResolver.GetPriorityTypeHandler(update.Type);
-            if (updateHandler != null)
+            // Получаем текушее состояние чата. 
+            string currentState = chat?.States?.CurrentState ?? BotConstants.StartState;
+            BotHandlerResolver handlerResolver = new(_assembly, Assembly.GetExecutingAssembly());
+            BotHandlerResolverArgs resolverArgs = new()
             {
-                await ProcessRequestByHandler<BaseBotPriorityHandler>(updateHandler, botId, isOwner, botClient, update, chat, user, savedUpdateEntity, userClaims);
-                return Ok();
+                BotId = botId,
+                UserRole = user?.Role,
+                User = user,
+                UserClaims = userClaims,
+                UpdateType = update.Type(),
+                StateName = currentState,
+                Command = update.Type() == UpdateType.Command ? update!.Message!.Text : null,
+            };
+
+            List<Type>? handlerTypes = handlerResolver.GetHandlers(resolverArgs);
+            if (handlerTypes is null || handlerTypes.Any() == false)
+            {
+                throw new Exception("Не нашел обработчика для состояния");
             }
 
-            // Тут обрабатываем уже состояние бота.
-            if (user != null && chat != null)
-            {
-                // Получаем текушее состояние чата. 
-                string currentState = chat.States?.CurrentState ?? BotConstants.StartState;
-            
-                BotStateHandlerResolver resolver = new(_assembly, Assembly.GetExecutingAssembly());
-                Type handlerType = resolver.GetPriorityStateHandlerType(currentState, user.Role)
-                                   ?? throw new NotFoundHandlerForStateException(currentState, _assembly.GetName().Name);
-            
-                await ProcessRequestByHandler<BaseBotState>(handlerType, botId, isOwner, botClient, update, chat, user, savedUpdateEntity, userClaims);
-
-                return Ok();
-            }
+            var handlerType = handlerTypes.First();
+            await ProcessRequestByHandler<IBaseBotHandler>(handlerType, botId, isOwner, botClient, update, chat, user, savedUpdateEntity, userClaims);
+            return Ok();
         }
         catch (Exception e)
         {
@@ -191,48 +180,17 @@ public class BotDispatcherController : BaseBotController
     {
         await BotHelper.ExecuteFor(_db, botId, BotConstants.BaseBotClaims.BotExceptionsGet, async (tuple) =>
         {
-            await botClient.SendTextMessageAsync(tuple.chat.ChatId,
-                $"Бот не может найти обработчик для запроса\n<code>{JsonConvert.SerializeObject(update, Formatting.Indented)}</code>", parseMode:ParseMode.Html);
+            await botClient.SendMessageAsync(tuple.chat.ChatId,
+                $"Бот не может найти обработчик для запроса\n<code>{update.ToJson()}</code>", parseMode:ParseMode.Html);
         });
     }
-    
-    /// <summary>
-    /// Обрабатываем специфичные запросы.
-    /// </summary>
-    /// <param name="update"></param>
-    /// <returns></returns>
-    private async Task<bool> HandleSpecifiedRequests(Update update)
-    {
-        // Необходимо обработать Poll тип запроса, потому что у него нет данных о пользователе и чате.
-        if (update.Type == UpdateType.Poll)
-        {
-            //await (_botOptions?.PollHandler?.Invoke(update.Poll) ?? DefaultHandlers.DefaultPoll.Handler(update.Poll));
-            return true;
-        }
-
-        return false;
-    }
-    
-    /// <summary>
-    /// Является ли запрос командой бота.
-    /// </summary>
-    /// <remarks>
-    /// Команды представлены в виде текста, начинающегося с '/'.
-    /// Например "/command".
-    /// </remarks>
-    /// <param name="update">Запрос бота.</param>
-    /// <returns>Является или не является командой.</returns>
-    private bool IsCommand(Update update) =>
-        update.Type == UpdateType.Message && 
-        update.Message.Type == MessageType.Text &&
-        update.Message.Text.StartsWith("/");
 
     /// <summary>
     /// Запустить обработчик типа состояния или команды бота и получить результат. 
     /// </summary>
     /// <param name="handlerTypeName">Наименование типа обработчика.</param>
     /// <param name="update">Объект запроса от Telegram API по webhook.</param>
-    /// <remarks>T - <see cref="BaseBotState"/> или <see cref="BaseBotCommand"/>.</remarks>
+    /// <remarks>T - <see cref="BaseBotHandler"/> или <see cref="BaseBotCommand"/>.</remarks>
     /// <returns></returns>
     /// <exception cref="NotFoundHandlerForStateException">Не найден тип обработчика запроса.</exception>
     /// <exception cref="NotFoundHandlerMethodException">Не найден метод обработчика запроса.</exception>
@@ -245,11 +203,10 @@ public class BotDispatcherController : BaseBotController
             $"{user?.TelegramId.ToString() ?? "UnknownUser"}/@{user?.TelegramUsername ?? "_"}",
             $"{chat?.TelegramId.ToString() ?? "_"}",
             $"{chat?.States?.CurrentState ?? "_"}",
-            update.Type.ToString()
+            update.Type().ToString()
         );
         
-        Assembly handlerTypeAssembly = handlerType.Assembly;
-        
+        // Assembly handlerTypeAssembly = handlerType.Assembly;
         // T handlerInstance = (T) handlerTypeAssembly.CreateInstance(handlerType.FullName, true, BindingFlags.Default, null,
         //     new object[] { HttpContext.RequestServices }, null, null);
 
@@ -267,6 +224,7 @@ public class BotDispatcherController : BaseBotController
         handlerInstance.BotId = botId;
         handlerInstance.BotClient = botClient;
         handlerInstance.IsOwner = isOwner;
+        handlerInstance.ServiceProvider = HttpContext.RequestServices;
         handlerInstance.UserClaims = userClaims?.ToList()?.AsReadOnly() 
                                      ?? new List<ClaimValue>().AsReadOnly();
         

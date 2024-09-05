@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Repository;
 using Newtonsoft.Json;
-using Telegram.Bot.Types;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Utils.ReportGenerator;
 

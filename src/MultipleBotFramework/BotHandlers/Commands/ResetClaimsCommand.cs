@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Exceptions;
 using MultipleBotFramework.Repository;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -19,7 +20,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// /reset @user {claim_name|claim_id} {claim_name|claim_id} ...
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserClaimDelete})]
-public class ResetClaimsCommand: BaseBotCommand
+[BotHandler(command: Name, version: 1.0f, requiredUserClaims: new []{BotConstants.BaseBotClaims.BotUserClaimDelete})]
+public class ResetClaimsCommand: BaseBotHandler
 {
     internal const string Name = "/reset";
 
@@ -37,7 +39,7 @@ public class ResetClaimsCommand: BaseBotCommand
 
         if (words == null || words.Any() == false)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
+            await BotClient.SendMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
                                                         "Например [/reset {@user} {число|строка} {число|строка} ...]");
             return;
         }
@@ -47,7 +49,7 @@ public class ResetClaimsCommand: BaseBotCommand
 
         if (user == null)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найден пользователь [{userParam}].\n" + 
+            await BotClient.SendMessageAsync(Chat.ChatId, $"Не найден пользователь [{userParam}].\n" + 
                                                         "Необходимо указать параметры команды.\n" +
                                                         "Например [/reset {@user} {число|строка} {число|строка} ...]");
             return;
@@ -57,7 +59,7 @@ public class ResetClaimsCommand: BaseBotCommand
 
         if (claims == null || claims.Any() == false)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
+            await BotClient.SendMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
                                                               "Например [/set {@user} {число|строка} {число|строка} ...]");
             return;
         }
@@ -77,12 +79,9 @@ public class ResetClaimsCommand: BaseBotCommand
             }
             if (existed == null)
             {
-                await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
+                await BotClient.SendMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
                 throw new NotFoundBotClaim(claimId);
             }
-
-            // Нельзя удалять супер ращрешение у других. Оно только у админа.
-            if(existed.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty) continue;
             
             claimsToDelete.Add(existed);
         }
@@ -90,7 +89,7 @@ public class ResetClaimsCommand: BaseBotCommand
         await RemoveClaimsFromUser(user.Id, claimsToDelete);
         
         IEnumerable<BotClaimEntity>? userAllClaims = await _baseBotRepository.GetUserClaims(BotId, user.Id);
-        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, "Текущие разрешения пользователя"), parseMode:ParseMode.Html);
+        await BotClient.SendMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, "Текущие разрешения пользователя"), parseMode:ParseMode.Html);
     }
 
     /// <summary>

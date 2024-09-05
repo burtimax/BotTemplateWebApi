@@ -8,15 +8,17 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
 using MultipleBotFramework.Services;
 using MultipleBotFramework.Utils.ReportGenerator;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.AvailableTypes;
+using Telegram.BotAPI.GettingUpdates;
 using File = System.IO.File;
 
 namespace MultipleBotFramework.Utils.ExceptionHandler;
@@ -65,7 +67,7 @@ public class BotExceptionHandler
         using (Stream stream = StreamHelper.GenerateStreamFromString(messageReport))
         {
             string errorFileName = $"{DateTime.Now.Ticks.ToString()}.txt";
-            InputFileStream fileException = InputFile.FromStream(stream, errorFileName);
+            InputFile fileException = new InputFile(stream, errorFileName);
             StringBuilder captionBuilder = new();
             captionBuilder.AppendLine($"<b>Ошибка программы</b>")
                 .AppendLine();
@@ -105,21 +107,30 @@ public class BotExceptionHandler
                 .Select(uc => uc.UserId)
                 .ToListAsync();
             IEnumerable<BotChatEntity> moderatorChats =
-                await db.Chats.Where(c => moderatorUserIds.Contains(c.BotUserId)).ToListAsync();
+                await db.Chats.Where(c => c.BotUserId != null && moderatorUserIds.Contains(c.BotUserId.Value)).ToListAsync();
 
-            InputFile fileFromTelegram = null;
+            string fileFromTelegram = null;
             
             foreach (BotChatEntity ch in moderatorChats)
             {
                 try
                 {
                     if (cancellationToken?.IsCancellationRequested == true) return;
-                    
-                    var message = await botClient.SendDocumentAsync(ch.ChatId, fileFromTelegram ?? fileException, caption: caption,
-                        parseMode: ParseMode.Html);
+
+                    Message message = null;
+                    if (string.IsNullOrEmpty(fileFromTelegram) == false)
+                    {
+                        message = await botClient.SendDocumentAsync(ch.ChatId, fileFromTelegram, caption: caption,
+                            parseMode: ParseMode.Html);
+                    }
+                    else
+                    {
+                        message = await botClient.SendDocumentAsync(ch.ChatId, fileException, caption: caption,
+                            parseMode: ParseMode.Html);
+                    }
                     
                     // Другим отрпавляем тот же документ, только по ИД.
-                    fileFromTelegram = InputFile.FromString(message.Document!.FileId);
+                    fileFromTelegram = message.Document!.FileId;
                 }
                 catch (Exception exception)
                 {

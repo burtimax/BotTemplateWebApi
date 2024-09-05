@@ -5,12 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -19,7 +20,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// /me
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new[] { BotConstants.BaseBotClaims.BotUserGet })]
-public class MeCommand : BaseBotCommand
+[BotHandler(command:Name, version: 1.0f, requiredUserClaims: new[] { BotConstants.BaseBotClaims.BotUserGet })]
+public class MeCommand : BaseBotHandler
 {
     internal const string Name = "/me";
 
@@ -34,10 +36,11 @@ public class MeCommand : BaseBotCommand
 
     public override async Task HandleBotRequest(Update update)
     {
-        BotChatEntity? userChat = await _baseBotRepository.GetChat(BotId, Chat.ChatId, User.Id);
+        //BotChatEntity? userChat = await _baseBotRepository.GetChat(BotId, Chat.ChatId, User.Id);
+        BotChatEntity? userChat = await _baseBotRepository.GetChatById(BotId, Chat.ChatId);
         IEnumerable<BotClaimEntity>? claims = await _baseBotRepository.GetUserClaims(BotId, User.Id);
         string userData = UserCommand.GetUserDataString(User!, userChat, claims);
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, userData, parseMode:ParseMode.Html);
+        await BotClient.SendMessageAsync(Chat.ChatId, userData, parseMode:ParseMode.Html);
     }
 }

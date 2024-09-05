@@ -6,13 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Exceptions;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -21,7 +22,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// /set @user {claim_name|claim_id} {claim_name|claim_id} ...
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserClaimCreate})]
-public class SetClaimsCommand: BaseBotCommand
+[BotHandler(command: Name, version: 1.0f,requiredUserClaims: new []{BotConstants.BaseBotClaims.BotUserClaimCreate})]
+public class SetClaimsCommand: BaseBotHandler
 {
     internal const string Name = "/set";
 
@@ -41,7 +43,7 @@ public class SetClaimsCommand: BaseBotCommand
 
         if (words == null || words.Any() == false)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
+            await BotClient.SendMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
                                                         "Например [/set {@user} {число|строка} {число|строка} ...]");
             return;
         }
@@ -51,7 +53,7 @@ public class SetClaimsCommand: BaseBotCommand
 
         if (user == null)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найден пользователь [{userIdentity}].\n" + 
+            await BotClient.SendMessageAsync(Chat.ChatId, $"Не найден пользователь [{userIdentity}].\n" + 
                                                         "Необходимо указать параметры команды.\n" +
                                                         "Например [/set {@user} {число|строка} {число|строка} ...]");
             return;
@@ -63,7 +65,7 @@ public class SetClaimsCommand: BaseBotCommand
 
         if (claims == null || claims.Any() == false)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
+            await BotClient.SendMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
                                                               "Например [/set {@user} {число|строка} {число|строка} ...]");
             return;
         }
@@ -82,12 +84,9 @@ public class SetClaimsCommand: BaseBotCommand
             
             if (existed == null)
             {
-                await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
+                await BotClient.SendMessageAsync(Chat.ChatId, $"Не найдено разрешение [{claimId}]");
                 throw new NotFoundBotClaim(claimId);
             }
-
-            // Нельзя добавлять супер разрешение другим. Оно только у админа.
-            if(existed.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty) continue;
             
             claimsToAdd.Add(existed);
         }
@@ -95,7 +94,7 @@ public class SetClaimsCommand: BaseBotCommand
         await AddClaimsToUser(user.Id, claimsToAdd);
         
         IEnumerable<BotClaimEntity>? userAllClaims = await _baseBotRepository.GetUserClaims(BotId, user.Id);
-        await BotClient.SendTextMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, $"Текущие разрешения пользователя {userIdentity}"), parseMode:ParseMode.Html);
+        await BotClient.SendMessageAsync(Chat.ChatId, ClaimsCommand.GenerateClaimsListString(userAllClaims, $"Текущие разрешения пользователя {userIdentity}"), parseMode:ParseMode.Html);
     }
 
     /// <summary>

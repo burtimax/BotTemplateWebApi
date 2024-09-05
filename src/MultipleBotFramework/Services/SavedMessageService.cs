@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
-using Telegram.Bot.Types;
+using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Services;
 
@@ -39,8 +39,8 @@ public class SavedMessageService : ISavedMessageService
     public async Task<bool> HasSavedMessageWithMediaType(long botId, long? telegramChatId, long? telegramUserId, string? mediaGroupId)
     {
         return 0 < ( await _db.SavedMessages.CountAsync(sm => sm.BotId == botId &&
-                                                              sm.TelegramChatId == telegramChatId &&
-                                                              sm.TelegramUserId == telegramUserId &&
+                                                              (telegramChatId == null || sm.TelegramChatId == telegramChatId)  &&
+                                                              (telegramUserId == null || sm.TelegramUserId == telegramUserId) &&
                                                               sm.MediaGroupId == mediaGroupId));
     }
     

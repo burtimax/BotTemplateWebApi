@@ -7,11 +7,12 @@ using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
 using MultipleBotFramework.Db;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Utils;
-using Telegram.Bot;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Types;
+using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -19,7 +20,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// Команда уведомления для всех пользователей бота.
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class NotifyCommand : BaseBotCommand
+[BotHandler(command:Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
+public class NotifyCommand : BaseBotHandler
 {
     public const string Name = "/notify";
 
@@ -34,7 +36,7 @@ public class NotifyCommand : BaseBotCommand
     {
         if (update.Message?.ReplyToMessage == null)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Ответь на какое-нибудь сообщение");
+            await BotClient.SendMessageAsync(Chat.ChatId, "Ответь на какое-нибудь сообщение");
             return;
         }
 
@@ -55,7 +57,7 @@ public class NotifyCommand : BaseBotCommand
                             update.Message.ReplyToMessage.MessageId);
                         await Task.Delay(100); // Чтобы не выйти за лимиты бота и его не заблокировали.
                     }
-                    catch (ApiRequestException e) when (e.ErrorCode == 403)
+                    catch (BotRequestException e) when (e.ErrorCode == 403)
                     {
                         Debug.WriteLine(e.Message, "ERROR");
                     }

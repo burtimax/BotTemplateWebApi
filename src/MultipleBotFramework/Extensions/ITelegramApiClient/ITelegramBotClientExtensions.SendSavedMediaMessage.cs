@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MultipleBotFramework.Db.Entity;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using MultipleBotFramework.Enums;
+using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Extensions.ITelegramApiClient;
 
 public static partial class ITelegramBotClientExtensions
 {
     
-    private static async Task<Message[]> SendMediaGroup(ITelegramBotClient client, ChatId chatId, List<BotSavedMessageEntity> messages)
+    private static async Task<IEnumerable<Message>> SendMediaGroup(ITelegramBotClient client, long chatId, List<BotSavedMessageEntity> messages)
     {
-        List<IAlbumInputMedia> mediaGroup = new List<IAlbumInputMedia>();
+        List<InputMedia> mediaGroup = new List<InputMedia>();
         string? caption = null;
         List<MessageEntity>? entities = null;
         
@@ -31,16 +33,16 @@ public static partial class ITelegramBotClientExtensions
     /// </summary>
     /// <param name="messageEntity"></param>
     /// <returns></returns>
-    private static IAlbumInputMedia GetMediaFromMessage(BotSavedMessageEntity messageEntity)
+    private static InputMedia GetMediaFromMessage(BotSavedMessageEntity messageEntity)
     {
         Message mes = messageEntity.TelegramMessage!;
 
-        dynamic? media = messageEntity.TelegramMessage.Type switch
+        dynamic? media = messageEntity.TelegramMessage.Type() switch
         {
-            MessageType.Photo => new InputMediaPhoto(InputFile.FromString(messageEntity.TelegramMessage.Photo![^1].FileId)),
-            MessageType.Video => new InputMediaVideo(InputFile.FromString(messageEntity.TelegramMessage.Video!.FileId)),
-            MessageType.Audio => new InputMediaAudio(InputFile.FromString(messageEntity.TelegramMessage.Audio!.FileId)),
-            MessageType.Document => new InputMediaDocument(InputFile.FromString(messageEntity.TelegramMessage.Document!.FileId)),
+            MessageType.Photo => new InputMediaPhoto(messageEntity.TelegramMessage.Photo.Last().FileId),
+            MessageType.Video => new InputMediaVideo(messageEntity.TelegramMessage.Video!.FileId),
+            MessageType.Audio => new InputMediaAudio(messageEntity.TelegramMessage.Audio!.FileId),
+            MessageType.Document => new InputMediaDocument(messageEntity.TelegramMessage.Document!.FileId),
             _ => null,
         };
 

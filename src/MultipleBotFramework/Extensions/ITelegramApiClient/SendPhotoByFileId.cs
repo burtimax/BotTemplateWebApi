@@ -1,8 +1,8 @@
 ﻿// using System.Threading;
 // using System.Threading.Tasks;
-// using Telegram.Bot;
+// using Telegram.BotAPI;
 // using Telegram.Bot.Requests;
-// using Telegram.Bot.Types;
+// 
 //
 // namespace BotFramework.Extensions;
 //

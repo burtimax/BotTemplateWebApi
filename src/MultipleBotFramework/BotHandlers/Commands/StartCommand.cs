@@ -4,11 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -16,7 +17,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// Обязательная команда бота (по умолчанию)
 /// </summary>
 [BotCommand(Name, version: 0.1f)]
-public class StartCommand : BaseBotCommand
+[BotHandler(command: Name, version: 0.1f)]
+public class StartCommand : BaseBotHandler
 {
     internal const string Name = "/start";
 
@@ -31,6 +33,6 @@ public class StartCommand : BaseBotCommand
 
     public override async Task HandleBotRequest(Update update)
     {
-        await BotClient.SendTextMessageAsync(Chat.ChatId, "Default framework handler", parseMode:ParseMode.Html);
+        await BotClient.SendMessageAsync(Chat.ChatId, "Default framework handler", parseMode:ParseMode.Html);
     }
 }

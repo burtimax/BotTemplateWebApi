@@ -21,8 +21,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
-    <PackageReference Include="Telegram.Bot" Version="20.0.0-alpha.1" />
+    <PackageReference Include="Telegram.BotAPI" Version="7.7.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Db\Migrations" />
+    <Folder Include="Db\Migrations\" />
     <Folder Include="Extensions\ITelegramApiClient\Messages\" />
   </ItemGroup>
 

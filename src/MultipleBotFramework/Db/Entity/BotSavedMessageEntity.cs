@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Telegram.Bot.Types;
+using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Db.Entity;
 
@@ -14,13 +14,13 @@ public class BotSavedMessageEntity : BaseEntity<long>
     /// <summary>
     /// Внешний ключ на сущность BotChat
     /// </summary>
-    [Comment("Внешний ключ на таблицу чатов.")]
+    [Comment("Telegram ID чата.")]
     public long? TelegramChatId { get; set; }
         
     /// <summary>
     /// Внешний ключ на сущность BotChat
     /// </summary>
-    [Comment("Внешний ключ на таблицу чатов.")]
+    [Comment("Telegram ID пользователя.")]
     public long? TelegramUserId { get; set; }
     
     /// <summary>
@@ -36,13 +36,13 @@ public class BotSavedMessageEntity : BaseEntity<long>
     public string? MediaGroupId { get; set; }
         
     /// <summary>
-    /// Сериализованное в json сообщение.
+    /// Сериализованное в json сообщение. <see cref="Message"/>
     /// </summary>
     [Comment("Сериализованное в json сообщение.")]
     public string? TelegramMessageJson { get; set; }
 
     /// <summary>
-    /// Содержание сообщения (текст или имя файла)
+    /// Комментарий к сохраненному сообщению.
     /// </summary>
     [Comment("Комментарий к сообщению.")]
     public string? Comment { get; set; }
@@ -60,8 +60,11 @@ public class BotSavedMessageEntity : BaseEntity<long>
         get
         {
             if (string.IsNullOrEmpty(TelegramMessageJson)) return null;
-            return JsonConvert.DeserializeObject<Message>(TelegramMessageJson);
+            return JsonSerializer.Deserialize<Message>(TelegramMessageJson);
         }
-        set => TelegramMessageJson = JsonConvert.SerializeObject(value, Formatting.Indented);
+        set => TelegramMessageJson = JsonSerializer.Serialize(value, new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+        });
     }
 }

@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9AF79BB5-EDB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4925A2AA-4363-4684-A115-57A08301878C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleBotFramework", "src\MultipleBotFramework\MultipleBotFramework.csproj", "{5834BA41-82D7-42BC-927D-53D1525C5DBE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleBotFramework_Obsolete", "src\MultipleBotFramework_Obsolete\MultipleBotFramework_Obsolete.csproj", "{5834BA41-82D7-42BC-927D-53D1525C5DBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleBotFrameworkUpgrade", "src\MultipleBotFrameworkUpgrade\MultipleBotFrameworkUpgrade.csproj", "{28BB583A-AB47-42E5-A7B3-1FBCB33EE94D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleBotFramework", "src\MultipleBotFramework\MultipleBotFramework.csproj", "{28BB583A-AB47-42E5-A7B3-1FBCB33EE94D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Telegram.Bot;
-using Telegram.Bot.Args;
+using Telegram.BotAPI;
 
 namespace MultipleBotFramework.Utils.BotEventHadlers;
 
@@ -15,7 +14,7 @@ public class OnMakingApiRequest
     
     public static async ValueTask Handler(
         ITelegramBotClient botClient,
-        ApiRequestEventArgs args,
+        string method,
         CancellationToken cancellationToken = default)
     {
         // Прописываем логику, чтобы бот не выходил за ограничения по запросам в секунду.

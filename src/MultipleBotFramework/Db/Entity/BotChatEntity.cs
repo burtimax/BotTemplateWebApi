@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Models;
-using Telegram.Bot.Types;
 
 namespace MultipleBotFramework.Db.Entity
 {
@@ -16,21 +16,29 @@ namespace MultipleBotFramework.Db.Entity
         /// Идентификатор чата в телеграм.
         /// </summary>
         [Comment("Идентификатор чата в Telegram.")]
-        public long? TelegramId { get; set; }
+        public long TelegramId { get; set; }
 
+        /// <summary>
+        /// private, channel, group и прочие.
+        /// </summary>
+        public string? Type { get; set; }
+        
         /// <summary>
         /// Идентификатор чата в телеграм.
         /// </summary>
         /// <remarks>Некоторые чаты вместо long идентификатора имеют username идентификатор</remarks>
         [Comment("Строковый идентификатор чата в телеграм. Некоторые чаты вместо long идентификатора имеют username идентификатор.")]
         public string? TelegramUsername { get; set; }
+        
+        [Comment("Заголовок чата")]
+        public string? Title { get; set; }
 
         /// <summary>
         /// Внешний ключ на пользователя.
         /// </summary>
         [Comment("Внешний ключ на пользователя.")]
-        public long BotUserId { get; set; }
-        public BotUserEntity BotUser { get; set; }
+        public long? BotUserId { get; set; }
+        public BotUserEntity? BotUser { get; set; }
 
         /// <summary>
         /// Состояние чата.
@@ -71,22 +79,15 @@ namespace MultipleBotFramework.Db.Entity
         /// Свойство для работы с состояниями чата.
         /// </summary>
         [NotMapped] public ChatStates States => _chatStates ??= new ChatStates(_states);
-        
+
 
         /// <summary>
         /// Получить Telegram идентификатор чата (Id или Username)
         /// </summary>
         /// <remarks>NotMapped свойство</remarks>
         [NotMapped]
-        public ChatId ChatId {
-            get
-            {
-                return TelegramId != null ? 
-                    new ChatId((long)TelegramId) : 
-                    new ChatId(TelegramUsername ?? "");
-            }
-        }
-        
+        public long ChatId => TelegramId;
+
         #endregion
     }
 }

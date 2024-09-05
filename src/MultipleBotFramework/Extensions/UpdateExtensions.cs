@@ -1,6 +1,7 @@
-﻿using MultipleBotFramework.Exceptions;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+﻿using MultipleBotFramework.Enums;
+using MultipleBotFramework.Exceptions;
+using Telegram.BotAPI.AvailableTypes;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Extensions
 {
@@ -12,11 +13,45 @@ namespace MultipleBotFramework.Extensions
         /// </summary>
         /// <param name="update">Объект запроса от бота.</param>
         /// <returns></returns>
+        public static UpdateType Type(this Update update)
+        {
+            var updateType = update switch
+            {
+                { Message: { } }            => UpdateType.Message,
+                { EditedMessage: { } }      => UpdateType.EditedMessage,
+                { InlineQuery: { } }        => UpdateType.InlineQuery,
+                { ChosenInlineResult: { } } => UpdateType.ChosenInlineResult,
+                { CallbackQuery: { } }      => UpdateType.CallbackQuery,
+                { ChannelPost: { } }        => UpdateType.ChannelPost,
+                { EditedChannelPost: { } }  => UpdateType.EditedChannelPost,
+                { ShippingQuery: { } }      => UpdateType.ShippingQuery,
+                { PreCheckoutQuery: { } }   => UpdateType.PreCheckoutQuery,
+                { Poll: { } }               => UpdateType.Poll,
+                { PollAnswer: { } }         => UpdateType.PollAnswer,
+                { MyChatMember: { } }       => UpdateType.MyChatMember,
+                { ChatMember: { } }         => UpdateType.ChatMember,
+                { ChatJoinRequest: { } }    => UpdateType.ChatJoinRequest,
+                _                           => UpdateType.Unknown
+            };
+
+            if (updateType is UpdateType.Message
+                && update.Message!.Type() == MessageType.Text
+                && update.Message!.Text!.StartsWith("/")) updateType = UpdateType.Command;
+
+            return updateType;
+        }
+        
+        /// <summary>
+        /// Получить объект пользователя из Update для разных типов запросов.
+        /// </summary>
+        /// <param name="update">Объект запроса от бота.</param>
+        /// <returns></returns>
         public static Chat? GetChat(this Update update)
         {
-            return update.Type switch
+            return update.Type() switch
             {
                 UpdateType.Message => update.Message.Chat,
+                UpdateType.Command => update.Message.Chat,
                 UpdateType.CallbackQuery => update.CallbackQuery.Message.Chat,
                 UpdateType.ChannelPost => update.ChannelPost.Chat,
                 UpdateType.ChatMember => update.ChatMember.Chat,
@@ -42,9 +77,10 @@ namespace MultipleBotFramework.Extensions
         /// <returns></returns>
         public static object GetPayload(this Update update)
         {
-            return update.Type switch
+            return update.Type() switch
             {
                 UpdateType.Message => update.Message,
+                UpdateType.Command => update.Message,
                 UpdateType.Poll => update.Poll,
                 UpdateType.CallbackQuery => update.CallbackQuery,
                 UpdateType.ChannelPost => update.ChannelPost,
@@ -69,9 +105,10 @@ namespace MultipleBotFramework.Extensions
         /// <returns>User object</returns>
         public static User? GetUser(this Update update)
         {
-            return update.Type switch
+            return update.Type() switch
             {
                 UpdateType.Message => update.Message.From,
+                UpdateType.Command => update.Message.From,
                 UpdateType.CallbackQuery => update.CallbackQuery.From,
                 UpdateType.ChannelPost => update.ChannelPost.From,
                 UpdateType.ChatMember => update.ChatMember.From,

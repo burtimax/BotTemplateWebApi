@@ -1,4 +1,4 @@
-﻿using Telegram.Bot;
+﻿using Telegram.BotAPI;
 
 namespace MultipleBotFramework.Base
 {

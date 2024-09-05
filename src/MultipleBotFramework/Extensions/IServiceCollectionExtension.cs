@@ -8,8 +8,6 @@ using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
 using MultipleBotFramework.Services;
 using MultipleBotFramework.Utils;
-using MultipleBotFramework.Utils.BotEventHadlers;
-using Telegram.Bot;
 
 namespace MultipleBotFramework.Extensions;
 

@@ -5,9 +5,10 @@ using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
 using MultipleBotFramework.BotHandlers.States.SaveMessage;
 using MultipleBotFramework.Db;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Enums;
-using Telegram.Bot;
-using Telegram.Bot.Types;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -15,7 +16,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// Команда уведомления для всех пользователей бота.
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class SaveMessageCommand : BaseBotCommand
+[BotHandler(command: Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
+public class SaveMessageCommand : BaseBotHandler
 {
     public const string Name = "/save_msg";
 
@@ -28,12 +30,12 @@ public class SaveMessageCommand : BaseBotCommand
 
     public override async Task HandleBotRequest(Update update)
     {
-        if (Chat.States.CurrentState != SaveMessageState.Name)
+        if (Chat.States.CurrentState != SaveMessageHandler.Name)
         {
-            Chat.States.Set(SaveMessageState.Name, ChatStateSetterType.SetNext);
+            Chat.States.Set(SaveMessageHandler.Name, ChatStateSetterType.SetNext);
             await _db.SaveChangesAsync();
         }
         
-        await BotClient.SendTextMessageAsync(Chat.ChatId, "Отправьте сообщение, которое будет сохранено");
+        await BotClient.SendMessageAsync(Chat.ChatId, "Отправьте сообщение, которое будет сохранено");
     }
 }

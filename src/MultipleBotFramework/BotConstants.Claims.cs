@@ -97,7 +97,6 @@ namespace MultipleBotFramework
                 List<FieldInfo> claimNameFields = typeof(BaseBotClaims).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
                     .Where(fi => fi.IsLiteral && !fi.IsInitOnly && fi.FieldType == typeof(string))
                     .Where(fi => fi.Name.EndsWith("Description") == false)
-                    .Append(typeof(BaseBotClaims).GetField(nameof(IAmBruceAlmighty), BindingFlags.NonPublic | BindingFlags.Static))
                     .ToList();
 
                 IEnumerable<ClaimValue> claimsRes = new List<ClaimValue>();
@@ -105,8 +104,7 @@ namespace MultipleBotFramework
                 foreach (var fieldClaimName in claimNameFields)
                 {
                     if(fieldClaimName is null 
-                       || string.IsNullOrEmpty(fieldClaimName.Name)
-                       || fieldClaimName.Name == nameof(IAmBruceAlmighty)) continue;
+                       || string.IsNullOrEmpty(fieldClaimName.Name)) continue;
                     
                     FieldInfo? prop = typeof(BaseBotClaims).GetField($"{fieldClaimName.Name}Description", BindingFlags.Public | BindingFlags.Static) ??
                                       typeof(BaseBotClaims).GetField($"{fieldClaimName.Name}Description", BindingFlags.NonPublic | BindingFlags.Static);

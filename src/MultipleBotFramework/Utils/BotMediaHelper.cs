@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using MultipleBotFramework.Enums;
 using MultipleBotFramework.Models;
-using Telegram.Bot;
-using Telegram.Bot.Types;
+using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
 using File = System.IO.File;
 
 namespace MultipleBotFramework.Utils
@@ -22,13 +22,53 @@ namespace MultipleBotFramework.Utils
         {
             using (FileStream fs = new FileStream(fp, FileMode.Create))
             {
-                using (MemoryStream ms = new MemoryStream())
+                Telegram.BotAPI.AvailableTypes.File fileInfo = await botClient.GetFileAsync(fileId);
+                
+                using (var client = new HttpClient()) // WebClient
                 {
-                    await botClient.GetInfoAndDownloadFileAsync(fileId, ms);
-                    ms.Position = 0;
-                    await fs.WriteAsync(ms.GetBuffer());
+                    byte[] file = await client.GetByteArrayAsync(fileInfo.FilePath);
+                    fs.Position = 0;
+                    await fs.WriteAsync(file);
                 }
             }
+        }
+        
+        private async Task<HttpResponseMessage> GetResponseAsync(
+            HttpClient httpClient,
+            string fileUri,
+            CancellationToken cancellationToken)
+        {
+            HttpResponseMessage? httpResponse;
+            try
+            {
+                httpResponse = await httpClient
+                    .GetAsync(
+                        requestUri: fileUri,
+                        completionOption: HttpCompletionOption.ResponseHeadersRead,
+                        cancellationToken: cancellationToken
+                    )
+                    .ConfigureAwait(continueOnCapturedContext: false);
+            }
+            catch (TaskCanceledException exception)
+            {
+                if (cancellationToken.IsCancellationRequested) { throw; }
+
+                throw new BotRequestException(
+                    errorCode: 500,
+                    description: "Request timed out",
+                    null
+                );
+            }
+            catch (Exception exception)
+            {
+                throw new BotRequestException(
+                    description: "Exception during file download",
+                    errorCode: 500, 
+                    parameters:null
+                );
+            }
+
+            return httpResponse;
         }
 
         /// <summary>
@@ -68,34 +108,42 @@ namespace MultipleBotFramework.Utils
         /// <param name="botClient">API клиент.</param>
         /// <param name="fileId">ИД файла.</param>
         /// <returns>Данные по файлу.</returns>
-        public static async Task<(Telegram.Bot.Types.File fileInfo, MemoryStream fileData)> GetFileFromTelegramAsync(ITelegramBotClient botClient, string fileId)
+        public static async Task<( Telegram.BotAPI.AvailableTypes.File fileInfo, MemoryStream fileData)> GetFileFromTelegramAsync(ITelegramBotClient botClient, string fileId)
         {
             if (botClient == null) throw new ArgumentNullException(nameof(botClient));
             if (string.IsNullOrEmpty(fileId)) throw new ArgumentNullException(nameof(fileId));
+            MemoryStream ms = new MemoryStream();
             
-            MemoryStream ms = new();
-            Telegram.Bot.Types.File res = await botClient.GetInfoAndDownloadFileAsync(fileId, ms);
-            ms.Position = 0;
-            return (res, ms);
+            Telegram.BotAPI.AvailableTypes.File fileInfo = await botClient.GetFileAsync(fileId);
+            
+            using (var client = new HttpClient()) // WebClient
+            {
+                byte[] file = await client.GetByteArrayAsync(fileInfo.FilePath);
+                ms.Position = 0;
+                await ms.WriteAsync(file);
+            }
+
+            return (fileInfo, ms);
         }
 
+        // TODO REFACTOR
         /// <summary>
         /// Получить фото из Telegram.
         /// </summary>
         /// <param name="botClient">API клиент.</param>
         /// <param name="requiredQuality">Требуемое качество фото.</param>
-        /// <param name="photoSizes">Фото размеры. <see cref="Update.Message.Photo"/></param>
+        /// <param name="photoSizes">Фото размеры. <see cref="Message.Photo"/></param>
         /// <returns>Данные по фото.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static Task<(Telegram.Bot.Types.File fileInfo, MemoryStream fileData)> GetPhotoFromTelegramAsync(
-            ITelegramBotClient botClient, PhotoQuality requiredQuality, PhotoSize[] photoSizes)
-        {
-            if (botClient is null) throw new ArgumentNullException(nameof(botClient));
-            if (photoSizes is null || photoSizes.Any() == false) throw new ArgumentNullException(nameof(photoSizes));
-            
-            int index = (int)requiredQuality - 1;
-            if (index >= photoSizes.Length) index = photoSizes.Length - 1;
-            return GetFileFromTelegramAsync(botClient, photoSizes[index].FileId);
-        }
+        // public static Task<(Telegram.Bot.Types.File fileInfo, MemoryStream fileData)> GetPhotoFromTelegramAsync(
+        //     ITelegramBotClient botClient, PhotoQuality requiredQuality, PhotoSize[] photoSizes)
+        // {
+        //     if (botClient is null) throw new ArgumentNullException(nameof(botClient));
+        //     if (photoSizes is null || photoSizes.Any() == false) throw new ArgumentNullException(nameof(photoSizes));
+        //     
+        //     int index = (int)requiredQuality - 1;
+        //     if (index >= photoSizes.Length) index = photoSizes.Length - 1;
+        //     return GetFileFromTelegramAsync(botClient, photoSizes[index].FileId);
+        // }
     }
 }

@@ -6,11 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -19,7 +20,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// /commands
 /// </summary>
 [BotCommand(Name, version: 1.0f)]
-public class CommandsCommand: BaseBotCommand
+[BotHandler(command:Name, version: 1.0f)]
+public class CommandsCommand: BaseBotHandler
 {
     internal const string Name = "/commands";
 
@@ -84,7 +86,7 @@ public class CommandsCommand: BaseBotCommand
         }
         
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, sb.ToString(), parseMode:ParseMode.Html);
+        await BotClient.SendMessageAsync(Chat.ChatId, sb.ToString(), parseMode:ParseMode.Html);
     }
 
     private bool HasUserClaim(string claimName)

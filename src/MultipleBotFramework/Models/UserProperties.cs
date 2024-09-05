@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
+using System.Text.Json;
 using MultipleBotFramework.Exceptions;
-using Newtonsoft.Json;
 
 namespace MultipleBotFramework.Models;
 
@@ -25,8 +27,16 @@ public class ComplexDictionary
     {
         string value = Get(key);
 
-        T result = JsonConvert.DeserializeObject<T>(value);
-        return result;
+        try
+        {
+            T result = JsonSerializer.Deserialize<T>(value) ?? throw new ArgumentNullException(nameof(value));
+            return result;
+        }
+        catch (Exception e)
+        {
+            T res = (T) TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value);
+            return res;
+        }
     }
 
     public string Get(string key)
@@ -36,7 +46,7 @@ public class ComplexDictionary
             throw new UserPropertiesHasNotValueByKeyException(key);
         }
 
-        return JsonConvert.DeserializeObject<string>(value);
+        return value.ToString() ?? throw new ArgumentNullException(nameof(value));
     }
 
     public void Set(string key, object value)
@@ -46,7 +56,7 @@ public class ComplexDictionary
             Remove(key);
         }
 
-        string addValue = JsonConvert.SerializeObject(value);
+        string addValue = value is string ? (string) value : JsonSerializer.Serialize(value);
         
         _data.Add(key, addValue);
     }

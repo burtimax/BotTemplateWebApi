@@ -8,11 +8,12 @@ using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
 using MultipleBotFramework.Db;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Utils;
-using Telegram.Bot;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Types;
+using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -20,7 +21,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// Команда уведомления (тест для проверки).
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class NotifyTestCommand : BaseBotCommand
+[BotHandler(command: Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
+public class NotifyTestCommand : BaseBotHandler
 {
     public const string Name = "/testnotify";
 
@@ -35,7 +37,7 @@ public class NotifyTestCommand : BaseBotCommand
     {
         if (update.Message?.ReplyToMessage == null)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Ответь на какое-нибудь сообщение");
+            await BotClient.SendMessageAsync(Chat.ChatId, "Ответь на какое-нибудь сообщение");
             return;
         }
 
@@ -55,7 +57,7 @@ public class NotifyTestCommand : BaseBotCommand
                         await BotClient.CopyMessageAsync(tuple.chat.ChatId, Chat.ChatId,
                             update.Message.ReplyToMessage.MessageId);
                     }
-                    catch (ApiRequestException e) when (e.ErrorCode == 403)
+                    catch (BotRequestException e) when (e.ErrorCode == 403)
                     {
                         Debug.WriteLine(e.Message, "ERROR");
                     }

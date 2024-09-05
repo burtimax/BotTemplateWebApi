@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Telegram.Bot.Types;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Base;
 

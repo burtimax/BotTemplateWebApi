@@ -6,12 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -20,7 +21,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// /user {string}
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new[] { BotConstants.BaseBotClaims.BotUserGet })]
-public class UserCommand : BaseBotCommand
+[BotHandler(command: Name, version: 1.0f, requiredUserClaims: new[] { BotConstants.BaseBotClaims.BotUserGet })]
+public class UserCommand : BaseBotHandler
 {
     internal const string Name = "/user";
 
@@ -38,7 +40,7 @@ public class UserCommand : BaseBotCommand
         string[] words = update.Message.Text.Split(' ');
         if (words.Length < 2)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Введите идентификатор пользователя.\n" +
+            await BotClient.SendMessageAsync(Chat.ChatId, "Введите идентификатор пользователя.\n" +
                                                               "Например [/user {string}]");
             return;
         }
@@ -49,16 +51,17 @@ public class UserCommand : BaseBotCommand
 
         if (user == null)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId,
+            await BotClient.SendMessageAsync(Chat.ChatId,
                 $"Не найден пользователь в идентификатором {userIdentity}.");
             return;
         }
 
-        BotChatEntity? userChat = await _baseBotRepository.GetChat(BotId, Chat.ChatId, user.Id);
+        //BotChatEntity? userChat = await _baseBotRepository.GetChat(BotId, Chat.ChatId, user.Id);
+        BotChatEntity? userChat = await _baseBotRepository.GetChatById(BotId, Chat.ChatId);
         IEnumerable<BotClaimEntity>? claims = await _baseBotRepository.GetUserClaims(BotId, user.Id);
         string userData = GetUserDataString(user!, userChat, claims);
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, userData, parseMode:ParseMode.Html);
+        await BotClient.SendMessageAsync(Chat.ChatId, userData, parseMode:ParseMode.Html);
     }
 
     /// <summary>

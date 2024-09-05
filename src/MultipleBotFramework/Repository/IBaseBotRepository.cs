@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dto;
-using TelegramModel = Telegram.Bot.Types;
+using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Repository
 {
@@ -64,22 +64,38 @@ namespace MultipleBotFramework.Repository
         Task<IEnumerable<BotUserEntity>> GetUsersByClaim(long botId, string claimName);
         
         /// <summary>
+        /// Получить пользователей по роли.
+        /// </summary>
+        /// <param name="role"></param>
+        /// <returns></returns>
+        Task<IEnumerable<BotUserEntity>> GetUsersByRole(string role);
+        
+        /// <summary>
         /// Добавить пользователя или обновить информацию по нему.
         /// Обновляет информацию (Firstname, Lastname, Username)
         /// Потому что с прошествием времени может поменяться эта информация.
         /// </summary>
-        Task<BotUserEntity?> UpsertUser(long botId, TelegramModel.User? user);
+        Task<BotUserEntity?> UpsertUser(long botId, User user);
 
+        /// <summary>
+        /// Добавить чат или обновить информацию по нему.
+        /// Обновляет информацию (Username, Title)
+        /// Потому что с прошествием времени может поменяться эта информация.
+        /// </summary>
+        public Task<BotChatEntity?> UpsertChat(long botId, Chat chat, User? user);
+        
         /// <summary>
         /// Получить чат по ИД.
         /// </summary>
-        Task<BotChatEntity?> GetChat(long botId, TelegramModel.ChatId chatId, long botUserId);
+        public Task<BotChatEntity?> GetChatById(long botId, long chatId);
         
         /// <summary>
         /// Добавить чат пользователя.
         /// </summary>
+        /// <param name="botId"></param>
         /// <param name="chat">Telegram Chat object</param>
-        Task<BotChatEntity?> AddChat(long botId, TelegramModel.Chat? chat, BotUserEntity? chatOwner);
+        /// <param name="chatOwner"></param>
+        Task<BotChatEntity?> AddChat(long botId, Chat? chat, BotUserEntity? chatOwner);
 
         /// <summary>
         /// Получить пользователя по ИД.

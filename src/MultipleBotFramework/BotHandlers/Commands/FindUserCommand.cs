@@ -7,12 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -21,7 +22,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// /find {string}
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserGet})]
-public class FindUserCommand: BaseBotCommand
+[BotHandler(command:Name, version: 1.0f, requiredUserClaims: new []{BotConstants.BaseBotClaims.BotUserGet})]
+public class FindUserCommand: BaseBotHandler
 {
     internal const string Name = "/find";
 
@@ -44,7 +46,7 @@ public class FindUserCommand: BaseBotCommand
         
         if (words == null || words.Any() == false)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Отсутствует строка поиска.\n" +
+            await BotClient.SendMessageAsync(Chat.ChatId, "Отсутствует строка поиска.\n" +
                                                         "Например [/find {string}]");
             return;
         }
@@ -53,11 +55,11 @@ public class FindUserCommand: BaseBotCommand
 
         if (users == null || users.Any() == false)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Не найдены пользователи.");
+            await BotClient.SendMessageAsync(Chat.ChatId, "Не найдены пользователи.");
             return;
         }
         
-        await BotClient.SendTextMessageAsync(Chat.ChatId, $"<b>Найденные пользователи:</b>\n" + GetUsersString(users), parseMode:ParseMode.Html);
+        await BotClient.SendMessageAsync(Chat.ChatId, $"<b>Найденные пользователи:</b>\n" + GetUsersString(users), parseMode:ParseMode.Html);
     }
 
     private string GetUsersString(IEnumerable<BotUserEntity> users)

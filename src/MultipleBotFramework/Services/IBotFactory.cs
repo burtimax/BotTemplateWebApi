@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Telegram.Bot;
+﻿using Telegram.BotAPI;
 
 namespace MultipleBotFramework.Services;
 

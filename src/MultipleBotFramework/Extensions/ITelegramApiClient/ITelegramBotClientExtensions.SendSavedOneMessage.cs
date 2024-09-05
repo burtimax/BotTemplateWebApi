@@ -1,20 +1,22 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MultipleBotFramework.Db.Entity;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
+using MultipleBotFramework.Enums;
+using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.AvailableTypes;
+using Telegram.BotAPI.Stickers;
 
 namespace MultipleBotFramework.Extensions.ITelegramApiClient;
 
 public static partial class ITelegramBotClientExtensions
 {
-    private static async Task SendOneMessage(ITelegramBotClient client, ChatId chatId, BotSavedMessageEntity messageEntity, IReplyMarkup replyMarkup = default)
+    private static async Task SendOneMessage(ITelegramBotClient client, long chatId, BotSavedMessageEntity messageEntity, ReplyMarkup replyMarkup = default)
     {
         Message mes = messageEntity.TelegramMessage!;
         
-        switch (mes.Type)
+        switch (mes.Type())
         {
             case MessageType.Animation:
                 await SendAnimation(client, chatId, mes, replyMarkup);
@@ -53,12 +55,11 @@ public static partial class ITelegramBotClientExtensions
     /// <param name="client">Telegram Bot API клиент.</param>
     /// <param name="chatId">ИД чата.</param>
     /// <param name="mes">Сообщение</param>
-    private static async Task SendDocument(ITelegramBotClient client, ChatId chatId, Message mes, IReplyMarkup replyMarkup = default)
+    private static async Task SendDocument(ITelegramBotClient client, long chatId, Message mes, ReplyMarkup replyMarkup = default)
     {
-        InputFile input = InputFile.FromString(mes.Document!.FileId);
         await client.SendDocumentAsync(
             chatId:chatId,
-            document: input,
+            document: mes.Document!.FileId,
             caption:mes.Caption,
             captionEntities: mes.CaptionEntities,
             replyMarkup: replyMarkup
@@ -71,12 +72,12 @@ public static partial class ITelegramBotClientExtensions
     /// <param name="client">Telegram Bot API клиент.</param>
     /// <param name="chatId">ИД чата.</param>
     /// <param name="mes">Сообщение</param>
-    private static async Task SendVideoNote(ITelegramBotClient client, ChatId chatId, Message mes, IReplyMarkup replyMarkup = default)
+    private static async Task SendVideoNote(ITelegramBotClient client, long chatId, Message mes, ReplyMarkup replyMarkup = default)
     {
-        InputFile input = InputFile.FromString(mes.VideoNote!.FileId);
+        
         await client.SendVideoNoteAsync(
             chatId:chatId,
-            videoNote:input,
+            videoNote:mes.VideoNote!.FileId,
             replyMarkup: replyMarkup
         );
     }
@@ -87,15 +88,15 @@ public static partial class ITelegramBotClientExtensions
     /// <param name="client">Telegram Bot API клиент.</param>
     /// <param name="chatId">ИД чата.</param>
     /// <param name="mes">Сообщение</param>
-    private static async Task SendVideo(ITelegramBotClient client, ChatId chatId, Message mes, IReplyMarkup replyMarkup = default)
+    private static async Task SendVideo(ITelegramBotClient client, long chatId, Message mes, ReplyMarkup replyMarkup = default)
     {
-        InputFile input = InputFile.FromString(mes.Video!.FileId);
         await client.SendVideoAsync(
             chatId:chatId,
-            video: input,
+            video: mes.Video!.FileId,
             caption: mes.Caption,
             captionEntities:mes.CaptionEntities,
-            replyMarkup: replyMarkup);
+            replyMarkup: replyMarkup
+            );
     }
     
     /// <summary>
@@ -104,14 +105,14 @@ public static partial class ITelegramBotClientExtensions
     /// <param name="client">Telegram Bot API клиент.</param>
     /// <param name="chatId">ИД чата.</param>
     /// <param name="mes">Сообщение</param>
-    private static async Task SendSticker(ITelegramBotClient client, ChatId chatId, Message mes, IReplyMarkup replyMarkup = default)
+    private static async Task SendSticker(ITelegramBotClient client, long chatId, Message mes, ReplyMarkup replyMarkup = default)
     {
-        InputFile input = InputFile.FromString(mes.Sticker!.FileId);
         await client.SendStickerAsync(
             chatId:chatId,
-            sticker:input,
+            sticker:mes.Sticker!.FileId,
             emoji:mes.Sticker.Emoji,
-            replyMarkup: replyMarkup);
+            replyMarkup: replyMarkup
+            );
     }
     
     /// <summary>
@@ -120,16 +121,16 @@ public static partial class ITelegramBotClientExtensions
     /// <param name="client">Telegram Bot API клиент.</param>
     /// <param name="chatId">ИД чата.</param>
     /// <param name="mes">Сообщение</param>
-    private static async Task SendVoice(ITelegramBotClient client, ChatId chatId, Message mes, IReplyMarkup replyMarkup = default)
+    private static async Task SendVoice(ITelegramBotClient client, long chatId, Message mes, ReplyMarkup replyMarkup = default)
     {
-        InputFile input = InputFile.FromString(mes.Voice!.FileId);
         await client.SendVoiceAsync(
             chatId:chatId,
-            voice: input,
+            voice: mes.Voice!.FileId,
             duration: mes.Voice.Duration,
             caption: mes.Caption,
             captionEntities: mes.CaptionEntities,
-            replyMarkup: replyMarkup);
+            replyMarkup: replyMarkup
+            );
     }
     
     /// <summary>
@@ -138,16 +139,16 @@ public static partial class ITelegramBotClientExtensions
     /// <param name="client">Telegram Bot API клиент.</param>
     /// <param name="chatId">ИД чата.</param>
     /// <param name="mes">Сообщение</param>
-    private static async Task SendPhoto(ITelegramBotClient client, ChatId chatId, Message mes, IReplyMarkup replyMarkup = default)
+    private static async Task SendPhoto(ITelegramBotClient client, long chatId, Message mes, ReplyMarkup replyMarkup = default)
     {
-        InputFile input = InputFile.FromString(mes.Photo![^1].FileId);
         var message = await client.SendPhotoAsync(
             chatId:chatId,
-            photo:input,
+            photo:mes.Photo.Last().FileId,
             caption: mes.Caption,
             captionEntities: mes.CaptionEntities,
             hasSpoiler: mes.HasMediaSpoiler,
-            replyMarkup: replyMarkup);
+            replyMarkup: replyMarkup
+            );
     }
     
     /// <summary>
@@ -156,14 +157,15 @@ public static partial class ITelegramBotClientExtensions
     /// <param name="client">Telegram Bot API клиент.</param>
     /// <param name="chatId">ИД чата.</param>
     /// <param name="mes">Сообщение</param>
-    private static async Task SendText(ITelegramBotClient client, ChatId chatId, Message mes, IReplyMarkup replyMarkup = default)
+    private static async Task SendText(ITelegramBotClient client, long chatId, Message mes, ReplyMarkup replyMarkup = default)
     {
-        await client.SendTextMessageAsync(
+        await client.SendMessageAsync(
             chatId:chatId, 
             text: mes.Text!,
             entities: mes.Entities,
-            disableWebPagePreview: true,
-            replyMarkup: replyMarkup);
+            linkPreviewOptions: new LinkPreviewOptions(){IsDisabled = true},
+            replyMarkup: replyMarkup
+            );
     }
 
     /// <summary>
@@ -172,16 +174,16 @@ public static partial class ITelegramBotClientExtensions
     /// <param name="client">Telegram Bot API клиент.</param>
     /// <param name="chatId">ИД чата.</param>
     /// <param name="mes">Сообщение</param>
-    private static async Task SendAudio(ITelegramBotClient client, ChatId chatId, Message mes, IReplyMarkup replyMarkup = default)
+    private static async Task SendAudio(ITelegramBotClient client, long chatId, Message mes, ReplyMarkup replyMarkup = default)
     {
-        InputFile input = InputFile.FromString(mes.Audio!.FileId);
         await client.SendAudioAsync(
             chatId:chatId, 
-            audio: input, 
+            audio: mes.Audio!.FileId, 
             caption:mes.Caption,
             captionEntities:mes.CaptionEntities,
             duration: mes.Audio.Duration,
-            replyMarkup: replyMarkup);
+            replyMarkup: replyMarkup
+            );
     }
     
     /// <summary>
@@ -190,14 +192,14 @@ public static partial class ITelegramBotClientExtensions
     /// <param name="client">Telegram Bot API клиент.</param>
     /// <param name="chatId">ИД чата.</param>
     /// <param name="mes">Сообщение</param>
-    private static async Task SendAnimation(ITelegramBotClient client, ChatId chatId, Message mes, IReplyMarkup replyMarkup = default)
+    private static async Task SendAnimation(ITelegramBotClient client, long chatId, Message mes, ReplyMarkup replyMarkup = default)
     {
-        InputFile input = InputFile.FromString(mes.Animation!.FileId);
         await client.SendAnimationAsync(
             chatId:chatId, 
-            animation:input, 
+            animation:mes.Animation!.FileId, 
             caption:mes.Caption,
             captionEntities:mes.CaptionEntities,
-            replyMarkup: replyMarkup);
+            replyMarkup: replyMarkup
+            );
     }
 }

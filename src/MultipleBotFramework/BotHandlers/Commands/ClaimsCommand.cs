@@ -7,12 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -21,7 +22,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// /claims
 /// </summary>
 [BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotClaimsGet})]
-public class ClaimsCommand: BaseBotCommand
+[BotHandler(command:Name, version: 1.0f, requiredUserClaims: new []{BotConstants.BaseBotClaims.BotClaimsGet})]
+public class ClaimsCommand: BaseBotHandler
 {
     internal const string Name = "/claims";
 
@@ -40,11 +42,11 @@ public class ClaimsCommand: BaseBotCommand
 
         if (claims == null || claims.Any() == false)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "У бота нет зарегистрированных разрешений!", parseMode:ParseMode.Html);
+            await BotClient.SendMessageAsync(Chat.ChatId, "У бота нет зарегистрированных разрешений!", parseMode:ParseMode.Html);
             return;
         }
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, GenerateClaimsListString(claims, "Разрешения бота"), parseMode:ParseMode.Html);
+        await BotClient.SendMessageAsync(Chat.ChatId, GenerateClaimsListString(claims, "Разрешения бота"), parseMode:ParseMode.Html);
     }
 
     /// <summary>

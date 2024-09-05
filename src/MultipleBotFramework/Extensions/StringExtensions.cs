@@ -1,6 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using MultipleBotFramework.Utils;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace MultipleBotFramework.Extensions;
 
@@ -21,6 +20,7 @@ public static class StringExtensions
         return startUnderscores + Regex.Replace(input, @"([a-z0-9])([A-Z])", "$1_$2").ToLower();
     }
 
+    // TODO REFACTOR
     /// <summary>
     /// Из строки сделать клавиатуру для бота.
     /// </summary>
@@ -31,9 +31,14 @@ public static class StringExtensions
     /// <param name="str"></param>
     /// <typeparam name="T"><see cref="IReplyMarkup"/></typeparam>
     /// <returns></returns>
-    public static T ToReplyMarkup<T>(this string str) where T : IReplyMarkup
+    // public static T ToReplyMarkup<T>(this string str) where T : ReplyMarkup
+    // {
+    //     StringMarkupBuilder<T> smb = new();
+    //     return smb.Build(str);
+    // }
+    
+    public static TResult? To<TResult>(this string json)
     {
-        StringMarkupBuilder<T> smb = new();
-        return smb.Build(str);
+        return JsonSerializer.Deserialize<TResult>(json);
     }
 }

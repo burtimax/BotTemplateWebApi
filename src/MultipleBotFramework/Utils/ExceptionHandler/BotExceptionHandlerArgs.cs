@@ -1,6 +1,6 @@
 ﻿using System;
 using MultipleBotFramework.Db.Entity;
-using Telegram.Bot.Types;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Utils.ExceptionHandler;
 

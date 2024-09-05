@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Telegram.Bot.Types;
+using Telegram.BotAPI.AvailableTypes;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Options;
 

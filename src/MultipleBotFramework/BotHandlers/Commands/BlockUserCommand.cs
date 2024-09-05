@@ -7,10 +7,11 @@ using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
-using Telegram.Bot;
-using Telegram.Bot.Types;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -18,8 +19,9 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// Команда для блокировки пользователей.
 /// /block {@user|user_id} {@user|user_id} ... 
 /// </summary>
-[BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserBlock})]
-public class BlockUserCommand: BaseBotCommand
+[BotHandler(command:Name, version:1f, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserBlock})]
+[BotCommand(command:Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserBlock})]
+public class BlockUserCommand: BaseBotHandler
 {
     internal const string Name = "/block";
 
@@ -39,7 +41,7 @@ public class BlockUserCommand: BaseBotCommand
 
         if (users == null || users.Any() == false)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
+            await BotClient.SendMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
                                                         "Например [/block {@user|user_id} {@user|user_id} ...]");
             return;
         }
@@ -60,7 +62,7 @@ public class BlockUserCommand: BaseBotCommand
 
             if (user == null)
             {
-                await BotClient.SendTextMessageAsync(Chat.ChatId, $"Не найден пользователь [{userIdentity}].\n" + 
+                await BotClient.SendMessageAsync(Chat.ChatId, $"Не найден пользователь [{userIdentity}].\n" + 
                                                                   "Необходимо указать параметры команды.\n" +
                                                                   "Например [/block {@user|user_id} {@user|user_id} ...]");
                 return;
@@ -73,7 +75,7 @@ public class BlockUserCommand: BaseBotCommand
         
         await _baseBotRepository.BlockUsers(BotId, usersToBlock.Select(u => u.Id).ToArray());
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, "Пользователи заблокированы.");
+        await BotClient.SendMessageAsync(Chat.ChatId, "Пользователи заблокированы.");
     }
     
 }

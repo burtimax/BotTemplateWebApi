@@ -1,6 +1,6 @@
 ﻿// using System;
 // using BotFramework.Enums;
-// using Telegram.Bot.Types;
+// 
 //
 // namespace BotFramework.Extensions;
 //

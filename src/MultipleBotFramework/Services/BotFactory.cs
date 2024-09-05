@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Models;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Utils.BotEventHadlers;
-using Telegram.Bot;
+using Telegram.BotAPI;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Services;
 
@@ -29,14 +27,14 @@ public class BotFactory : IBotFactory
         {
             try
             {
-                TelegramBotClient botClient = new(bot.Token);
+                MyTelegramBotClient botClient = new(bot.Token);
                 string webhook = config.Webhook.TrimEnd('/') + '/' + bot.Id;
                 botClient.SetWebhookAsync(webhook).Wait();
                 
                 if (botOptions != null && botOptions.BoundRequestsInSecond != null)
                 {
                     OnMakingApiRequest.BoundRequestInSecond = botOptions.BoundRequestsInSecond.Value;
-                    botClient.OnMakingApiRequest += OnMakingApiRequest.Handler;
+                    botClient.OnMakingApiRequest += OnMakingApiRequest.Handler; 
                 }
                 
                 _bots.Add((bot.Id, botClient));

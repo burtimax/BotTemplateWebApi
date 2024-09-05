@@ -5,10 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
+using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.AvailableTypes;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.Commands;
 
@@ -16,7 +18,8 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// Команда уведомления для всех пользователей бота.
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class GetMessageInfoCommand : BaseBotCommand
+[BotHandler(command:Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
+public class GetMessageInfoCommand : BaseBotHandler
 {
     public const string Name = "/msg";
 
@@ -31,7 +34,7 @@ public class GetMessageInfoCommand : BaseBotCommand
     {
         if (update.Message?.ReplyToMessage == null)
         {
-            await BotClient.SendTextMessageAsync(Chat.ChatId, "Ответь на какое-нибудь сообщение");
+            await BotClient.SendMessageAsync(Chat.ChatId, "Ответь на какое-нибудь сообщение");
             return;
         }
 
@@ -42,6 +45,6 @@ public class GetMessageInfoCommand : BaseBotCommand
           .AppendLine($"<b>ChatId</b> - <code>{replyMessage.Chat.Id}</code>")
           .AppendLine($"<b>MessageId</b> - <code>{replyMessage.MessageId}</code>");
 
-        await BotClient.SendTextMessageAsync(Chat.ChatId, sb.ToString(), parseMode: ParseMode.Html);
+        await BotClient.SendMessageAsync(Chat.ChatId, sb.ToString(), parseMode: ParseMode.Html);
     }
 }

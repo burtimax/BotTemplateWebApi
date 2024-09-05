@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace MultipleBotFramework.Extensions;
 
@@ -14,4 +15,12 @@ public static class ObjectExtensions
         [CallerArgumentExpression(nameof(value))] string? parameterName = default
     ) =>
         value ?? throw new ArgumentNullException(parameterName);
+    
+    public static string ToJson(this object obj)
+    {
+        return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+        });
+    }
 }

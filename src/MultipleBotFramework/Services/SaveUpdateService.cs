@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dto;
+using MultipleBotFramework.Enums;
+using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Repository;
 using Newtonsoft.Json;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Telegram.BotAPI.AvailableTypes;
+using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Services;
 
@@ -24,14 +26,15 @@ public class SaveUpdateService : ISaveUpdateService
         SaveUpdateDto saveUpdateDto = new()
         {
             BotChatId = chat?.Id ?? 0,
-            Type = update.Type.ToString(),
-            TelegramId = update.Id,
+            Type = update.Type().ToString(),
+            TelegramId = update.UpdateId,
             Content = "NULL"
         };
 
-        saveUpdateDto.Content = update.Type switch
+        saveUpdateDto.Content = update.Type() switch
         {
             UpdateType.Message => GetContentByMessageType(update.Message), 
+            UpdateType.Command => GetContentByMessageType(update.Message), 
             UpdateType.CallbackQuery => update.CallbackQuery?.Data ?? "",
             UpdateType.EditedMessage => update.EditedMessage?.Text ?? "",
             UpdateType.Poll => update.Poll?.Question ?? "",
@@ -60,7 +63,7 @@ public class SaveUpdateService : ISaveUpdateService
     /// <returns></returns>
     private string GetContentByMessageType(Message message)
     {
-        return JsonConvert.SerializeObject(new{ MessageType = message.Type.ToString(), Content = GetObjectByMessageType(message)}, Formatting.Indented);
+        return JsonConvert.SerializeObject(new{ MessageType = message.Type().ToString(), Content = GetObjectByMessageType(message)}, Formatting.Indented);
     }
 
     /// <summary>
@@ -70,7 +73,7 @@ public class SaveUpdateService : ISaveUpdateService
     /// <returns></returns>
     private object? GetObjectByMessageType(Message message)
     {
-        return message.Type switch
+        return message.Type() switch
         {
             MessageType.Audio => message.Audio,
             MessageType.Contact => message.Contact,
