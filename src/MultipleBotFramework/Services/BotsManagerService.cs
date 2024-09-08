@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -161,6 +162,9 @@ public class BotsManagerService : IBotsManagerService
     {
         if(cacheInitialized) return;
         List<BotEntity> bots = await _db.Bots.ToListAsync();
+        
+        if(bots is null || bots.Any() == false) return;
+        
         foreach (var bot in bots)
         {
             await UpdateInCache(bot);

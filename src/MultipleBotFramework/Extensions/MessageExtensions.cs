@@ -109,6 +109,7 @@ public static class MessageExtensions
     
     public static bool TrySetContentToChatHistory(this Message m, ref BotChatHistoryEntity item)
     {
+        item.Type = ChatHistoryType.Message;
         item.MessageId = m.MessageId;
         item.MediaGroupId = m.MediaGroupId;
         item.MessageType = UpdateType.Message.ToString() + "." + m.Type().ToString();

@@ -44,6 +44,7 @@ public class BotUpdateDispatcher
     private readonly BotDbContext _db;
     private readonly ISavedMessageService _savedMessageService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly BotChatHistoryService _chatHistoryService;
 
     public BotUpdateDispatcher(
         IServiceProvider serviceProvider)
@@ -54,6 +55,7 @@ public class BotUpdateDispatcher
         _saveUpdateService = _serviceProvider.GetRequiredService<SaveUpdateService>();
         _botConfiguration = _serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
         _db = _serviceProvider.GetRequiredService<BotDbContext>();
+        _chatHistoryService = serviceProvider.GetRequiredService<BotChatHistoryService>();
         var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
         _botOptions = (_serviceProvider.GetRequiredService<IOptions<BotOptions>>())?.Value ?? new();
         _savedMessageService = _serviceProvider.GetRequiredService<ISavedMessageService>();
@@ -89,6 +91,7 @@ public class BotUpdateDispatcher
             if (telegramChat is not null)
             {
                 chat = existedChat ?? await _botRepository.UpsertChat(botId, telegramChat, telegramUser);
+                await _chatHistoryService.SaveInChatHistoryIfNeed(botId, chat.TelegramId, false, update);
             }
             
             // Если пользователь заблокирован, тогда ему не отвечаем!!!
