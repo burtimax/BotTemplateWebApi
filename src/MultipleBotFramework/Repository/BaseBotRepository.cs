@@ -154,7 +154,7 @@ namespace MultipleBotFramework.Repository
             BotUserEntity? botUser = null;
             if (user is not null)
             {
-                botUser = await GetUserById(botId, user!.Id);
+                botUser = await GetUser(botId, user!.Id);
             }
             
             BotChatEntity? existed = await GetChatById(botId, chat.Id);
@@ -191,24 +191,6 @@ namespace MultipleBotFramework.Repository
             _db.Chats.Add(newChatEntity);
             await _db.SaveChangesAsync();
             return newChatEntity;
-        }
-
-        /// <inheritdoc />
-        public async Task<BotUpdateEntity> AddUpdate(long botId, SaveUpdateDto updateDto)
-        {
-            BotUpdateEntity newUpdateEntity = new BotUpdateEntity()
-            {
-                BotId = botId,
-                TelegramMessageId = updateDto.TelegramId,
-                ChatId = updateDto.BotChatId,
-                Type = updateDto.Type,
-                Content = updateDto.Content
-            };
-
-            newUpdateEntity.CreatedAt = DateTimeOffset.Now;
-            _db.Updates.Add(newUpdateEntity);
-            await _db.SaveChangesAsync();
-            return newUpdateEntity;
         }
 
         /// <inheritdoc />

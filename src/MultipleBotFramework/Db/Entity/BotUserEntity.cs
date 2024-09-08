@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Models;
 
 namespace MultipleBotFramework.Db.Entity
@@ -50,6 +51,9 @@ namespace MultipleBotFramework.Db.Entity
         /// </summary>
         [Comment("Флаг заблокированного пользователя.")]
         public bool IsBlocked { get; set; } = false;
+
+        [Comment("Статус пользователя")]
+        public string? Status { get; set; }
         
         /// <summary>
         /// Имя пользователя в Telegram.
@@ -108,6 +112,17 @@ namespace MultipleBotFramework.Db.Entity
             return string.IsNullOrEmpty(this.TelegramUsername) == false
                 ? $"@{this.TelegramUsername}"
                 : null;
+        }
+
+        /// <summary>
+        /// Можно ли писать пользователю. Заблокировал ли пользователь бота.
+        /// </summary>
+        public bool IsLeftOrBanned
+        {
+            get
+            {
+                return Status == BotUserStatus.Banned || Status == BotUserStatus.Left;
+            }
         }
     }
 }

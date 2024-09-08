@@ -6,7 +6,7 @@ using Telegram.BotAPI;
 
 namespace MultipleBotFramework.Utils.BotEventHadlers;
 
-public class OnMakingApiRequest
+public class Throttling
 {
     internal static int BoundRequestInSecond = 30;
     private static object lockObj = new();

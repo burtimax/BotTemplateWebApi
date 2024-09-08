@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MultipleBotFramework.Db;
+using MultipleBotFramework.Dispatcher;
 using MultipleBotFramework.Dto;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
 using MultipleBotFramework.Services;
+using MultipleBotFramework.Services.Interfaces;
 using MultipleBotFramework.Utils;
 
 namespace MultipleBotFramework.Extensions;
@@ -25,7 +28,7 @@ public static class IServiceCollectionExtension
         // Делаем миграцию в БД.
         var ob = new DbContextOptionsBuilder<BotDbContext>();
         ob.UseNpgsql(botConfiguration.DbConnection);
-
+        
         using (BotDbContext botDbContext = new BotDbContext(ob.Options))
         {
             botDbContext.Database.Migrate();
@@ -37,9 +40,6 @@ public static class IServiceCollectionExtension
                 .ConfigureAwait(false)
                 .GetAwaiter()
                 .GetResult();
-
-            BotFactory botFactory = new BotFactory(botDbContext, botConfiguration, botOptions);
-            services.AddSingleton<IBotFactory>(botFactory);
         }
         
         // Регистрируем сервисы.
@@ -47,6 +47,10 @@ public static class IServiceCollectionExtension
         services.AddTransient<IBotUpdateRepository, BotUpdateRepository>();
         services.AddTransient<ISaveUpdateService, SaveUpdateService>();
         services.AddTransient<ISavedMessageService, SavedMessageService>();
+        services.AddTransient<IBotsManagerService, BotsManagerService>();
+        services.AddTransient<IBotFactory, BotFactory>();
+        services.AddHttpContextAccessor();
+        services.AddTransient<BotUpdateDispatcher>();
 
         return services;
     }

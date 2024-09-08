@@ -1,0 +1,6 @@
+@MultipleTestBotBot_HostAddress = http://localhost:5114
+
+GET {{MultipleTestBotBot_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

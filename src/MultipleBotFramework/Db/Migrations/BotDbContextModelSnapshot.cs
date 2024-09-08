@@ -18,7 +18,7 @@ namespace MultipleBotFramework.Db.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "hstore");
@@ -169,6 +169,18 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<string>("ShortDescription")
+                        .HasColumnType("text")
+                        .HasColumnName("short_description");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("text")
@@ -181,6 +193,10 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Property<string>("Username")
                         .HasColumnType("text")
                         .HasColumnName("username");
+
+                    b.Property<string>("Webhook")
+                        .HasColumnType("text")
+                        .HasColumnName("webhook");
 
                     b.HasKey("Id")
                         .HasName("pk_bots");
@@ -554,6 +570,11 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("role")
                         .HasComment("Роль пользователя в боте. Например [user, moderator, admin].");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text")
+                        .HasColumnName("status")
+                        .HasComment("Статус пользователя");
 
                     b.Property<string>("TelegramFirstname")
                         .HasColumnType("text")

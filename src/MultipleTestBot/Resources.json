@@ -1,0 +1,14 @@
+{
+  "IntroductionSavedMessageId" : 1,
+  "Introduction" : "Привет, отправляй сообщение",
+  "NoSupportedMessage" : "Такое я не уменю сохранять",
+  "SendMeNoTextMessage" : "Пришли мне не текст",
+  "NeedApprove" : "Проверь сообщение ☝\uFE0F (ID = [{0}])",
+  "ReplyForYourMessage" : "На твое сообщение ответили \uD83D\uDE09",
+  "MessageApprovedByModerator" : "Принято (ID = [{0}])",
+  "MessageDeclinedByModerator" : "Отклонено (ID = [{0}])",
+  "MessageSaved" : "\uD83D\uDD25",
+  "ButtonNext" : "\uD83E\uDE93",
+  "ButtonApprove" : "✅",
+  "ButtonDecline" : "\uD83D\uDEAB"
+}

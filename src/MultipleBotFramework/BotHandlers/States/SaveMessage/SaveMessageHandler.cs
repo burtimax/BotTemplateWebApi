@@ -10,6 +10,7 @@ using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Enums;
 using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Services;
+using MultipleBotFramework.Services.Interfaces;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.GettingUpdates;
 

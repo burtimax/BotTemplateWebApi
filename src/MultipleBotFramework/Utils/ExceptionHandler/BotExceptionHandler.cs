@@ -14,6 +14,7 @@ using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
 using MultipleBotFramework.Services;
+using MultipleBotFramework.Services.Interfaces;
 using MultipleBotFramework.Utils.ReportGenerator;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
@@ -52,7 +53,7 @@ public class BotExceptionHandler
 
         // Получим сервисы из DI
         IBotFactory botFactory = serviceProvider.GetRequiredService<IBotFactory>();
-        ITelegramBotClient? botClient = (botFactory.GetInstance(botId));
+        ITelegramBotClient? botClient = await botFactory.GetInstance(botId);
         if(botClient is null) return;
         
         IBotUpdateRepository botUpdateRepository = serviceProvider.GetRequiredService<IBotUpdateRepository>();

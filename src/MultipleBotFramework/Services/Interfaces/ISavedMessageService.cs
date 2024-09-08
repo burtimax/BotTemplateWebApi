@@ -2,7 +2,7 @@
 using MultipleBotFramework.Db.Entity;
 using Telegram.BotAPI.AvailableTypes;
 
-namespace MultipleBotFramework.Services;
+namespace MultipleBotFramework.Services.Interfaces;
 
 
 /// <summary>

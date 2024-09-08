@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dto;
 using MultipleBotFramework.Enums;
 using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Repository;
+using MultipleBotFramework.Services.Interfaces;
 using Newtonsoft.Json;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
@@ -13,11 +16,11 @@ namespace MultipleBotFramework.Services;
 /// <inheritdoc />
 public class SaveUpdateService : ISaveUpdateService
 {
-    private readonly IBaseBotRepository _botRepository;
-    
-    public SaveUpdateService(IBaseBotRepository botRepository)
+    private BotDbContext _db;
+
+    public SaveUpdateService(BotDbContext db)
     {
-        _botRepository = botRepository;
+        _db = db;
     }
     
     /// <inheritdoc />
@@ -53,7 +56,25 @@ public class SaveUpdateService : ISaveUpdateService
         
         saveUpdateDto.Content ??= "";
 
-        return await _botRepository.AddUpdate(botId, saveUpdateDto);
+        BotUpdateEntity newUpdateEntity = new BotUpdateEntity()
+        {
+            BotId = botId,
+            TelegramMessageId = saveUpdateDto.TelegramId,
+            ChatId = saveUpdateDto.BotChatId,
+            Type = saveUpdateDto.Type,
+            Content = saveUpdateDto.Content
+        };
+
+        newUpdateEntity.CreatedAt = DateTimeOffset.Now;
+        _db.Updates.Add(newUpdateEntity);
+        await _db.SaveChangesAsync();
+        return newUpdateEntity;
+    }
+
+    public async Task<BotUpdateEntity> SaveBotRequestResult<TResult>(string method, TResult result)
+    {
+        // TODO 
+        throw new NotImplementedException();
     }
 
     /// <summary>

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Services.Interfaces;
 using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Services;

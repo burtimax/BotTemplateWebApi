@@ -112,11 +112,6 @@ namespace MultipleBotFramework.Repository
         /// <param name="userTelegramId"></param>
         /// <returns></returns>
         public Task<bool> IsUserOwner(long botId, long userTelegramId);
-        
-        /// <summary>
-        /// Добавить сообщение.
-        /// </summary>
-        Task<BotUpdateEntity> AddUpdate(long botId, SaveUpdateDto updateDto);
 
         /// <summary>
         /// Получить разрешения пользователя.
