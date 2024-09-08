@@ -29,6 +29,7 @@ public class BotDbContextConfiguration
         builder.Entity<BotOwnerEntity>().ToTable("bot_owners", schema);
         builder.Entity<BotUserEntity>().ToTable("users", schema);
         builder.Entity<BotChatEntity>().ToTable("chats", schema);
+        builder.Entity<BotChatHistoryEntity>().ToTable("chat_history", schema);
         builder.Entity<BotUpdateEntity>().ToTable("updates", schema);
         builder.Entity<BotClaimEntity>().ToTable("claims", schema);
         builder.Entity<BotUserClaimEntity>().ToTable("user_claims", schema);

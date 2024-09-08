@@ -14,7 +14,7 @@ using Telegram.BotAPI.GettingUpdates;
 namespace MultipleBotFramework.Services;
 
 /// <inheritdoc />
-public class SaveUpdateService : ISaveUpdateService
+public class SaveUpdateService
 {
     private BotDbContext _db;
 
@@ -34,27 +34,21 @@ public class SaveUpdateService : ISaveUpdateService
             Content = "NULL"
         };
 
-        saveUpdateDto.Content = update.Type() switch
+        if (update.Type() == UpdateType.Message ||
+            update.Type() == UpdateType.Command)
         {
-            UpdateType.Message => GetContentByMessageType(update.Message), 
-            UpdateType.Command => GetContentByMessageType(update.Message), 
-            UpdateType.CallbackQuery => update.CallbackQuery?.Data ?? "",
-            UpdateType.EditedMessage => update.EditedMessage?.Text ?? "",
-            UpdateType.Poll => update.Poll?.Question ?? "",
-            UpdateType.ChannelPost => $"{update.ChannelPost?.Caption} \n {update.ChannelPost?.Text}",
-            UpdateType.ChatMember => $"{update.ChatMember?.From?.Id} : {update.ChatMember?.From?.Username}",
-            UpdateType.InlineQuery => update.InlineQuery?.Query ?? "",
-            UpdateType.PollAnswer => update.PollAnswer?.PollId ?? "",
-            UpdateType.ShippingQuery => update.ShippingQuery?.InvoicePayload ?? "",
-            UpdateType.ChatJoinRequest => update.ChatJoinRequest?.Bio ?? "",
-            UpdateType.ChosenInlineResult => update.ChosenInlineResult?.Query ?? "",
-            UpdateType.EditedChannelPost => $"{update.EditedChannelPost?.Caption} \n {update.EditedChannelPost?.Text}",
-            UpdateType.MyChatMember => $"{update.MyChatMember?.From?.Id} : {update.MyChatMember?.From?.Username}",
-            UpdateType.PreCheckoutQuery => update.PreCheckoutQuery?.InvoicePayload ?? "",
-            UpdateType.Unknown => "UNKNOWN UPDATE",
-        };
+            saveUpdateDto.Type += "." + update.Message.Type().ToString();
+        }
+
+        saveUpdateDto.Content = update.GetPayload()?.ToJson() ?? "NULL";
+
+        if (update.Type() == UpdateType.Message ||
+            update.Type() == UpdateType.Command)
+        {
+            saveUpdateDto.Content = GetContentByMessageType(update.Message);
+        }
         
-        saveUpdateDto.Content ??= "";
+        saveUpdateDto.Content ??= "NULL";
 
         BotUpdateEntity newUpdateEntity = new BotUpdateEntity()
         {
@@ -71,12 +65,6 @@ public class SaveUpdateService : ISaveUpdateService
         return newUpdateEntity;
     }
 
-    public async Task<BotUpdateEntity> SaveBotRequestResult<TResult>(string method, TResult result)
-    {
-        // TODO 
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// Получить сериализованный в json объект сообщения.
     /// </summary>
@@ -84,7 +72,7 @@ public class SaveUpdateService : ISaveUpdateService
     /// <returns></returns>
     private string GetContentByMessageType(Message message)
     {
-        return JsonConvert.SerializeObject(new{ MessageType = message.Type().ToString(), Content = GetObjectByMessageType(message)}, Formatting.Indented);
+        return JsonConvert.SerializeObject(GetObjectByMessageType(message), Formatting.Indented);
     }
 
     /// <summary>
@@ -107,7 +95,6 @@ public class SaveUpdateService : ISaveUpdateService
             MessageType.Photo => message.Photo,
             MessageType.Poll => message.Poll,
             MessageType.Sticker => message.Sticker,
-            MessageType.Unknown => new{ Content = nameof(MessageType.Unknown) },
             MessageType.Venue => message.Venue,
             MessageType.Video => message.Video,
             MessageType.Voice => message.Voice,
@@ -133,7 +120,8 @@ public class SaveUpdateService : ISaveUpdateService
             MessageType.VideoChatParticipantsInvited => message.VideoChatParticipantsInvited,
             MessageType.MessageAutoDeleteTimerChanged => message.MessageAutoDeleteTimerChanged,
             MessageType.WriteAccessAllowed => new { Value = message.WriteAccessAllowed?.WebAppName ?? "NULL" },
-            _ => new{ Value = "UNKNOWN MESSAGE TYPE" },
+            MessageType.Unknown => new{ Content = nameof(MessageType.Unknown) },
+            _ => new{ Value = "NOT IMPLEMENTED MESSAGE TYPE" },
         };
     }
         

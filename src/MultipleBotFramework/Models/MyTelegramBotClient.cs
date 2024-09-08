@@ -1,4 +1,7 @@
-﻿using System.Net.Http;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +10,7 @@ using MultipleBotFramework.Db;
 using MultipleBotFramework.Services;
 using MultipleBotFramework.Services.Interfaces;
 using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Models;
 
@@ -46,35 +50,47 @@ public class MyTelegramBotClient : TelegramBotClient, ITelegramBotClient
     TResult ITelegramBotClient.CallMethod<TResult>(string method, object? args = null)
     {
         OnMakingApiRequest?.Invoke(this, method);
-        return base.CallMethod<TResult>(method, args);
+        var result = base.CallMethod<TResult>(method, args);
+        SaveResultIfNeed(method, args, result).ConfigureAwait(false).GetAwaiter();
+        return result;
     }
     
-    Task<TResult> ITelegramBotClient.CallMethodAsync<TResult>(string method, object? args = null, CancellationToken cancellationToken = default)
+    async Task<TResult> ITelegramBotClient.CallMethodAsync<TResult>(string method, object? args = null, CancellationToken cancellationToken = default)
     {
         OnMakingApiRequest?.Invoke(this, method, cancellationToken);
-        return base.CallMethodAsync<TResult>(method, args, cancellationToken);
+        var result = await base.CallMethodAsync<TResult>(method, args, cancellationToken);
+        await SaveResultIfNeed(method, args, result);
+        return result;
     }
 
     BotResponse<TReturn> ITelegramBotClient.CallMethodDirect<TReturn>(string method, object? args = null)
     {
         OnMakingApiRequest?.Invoke(this, method);
-        return base.CallMethodDirect<TReturn>(method, args);
+        var result = base.CallMethodDirect<TReturn>(method, args);
+        SaveResultIfNeed(method, args, result).ConfigureAwait(false).GetAwaiter();
+        return result;
     }
 
-    Task<BotResponse<TReturn>> ITelegramBotClient.CallMethodDirectAsync<TReturn>(string method, object? args = null,
+    async Task<BotResponse<TReturn>> ITelegramBotClient.CallMethodDirectAsync<TReturn>(string method, object? args = null,
         CancellationToken cancellationToken = default(CancellationToken))
     {
         OnMakingApiRequest?.Invoke(this, method);
-        return base.CallMethodDirectAsync<TReturn>(method, args, cancellationToken);
+        var result = await base.CallMethodDirectAsync<TReturn>(method, args, cancellationToken);
+        await SaveResultIfNeed(method, args, result);
+        return result;
     }
 
-    private async Task SaveResult<TResult>(string method, TResult result)
+    private async Task SaveResultIfNeed<TResult>(string method, object? args, TResult result)
     {
+        if(args is null) return;
+        if(BotId is null) return;
+        if(TryGetChatIdFromArgs(args, out long chatId) == false) return;
+        
         BotDbContext? db = GetDb();
         if(db is null) return;
         
-        // ISaveUpdateService saveUpdateService = new SaveUpdateService(db);
-        // saveUpdateService.
+        BotChatHistoryService chatHistoryService = new(db);
+        await chatHistoryService.SaveInChatHistoryIfNeed(BotId.Value, chatId, true, result);
     }
     
     private BotDbContext? GetDb()
@@ -97,4 +113,39 @@ public class MyTelegramBotClient : TelegramBotClient, ITelegramBotClient
         _dbGetCount++;
         return _db;
     }
+    
+    
+    private bool TryGetChatIdFromArgs(object args, out long chatId)
+    {
+        chatId = 0;
+        if (typeof(IEnumerable).IsAssignableFrom(args.GetType()))
+        {
+            if (args is IDictionary<string, object> items)
+            {
+                foreach (var item in items)
+                {
+                    if (item.Key == PropertyNames.ChatId)
+                    {
+                        return long.TryParse(item.Value.ToString(), out chatId);
+                    }
+                }
+            }
+        }
+        else
+        {
+            var properties = args.GetType().GetProperties();
+
+            foreach (var property in properties)
+            {
+                var value = property.GetValue(args);
+                if (property.Name == PropertyNames.ChatId || property.Name == "ChatId")
+                {
+                    return long.TryParse(value.ToString(), out chatId);
+                }
+            }
+        }
+
+        return false;
+    }
+    
 }

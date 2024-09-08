@@ -45,9 +45,10 @@ public static class IServiceCollectionExtension
         // Регистрируем сервисы.
         services.AddTransient<IBaseBotRepository, BaseBotRepository>();
         services.AddTransient<IBotUpdateRepository, BotUpdateRepository>();
-        services.AddTransient<ISaveUpdateService, SaveUpdateService>();
+        services.AddTransient<SaveUpdateService>();
         services.AddTransient<ISavedMessageService, SavedMessageService>();
         services.AddTransient<IBotsManagerService, BotsManagerService>();
+        services.AddTransient<BotChatHistoryService>();
         services.AddTransient<IBotFactory, BotFactory>();
         services.AddHttpContextAccessor();
         services.AddTransient<BotUpdateDispatcher>();

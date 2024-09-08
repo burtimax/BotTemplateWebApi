@@ -39,7 +39,7 @@ public class BotUpdateDispatcher
     private readonly IBaseBotRepository _botRepository;
     private readonly Assembly[] _assemblies;
     private readonly BotOptions _botOptions;
-    private readonly ISaveUpdateService _saveUpdateService;
+    private readonly SaveUpdateService _saveUpdateService;
     private readonly BotConfiguration _botConfiguration;
     private readonly BotDbContext _db;
     private readonly ISavedMessageService _savedMessageService;
@@ -51,7 +51,7 @@ public class BotUpdateDispatcher
         _assemblies = AppDomain.CurrentDomain.GetAssemblies();
         _serviceProvider = serviceProvider;
         _botRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
-        _saveUpdateService = _serviceProvider.GetRequiredService<ISaveUpdateService>();
+        _saveUpdateService = _serviceProvider.GetRequiredService<SaveUpdateService>();
         _botConfiguration = _serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
         _db = _serviceProvider.GetRequiredService<BotDbContext>();
         var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();

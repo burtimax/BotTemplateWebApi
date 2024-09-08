@@ -16,6 +16,7 @@ namespace MultipleBotFramework.Db
         public DbSet<BotOwnerEntity> BotOwners { get; set; }
         public DbSet<BotUserEntity> Users { get; set; }
         public DbSet<BotChatEntity> Chats { get; set; }
+        public DbSet<BotChatHistoryEntity> ChatHistory { get; set; }
         public DbSet<BotUpdateEntity> Updates { get; set; }
         public DbSet<BotClaimEntity> Claims { get; set; }
         public DbSet<BotUserClaimEntity> UserClaims { get; set; }
