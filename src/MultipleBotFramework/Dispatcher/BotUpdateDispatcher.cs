@@ -120,6 +120,9 @@ public class BotUpdateDispatcher
                 return;
             }
             
+            // Отключенным чатам не отвечаем.
+            if (chat.DisabledUntil is not null && DateTime.Now <= chat.DisabledUntil) return;
+            
             // Получаем текушее состояние чата. 
             string currentState = chat?.States?.CurrentState ?? BotConstants.StartState;
             BotHandlerResolver handlerResolver = new(_assemblies);

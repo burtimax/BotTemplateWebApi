@@ -40,6 +40,9 @@ public static class IServiceCollectionExtension
                 .ConfigureAwait(false)
                 .GetAwaiter()
                 .GetResult();
+
+            var botsManager = new BotsManagerService(botDbContext, botOptions, botConfiguration);
+            botsManager.InitializeBotsIfNeed().GetAwaiter().GetResult();
         }
         
         // Регистрируем сервисы.
@@ -52,7 +55,7 @@ public static class IServiceCollectionExtension
         services.AddTransient<IBotFactory, BotFactory>();
         services.AddHttpContextAccessor();
         services.AddTransient<BotUpdateDispatcher>();
-
+        
         return services;
     }
 }

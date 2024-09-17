@@ -63,6 +63,12 @@ namespace MultipleBotFramework.Db.Entity
         [Comment("Внешний ключ на бота.")]
         public long BotId { get; set; }
         public BotEntity? Bot { get; set; }
+
+        /// <summary>
+        /// Бот не отвечает/не реагирует чату до определенного времени.
+        /// </summary>
+        [Comment("Бот не отвечает/не реагирует чату до определенного времени.")]
+        public DateTimeOffset? DisabledUntil { get; set; }
         
         #region NotMappedData
         

@@ -27,11 +27,16 @@ public class BotsManagerService : IBotsManagerService
     private BotOptions _botOptions;
     
     public BotsManagerService(BotDbContext db, IOptions<BotOptions> botOptions,
-        IOptions<BotConfiguration> config)
+        IOptions<BotConfiguration> config) : this(db, botOptions.Value, config.Value)
+    {
+    }
+
+    public BotsManagerService(BotDbContext db, BotOptions botOptions,
+        BotConfiguration config)
     {
         _db = db;
-        _botOptions = botOptions.Value;
-        var c = config.Value;
+        _botOptions = botOptions;
+        var c = config;
         
         if (string.IsNullOrEmpty(c.Webhook))
             throw new Exception("Required webhook address in configuratin");
@@ -150,7 +155,7 @@ public class BotsManagerService : IBotsManagerService
 
     private async Task<MyTelegramBotClient> GetFromCacheSafe(long botId)
     {
-        await InitializeCacheIfNeed();
+        await InitializeBotsIfNeed();
         
         if (botCache.ContainsKey(botId)) return botCache[botId];
 
@@ -158,7 +163,7 @@ public class BotsManagerService : IBotsManagerService
         return botCache[botId];
     }
 
-    private async Task InitializeCacheIfNeed()
+    public async Task InitializeBotsIfNeed()
     {
         if(cacheInitialized) return;
         List<BotEntity> bots = await _db.Bots.ToListAsync();

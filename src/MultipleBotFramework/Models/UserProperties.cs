@@ -82,6 +82,14 @@ public class ComplexDictionary
         return _data.ContainsKey(key);
     }
 
+    /// <summary>
+    /// Очистить все данные.
+    /// </summary>
+    public void Clear()
+    {
+        _data.Clear();
+    }
+
     /// <inheritdoc/>
     public override string ToString()
     {

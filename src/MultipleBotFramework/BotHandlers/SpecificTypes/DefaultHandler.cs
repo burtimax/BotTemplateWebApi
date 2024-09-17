@@ -5,6 +5,7 @@ using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Enums;
 using MultipleBotFramework.Extensions;
 using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.SpecificTypes;
@@ -23,8 +24,13 @@ public class DefaultHandler : BaseBotHandler
         if (Chat is not null && Chat.ChatId != default)
         {
             try
-            { await BotClient.SendMessageAsync(Chat.ChatId, $"DEFAULT [{update.Type().ToString()}]"); }
-            catch (Exception e) { }
+            {
+                await BotClient.SendMessageAsync(Chat.ChatId, $"DEFAULT [{update.Type().ToString()}]");
+            }
+            catch (Exception e)
+            {
+                
+            }
         }
 #endif
         

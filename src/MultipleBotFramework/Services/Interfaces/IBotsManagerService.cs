@@ -13,4 +13,5 @@ public interface IBotsManagerService
     public Task<BotEntity> CreateBot(string token, string? comment = null, BotStatus? status = null);
     public Task<BotEntity> UpdateBot(long id, string? token, string? comment = null, BotStatus? status = null);
     public Task DeleteBot(long id);
+    public Task InitializeBotsIfNeed();
 }
