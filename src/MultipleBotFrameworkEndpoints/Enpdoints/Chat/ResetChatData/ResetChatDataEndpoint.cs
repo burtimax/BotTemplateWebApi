@@ -28,6 +28,11 @@ public class ResetChatDataEndpoint : Endpoint<ResetChatDataRequest, BotChatEntit
         Post("/reset-data");
         AllowAnonymous();
         Group<ChatGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Сбрасываем данные чата.";
+            s.Description = "Стираем все переменные чата. Стираем состояния, устанавливаем [StartState] начальное состояние для чата. Метод необходим в редких случаях, когда нужно сбросить текущее состояние пользователя и вернуть на исходную.";
+        });
     }
 
     public override async Task HandleAsync(ResetChatDataRequest r, CancellationToken c)

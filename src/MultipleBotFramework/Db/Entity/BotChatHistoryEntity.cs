@@ -8,7 +8,7 @@ namespace MultipleBotFramework.Db.Entity
     /// Сообщение пользователя
     /// </summary>
     [Comment("История чата.")]
-    public class BotChatHistoryEntity : BaseEntity<Guid>
+    public class BotChatHistoryEntity : BaseEntity<long>
     {
         /// <summary>
         /// Внешний ключ на сущность BotChat
@@ -53,12 +53,20 @@ namespace MultipleBotFramework.Db.Entity
         /// Заполняется при наличии файла в сообщении.
         /// </summary>
         /// <returns></returns>
+        [Comment("Заполняется при наличии файла в сообщении.")]
         public string? FileId { get; set; }
 
         /// <summary>
         /// Кто отправил сообщение: бот или пользователь.
         /// </summary>
+        [Comment("Кто отправил сообщение: бот или пользователь.")]
         public bool IsBot { get; set; }
+
+        /// <summary>
+        /// Просмотрено модератором.
+        /// </summary>
+        [Comment("Просмотрено модератором.")]
+        public bool IsViewed { get; set; } = false;
         
         /// <summary>
         /// Внешний ключ на бота.

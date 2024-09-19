@@ -24,6 +24,11 @@ public class RenewBotEndpoint : Endpoint<RenewBotRequest, BotEntity>
         Post("/renew");
         AllowAnonymous();
         Group<BotGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Перезапускаем бота.";
+            s.Description = "Перезагружаем бота, обновляем данные вебхука, добавляем бота в botsManager (кеш).";
+        });
     }
 
     public override async Task HandleAsync(RenewBotRequest r, CancellationToken c)

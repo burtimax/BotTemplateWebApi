@@ -27,7 +27,7 @@ public class BotExceptionEntity : BaseEntity<long>
     /// ИД запроса, в момент обработки которого произошла ошибка. 
     /// </summary>
     [Comment("ИД запроса, в момент обработки которого произошла ошибка.")]
-    public Guid? UpdateEntityId { get; set; }
+    public long? UpdateEntityId { get; set; }
     public BotUpdateEntity? UpdateEntity { get; set; }
 
     /// <summary>

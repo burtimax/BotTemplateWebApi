@@ -28,6 +28,11 @@ sealed class BlockUserEndpoint : Endpoint<BlockUserRequest, List<BotUserEntity>>
         Post("/block");
         AllowAnonymous();
         Group<UserGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Заблокировать пользователя(лей) в боте.";
+            s.Description = $"Если установить {nameof(BlockUserRequest.IsBlocked)} true, тогда блоируем, false - разблокируем.";
+        });
     }
 
     public override async Task HandleAsync(BlockUserRequest r, CancellationToken c)

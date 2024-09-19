@@ -108,11 +108,13 @@ namespace MultipleBotFramework.Db.Migrations
 
             modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotChatHistoryEntity", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("bigint")
                         .HasColumnName("id")
                         .HasComment("Идентификатор сущности.");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<long>("BotId")
                         .HasColumnType("bigint")
@@ -134,11 +136,18 @@ namespace MultipleBotFramework.Db.Migrations
 
                     b.Property<string>("FileId")
                         .HasColumnType("text")
-                        .HasColumnName("file_id");
+                        .HasColumnName("file_id")
+                        .HasComment("Заполняется при наличии файла в сообщении.");
 
                     b.Property<bool>("IsBot")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_bot");
+                        .HasColumnName("is_bot")
+                        .HasComment("Кто отправил сообщение: бот или пользователь.");
+
+                    b.Property<bool>("IsViewed")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_viewed")
+                        .HasComment("Просмотрено модератором.");
 
                     b.Property<string>("JsonObject")
                         .HasColumnType("text")
@@ -337,8 +346,8 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnName("stack_trace")
                         .HasComment("Стек вызовов в приложении, перед ошибкой.");
 
-                    b.Property<Guid?>("UpdateEntityId")
-                        .HasColumnType("uuid")
+                    b.Property<long?>("UpdateEntityId")
+                        .HasColumnType("bigint")
                         .HasColumnName("update_entity_id")
                         .HasComment("ИД запроса, в момент обработки которого произошла ошибка.");
 
@@ -494,11 +503,13 @@ namespace MultipleBotFramework.Db.Migrations
 
             modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotUpdateEntity", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("bigint")
                         .HasColumnName("id")
                         .HasComment("Идентификатор сущности.");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<long>("BotId")
                         .HasColumnType("bigint")

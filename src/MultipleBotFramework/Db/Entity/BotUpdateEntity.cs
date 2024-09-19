@@ -7,7 +7,7 @@ namespace MultipleBotFramework.Db.Entity
     /// Сообщение пользователя
     /// </summary>
     [Comment("Таблица сообщений (запросов) бота.")]
-    public class BotUpdateEntity : BaseEntity<Guid>
+    public class BotUpdateEntity : BaseEntity<long>
     {
         /// <summary>
         /// Внешний ключ на сущность BotChat

@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFrameworkEndpoints.Extensions;
@@ -28,6 +29,11 @@ public class GetChatsEndpoint : Endpoint<GetChatsRequest, PagedList<BotChatEntit
         Get("/get");
         AllowAnonymous();
         Group<ChatGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Получаем сущности чатов.";
+            s.Description = "Можем отфильтровать чаты по ботам, можем сортировать по полям.";
+        });
     }
 
     public override async Task HandleAsync(GetChatsRequest r, CancellationToken c)
@@ -36,6 +42,11 @@ public class GetChatsEndpoint : Endpoint<GetChatsRequest, PagedList<BotChatEntit
             .WhereIf(r.BotIds is not null && r.BotIds.Any(), b => r.BotIds.Contains(b.BotId))
             .WhereIf(r.Ids is not null && r.Ids.Any(), b => r.Ids.Contains(b.Id))
             .Order(r.Order);
+
+        if (string.IsNullOrEmpty(r.Order))
+        {
+            query.OrderByDescending(c => c.UpdatedAt);
+        }
 
         var result = await PagedList<BotChatEntity>.ToPagedListAsync(query, r);
         await SendAsync(result);

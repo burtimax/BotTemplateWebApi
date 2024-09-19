@@ -28,6 +28,11 @@ public class GetBotExceptionsEndpoint : Endpoint<GetBotExceptionsRequest, PagedL
         Get("/get");
         AllowAnonymous();
         Group<ExceptionGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Получаем список ошибок в приложении.";
+            s.Description = "Необходимо чтобы отслеживать работу приложения, делать своевременные доработки.";
+        });
     }
 
     public override async Task HandleAsync(GetBotExceptionsRequest r, CancellationToken c)

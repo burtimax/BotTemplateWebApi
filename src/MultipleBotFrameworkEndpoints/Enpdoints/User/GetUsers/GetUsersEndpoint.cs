@@ -26,6 +26,11 @@ sealed class GetUsersEndpoint : Endpoint<GetUsersRequest, PagedList<BotUserEntit
         Get("/get");
         AllowAnonymous();
         Group<UserGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Получаем список пользователей.";
+            s.Description = "Можем отфильтровать сущности пользователей по ботам, по ИД, пагинировать и сотрировать.";
+        });
     }
 
     public override async Task HandleAsync(GetUsersRequest r, CancellationToken c)

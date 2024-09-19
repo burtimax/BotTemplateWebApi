@@ -32,6 +32,11 @@ public class UpdateBotEndpoint : Endpoint<UpdateBotRequest, BotEntity>
         Patch("/update");
         AllowAnonymous();
         Group<BotGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Обновляем данные бота (токен, статус и прочее).";
+            s.Description = "Используем когда у бота обновляем токен. Можем поменять статус бота, включить его (1), отключить его (0) или отправить на тех. работы (2).";
+        });
     }
 
     public override async Task HandleAsync(UpdateBotRequest r, CancellationToken c)

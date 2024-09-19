@@ -114,6 +114,7 @@ public static class MessageExtensions
         item.MediaGroupId = m.MediaGroupId;
         item.MessageType = UpdateType.Message.ToString() + "." + m.Type().ToString();
         item.JsonObject = GetPayload(m)?.ToJson();
+        item.IsViewed = false;
 
         string content = $"#[{m.Type().ToString()}]\n";
         string? fileId = "";

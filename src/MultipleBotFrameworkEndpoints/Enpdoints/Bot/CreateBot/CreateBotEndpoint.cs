@@ -31,6 +31,11 @@ public class CreateBotEndpoint : Endpoint<CreateBotRequest, BotEntity>
         Post("/create");
         AllowAnonymous();
         Group<BotGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Зарегистрировать (добавить) бота в приложение";
+            s.Description = "Добавляем бота в приложение, бот начинает работать в приложении по логике приложения.";
+        });
     }
 
     public override async Task HandleAsync(CreateBotRequest r, CancellationToken c)

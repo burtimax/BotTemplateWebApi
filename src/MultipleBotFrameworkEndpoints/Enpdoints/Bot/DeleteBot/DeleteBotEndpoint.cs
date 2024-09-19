@@ -25,6 +25,11 @@ public class DeleteBotEndpoint : Endpoint<DeleteBotRequest>
         Delete("/delete");
         AllowAnonymous();
         Group<BotGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Удаляем бота из приложения. Бот перестает работать в приложении.";
+            s.Description = "SoftDelete сущности бота. Бот перестанет работать.";
+        });
     }
 
     public override async Task HandleAsync(DeleteBotRequest r, CancellationToken c)

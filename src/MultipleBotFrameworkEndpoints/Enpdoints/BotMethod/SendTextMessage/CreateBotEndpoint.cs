@@ -43,6 +43,11 @@ public class SendTextMessageEndpoint : Endpoint<SendTextMessageRequest, BotChatH
         Post("/send-text-message");
         AllowAnonymous();
         Group<BotMethodGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Отправить сообщение через бота чату (пользователю).";
+            s.Description = "Отправить сообщение от лица бота в чат. Общаемся через бота.";
+        });
     }
 
     public override async Task HandleAsync(SendTextMessageRequest r, CancellationToken c)

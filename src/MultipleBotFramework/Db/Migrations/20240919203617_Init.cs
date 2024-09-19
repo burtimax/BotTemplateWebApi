@@ -28,8 +28,12 @@ namespace MultipleBotFramework.Db.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     token = table.Column<string>(type: "text", nullable: false),
                     username = table.Column<string>(type: "text", nullable: true),
+                    name = table.Column<string>(type: "text", nullable: true),
+                    short_description = table.Column<string>(type: "text", nullable: true),
                     description = table.Column<string>(type: "text", nullable: true),
                     comment = table.Column<string>(type: "text", nullable: true),
+                    webhook = table.Column<string>(type: "text", nullable: true),
+                    status = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
@@ -87,6 +91,41 @@ namespace MultipleBotFramework.Db.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "chat_history",
+                schema: "bot",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false, comment: "Идентификатор сущности.")
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    telegram_chat_id = table.Column<long>(type: "bigint", nullable: false, comment: "ИД чата в телеграме."),
+                    media_group_id = table.Column<string>(type: "text", nullable: true, comment: "Принадлежность сообщения определенной медиагруппе."),
+                    message_id = table.Column<long>(type: "bigint", nullable: true, comment: "Идентификатор сообщения в Telegram чате."),
+                    message_type = table.Column<string>(type: "text", nullable: true, comment: "Идентификатор сообщения в Telegram чате."),
+                    type = table.Column<int>(type: "integer", nullable: false, comment: "Тип элемента истории: message, callback, membertype and ect..."),
+                    content = table.Column<string>(type: "text", nullable: true, comment: "Строковое представление содержимого сообщения."),
+                    json_object = table.Column<string>(type: "text", nullable: true, comment: "JSON представление содержимого сообщения."),
+                    file_id = table.Column<string>(type: "text", nullable: true, comment: "Заполняется при наличии файла в сообщении."),
+                    is_bot = table.Column<bool>(type: "boolean", nullable: false, comment: "Кто отправил сообщение: бот или пользователь."),
+                    is_viewed = table.Column<bool>(type: "boolean", nullable: false, comment: "Просмотрено модератором."),
+                    bot_id = table.Column<long>(type: "bigint", nullable: false, comment: "Внешний ключ на бота."),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_chat_history", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_chat_history_bots_bot_id",
+                        column: x => x.bot_id,
+                        principalSchema: "bot",
+                        principalTable: "bots",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "История чата.");
+
+            migrationBuilder.CreateTable(
                 name: "saved_messages",
                 schema: "bot",
                 columns: table => new
@@ -130,6 +169,7 @@ namespace MultipleBotFramework.Db.Migrations
                     role = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, comment: "Роль пользователя в боте. Например [user, moderator, admin]."),
                     language_code = table.Column<string>(type: "text", nullable: true, comment: "Код языка пользователя. Ссылка на коды [https://en.wikipedia.org/wiki/IETF_language_tag]"),
                     is_blocked = table.Column<bool>(type: "boolean", nullable: false, comment: "Флаг заблокированного пользователя."),
+                    status = table.Column<string>(type: "text", nullable: true, comment: "Статус пользователя"),
                     telegram_firstname = table.Column<string>(type: "text", nullable: true, comment: "Имя пользователя в Telegram."),
                     telegram_lastname = table.Column<string>(type: "text", nullable: true, comment: "Фамилия пользователя в Telegram."),
                     bot_id = table.Column<long>(type: "bigint", nullable: false, comment: "Внешний ключ на бота."),
@@ -164,6 +204,7 @@ namespace MultipleBotFramework.Db.Migrations
                     title = table.Column<string>(type: "text", nullable: true, comment: "Заголовок чата"),
                     bot_user_id = table.Column<long>(type: "bigint", nullable: true, comment: "Внешний ключ на пользователя."),
                     bot_id = table.Column<long>(type: "bigint", nullable: false, comment: "Внешний ключ на бота."),
+                    disabled_until = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true, comment: "Бот не отвечает/не реагирует чату до определенного времени."),
                     __data_database_dictionary = table.Column<Dictionary<string, string>>(type: "hstore", nullable: false),
                     __states = table.Column<List<string>>(type: "text[]", nullable: false, comment: "Состояние чата."),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -235,7 +276,8 @@ namespace MultipleBotFramework.Db.Migrations
                 schema: "bot",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, comment: "Идентификатор сущности."),
+                    id = table.Column<long>(type: "bigint", nullable: false, comment: "Идентификатор сущности.")
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     chat_id = table.Column<long>(type: "bigint", nullable: false, comment: "Внешний ключ на таблицу чатов."),
                     telegram_message_id = table.Column<long>(type: "bigint", nullable: false, comment: "Идентификатор сообщения в Telegram чате."),
                     type = table.Column<string>(type: "text", nullable: false, comment: "Тип сообщения (текст, картинка, аудио, документ и т.д.)."),
@@ -274,7 +316,7 @@ namespace MultipleBotFramework.Db.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     user_entity_id = table.Column<long>(type: "bigint", nullable: true, comment: "Кто отправил запрос боту, когда произошла ошибка."),
                     chat_entity_id = table.Column<long>(type: "bigint", nullable: true, comment: "ИД чата, откуда пришел запрос, когда произошла ошибка."),
-                    update_entity_id = table.Column<Guid>(type: "uuid", nullable: true, comment: "ИД запроса, в момент обработки которого произошла ошибка."),
+                    update_entity_id = table.Column<long>(type: "bigint", nullable: true, comment: "ИД запроса, в момент обработки которого произошла ошибка."),
                     exception_message = table.Column<string>(type: "text", nullable: true, comment: "Сообщение об ошибке."),
                     stack_trace = table.Column<string>(type: "text", nullable: true, comment: "Стек вызовов в приложении, перед ошибкой."),
                     report_description = table.Column<string>(type: "text", nullable: true, comment: "Отчет об ошибке."),
@@ -318,6 +360,12 @@ namespace MultipleBotFramework.Db.Migrations
                 name: "ix_bot_owners_bot_id",
                 schema: "bot",
                 table: "bot_owners",
+                column: "bot_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_chat_history_bot_id",
+                schema: "bot",
+                table: "chat_history",
                 column: "bot_id");
 
             migrationBuilder.CreateIndex(
@@ -411,6 +459,10 @@ namespace MultipleBotFramework.Db.Migrations
         {
             migrationBuilder.DropTable(
                 name: "bot_owners",
+                schema: "bot");
+
+            migrationBuilder.DropTable(
+                name: "chat_history",
                 schema: "bot");
 
             migrationBuilder.DropTable(

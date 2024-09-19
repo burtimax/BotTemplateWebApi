@@ -25,6 +25,13 @@ public class DisableChatEndpoint : Endpoint<DisableChatRequest, BotChatEntity>
         Post("/disable");
         AllowAnonymous();
         Group<ChatGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Делаем чат неактивным.";
+            s.Description = "Указываем время (в секундах), которое чат будет неактивным. " +
+                            "Когда отправляем 0 сек - чат становится активным. В момент неактивности бот не отвечает (можно общаться через админку).";
+            
+        });
     }
 
     public override async Task HandleAsync(DisableChatRequest r, CancellationToken c)

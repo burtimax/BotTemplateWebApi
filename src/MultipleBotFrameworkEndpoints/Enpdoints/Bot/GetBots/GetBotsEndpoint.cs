@@ -26,6 +26,11 @@ public class GetBotsEndpoint : Endpoint<GetBotsRequest, PagedList<BotEntity>>
         Get("/get");
         AllowAnonymous();
         Group<BotGroup>();
+        Summary(s =>
+        {
+            s.Summary = "Получаем список ботов.";
+            s.Description = "Сущности ботов. Можем фильтровать, пагинировать, сортировать.";
+        });
     }
 
     public override async Task HandleAsync(GetBotsRequest r, CancellationToken c)

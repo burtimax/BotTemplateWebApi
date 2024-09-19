@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MultipleBotFramework.Db.Migrations
 {
     [DbContext(typeof(BotDbContext))]
-    [Migration("20240907213510_AddStatusToBotEntity")]
-    partial class AddStatusToBotEntity
+    [Migration("20240919203617_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,11 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
+
+                    b.Property<DateTimeOffset?>("DisabledUntil")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("disabled_until")
+                        .HasComment("Бот не отвечает/не реагирует чату до определенного времени.");
 
                     b.Property<long>("TelegramId")
                         .HasColumnType("bigint")
@@ -101,6 +106,95 @@ namespace MultipleBotFramework.Db.Migrations
                     b.ToTable("chats", "bot", t =>
                         {
                             t.HasComment("Сущность чата.");
+                        });
+                });
+
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotChatHistoryEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id")
+                        .HasComment("Идентификатор сущности.");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BotId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("bot_id")
+                        .HasComment("Внешний ключ на бота.");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text")
+                        .HasColumnName("content")
+                        .HasComment("Строковое представление содержимого сообщения.");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("FileId")
+                        .HasColumnType("text")
+                        .HasColumnName("file_id")
+                        .HasComment("Заполняется при наличии файла в сообщении.");
+
+                    b.Property<bool>("IsBot")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_bot")
+                        .HasComment("Кто отправил сообщение: бот или пользователь.");
+
+                    b.Property<bool>("IsViewed")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_viewed")
+                        .HasComment("Просмотрено модератором.");
+
+                    b.Property<string>("JsonObject")
+                        .HasColumnType("text")
+                        .HasColumnName("json_object")
+                        .HasComment("JSON представление содержимого сообщения.");
+
+                    b.Property<string>("MediaGroupId")
+                        .HasColumnType("text")
+                        .HasColumnName("media_group_id")
+                        .HasComment("Принадлежность сообщения определенной медиагруппе.");
+
+                    b.Property<long?>("MessageId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("message_id")
+                        .HasComment("Идентификатор сообщения в Telegram чате.");
+
+                    b.Property<string>("MessageType")
+                        .HasColumnType("text")
+                        .HasColumnName("message_type")
+                        .HasComment("Идентификатор сообщения в Telegram чате.");
+
+                    b.Property<long>("TelegramChatId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("telegram_chat_id")
+                        .HasComment("ИД чата в телеграме.");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type")
+                        .HasComment("Тип элемента истории: message, callback, membertype and ect...");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_chat_history");
+
+                    b.HasIndex("BotId")
+                        .HasDatabaseName("ix_chat_history_bot_id");
+
+                    b.ToTable("chat_history", "bot", t =>
+                        {
+                            t.HasComment("История чата.");
                         });
                 });
 
@@ -171,6 +265,14 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<string>("ShortDescription")
+                        .HasColumnType("text")
+                        .HasColumnName("short_description");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer")
@@ -247,8 +349,8 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnName("stack_trace")
                         .HasComment("Стек вызовов в приложении, перед ошибкой.");
 
-                    b.Property<Guid?>("UpdateEntityId")
-                        .HasColumnType("uuid")
+                    b.Property<long?>("UpdateEntityId")
+                        .HasColumnType("bigint")
                         .HasColumnName("update_entity_id")
                         .HasComment("ИД запроса, в момент обработки которого произошла ошибка.");
 
@@ -404,11 +506,13 @@ namespace MultipleBotFramework.Db.Migrations
 
             modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotUpdateEntity", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("bigint")
                         .HasColumnName("id")
                         .HasComment("Идентификатор сущности.");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<long>("BotId")
                         .HasColumnType("bigint")
@@ -633,6 +737,18 @@ namespace MultipleBotFramework.Db.Migrations
                     b.Navigation("Bot");
 
                     b.Navigation("BotUser");
+                });
+
+            modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotChatHistoryEntity", b =>
+                {
+                    b.HasOne("MultipleBotFramework.Db.Entity.BotEntity", "Bot")
+                        .WithMany()
+                        .HasForeignKey("BotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_chat_history_bots_bot_id");
+
+                    b.Navigation("Bot");
                 });
 
             modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotExceptionEntity", b =>
