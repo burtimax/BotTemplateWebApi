@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using MultipleBotFramework.Enums;
 using MultipleBotFramework.Models;
+using Telegram.BotAPI;
 
 namespace MultipleBotFramework.Db.Entity
 {
@@ -94,6 +96,23 @@ namespace MultipleBotFramework.Db.Entity
         [NotMapped]
         public long ChatId => TelegramId;
 
+        /// <summary>
+        /// Получить тип чата.
+        /// </summary>
+        /// <returns></returns>
+        public ChatType GetType()
+        {
+            return this.Type switch
+            {
+                ChatTypes.Sender => ChatType.Sender,
+                ChatTypes.Private => ChatType.Private,
+                ChatTypes.Group => ChatType.Group,
+                ChatTypes.Supergroup => ChatType.Supergroup,
+                ChatTypes.Channel => ChatType.Channel,
+                _ => ChatType.Unknown
+            };
+        }
+        
         #endregion
     }
 }

@@ -39,6 +39,11 @@ public class BotHandlerAttribute : Attribute
     /// Наименование состояния для обработчика.
     /// </summary>
     public string? StateName { get; set; }
+    
+    /// <summary>
+    /// Тип чата.
+    /// </summary>
+    public IEnumerable<ChatType>? ChatTypes { get; set; }
 
     /// <summary>
     /// Пользователи с одним из этих разрешений будут попадать в обработчик.
@@ -62,7 +67,8 @@ public class BotHandlerAttribute : Attribute
         string[]? userRoles = null,
         string[]? requiredUserClaims = null,
         double version = 1.0f,
-        long[] botIds = null)
+        long[] botIds = null,
+        ChatType[]? chatTypes = null)
     {
         this.StateName = stateName;
         this.UpdateTypes = updateTypes;
@@ -71,5 +77,6 @@ public class BotHandlerAttribute : Attribute
         this.UserClaims = requiredUserClaims?.ToList();
         this.BotIds = botIds?.ToList();
         this.Version = version;
+        this.ChatTypes = chatTypes;
     }
 }

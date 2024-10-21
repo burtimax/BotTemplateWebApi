@@ -26,7 +26,7 @@ public class SaveUpdateService : ISaveUpdateService
         {
             BotChatId = chat?.Id ?? 0,
             Type = update.Type.ToString(),
-            TelegramId = update.Id,
+            TelegramId = update.Message?.MessageId ?? update.Id,
             Content = "NULL"
         };
 

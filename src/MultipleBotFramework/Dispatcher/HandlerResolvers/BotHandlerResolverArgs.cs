@@ -43,6 +43,11 @@ public class BotHandlerResolverArgs
     /// </summary>
     public string? UserRole { get; set; }
 
+    /// <summary>
+    /// Тип чата.
+    /// </summary>
+    public ChatType ChatType { get; set; }
+    
     // /// <summary>
     // /// Версия обработчика
     // /// </summary>

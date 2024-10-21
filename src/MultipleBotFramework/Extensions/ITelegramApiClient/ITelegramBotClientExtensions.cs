@@ -14,22 +14,22 @@ namespace MultipleBotFramework.Extensions.ITelegramApiClient;
 
 public static partial class ITelegramBotClientExtensions
 {
-    public static async Task SendMediaAsync(this ITelegramBotClient client, long chatId, IEnumerable<InputMedia> media, string caption, string parseMode = ParseMode.Html)
+    public static async Task<IEnumerable<Message>> SendMediaAsync(this ITelegramBotClient client, long chatId, IEnumerable<InputMedia> media, string caption, string parseMode = ParseMode.Html)
     {
         if (media == null || media.Any() == false)
         {
             if (caption != null)
             {
-                await client.SendMessageAsync(chatId: chatId, text:caption, parseMode: parseMode);
-                return;
+                var message = await client.SendMessageAsync(chatId: chatId, text:caption, parseMode: parseMode);
+                return new List<Message>(){ message };
             }
-            return;
+            throw new ArgumentNullException(nameof(media));
         }
 
         media.Last().Caption = caption;
         media.Last().ParseMode = parseMode;
 
-        await client.SendMediaGroupAsync(chatId: chatId, media: media);
+        return await client.SendMediaGroupAsync(chatId: chatId, media: media);
     }
     
     

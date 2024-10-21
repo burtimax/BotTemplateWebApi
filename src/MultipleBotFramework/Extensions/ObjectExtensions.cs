@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MultipleBotFramework.Extensions;
 
@@ -21,6 +22,7 @@ public static class ObjectExtensions
         return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
         {
             WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         });
     }
 }

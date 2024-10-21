@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Enums;
 
 namespace MultipleBotFramework.Dispatcher.HandlerResolvers;
 
@@ -91,6 +92,8 @@ public class BotHandlerResolver
         {
             if (IsAppropriate1(args.StateName, attr.StateName) == false) continue;
             
+            if (IsAppropriate2(args.ChatType, attr.ChatTypes) == false) continue;
+            
             if ((string.IsNullOrEmpty(attr.Command) || (args.Command ?? "").StartsWith(attr.Command)) == false) continue;
 
             if (IsAppropriate2(args.UpdateType, attr.UpdateTypes) == false) continue;
@@ -138,8 +141,9 @@ public class BotHandlerResolver
         int versionFactor = 10;
         int commandFactor = 10000 * versionFactor;
         int botIdFactor = 105 * versionFactor;
-        int updateTypeFactor = 104 * versionFactor;
+        int updateTypeFactor = 10 * versionFactor;
         int stateNameFactor = 100 * versionFactor;
+        int chatTypeFactor = 100 * versionFactor;
         int userRoleFactor = 100 * versionFactor;
         int userClaimsFactor = 100 * versionFactor;
         
@@ -159,6 +163,10 @@ public class BotHandlerResolver
                 && string.IsNullOrEmpty(attr.StateName) == false
                 && string.Equals(args.StateName, attr.StateName)) sum += stateNameFactor;
 
+            if (attr.ChatTypes is not null 
+                && attr.ChatTypes.Any()
+                && attr.ChatTypes.Contains(args.ChatType)) sum += chatTypeFactor;
+            
             if (attr.UpdateTypes is not null 
                 && attr.UpdateTypes.Any()
                 && attr.UpdateTypes.Contains(args.UpdateType)) sum += updateTypeFactor;

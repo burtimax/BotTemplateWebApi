@@ -51,6 +51,7 @@ public class CommandsCommand: BaseBotHandler
             sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotReportGet}</code>");
             sb.AppendLine($"{ReportCommand.Name} <code>{{int hours}}</code> - <i>Получить отчет по боту.</i>");
             sb.AppendLine($"{SaveMessageCommand.Name} - <i>Сохранение сообщения в БД (в ответ на сообщение).</i>");
+            sb.AppendLine($"{MessageInfoCommand.Name} - <i>Получить json сообщения (ответ на сообщение).</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserClaimCreate))
         {

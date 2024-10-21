@@ -135,6 +135,7 @@ public class BotUpdateDispatcher
                 UpdateType = update.Type(),
                 StateName = currentState,
                 Command = update.Type() == UpdateType.Command ? update!.Message!.Text : null,
+                ChatType = chat?.GetType() ?? ChatType.Unknown,
             };
 
             List<Type>? handlerTypes = handlerResolver.GetHandlers(resolverArgs);

@@ -20,10 +20,7 @@ public static class IServiceCollectionExtension
         IEnumerable<ClaimValue>? claims = null, BotOptions botOptions = null)
     {
         // Регистрируем контекст
-        services.AddDbContext<BotDbContext>(options =>
-        {
-            options.UseNpgsql(botConfiguration.DbConnection);
-        });
+        AddMultipleBotDb(services, botConfiguration.DbConnection);
         
         // Делаем миграцию в БД.
         var ob = new DbContextOptionsBuilder<BotDbContext>();
@@ -46,16 +43,34 @@ public static class IServiceCollectionExtension
         }
         
         // Регистрируем сервисы.
+        services.AddTransient<IBotFactory, BotFactory>();
+        services.AddTransient<IBotsManagerService, BotsManagerService>();
+        services.AddTransient<BotUpdateDispatcher>();
+        AddMultipleBotServices(services);
+        
+        return services;
+    }
+    
+    public static IServiceCollection AddMultipleBotServices(this IServiceCollection services)
+    {
+        // Регистрируем сервисы.
         services.AddTransient<IBaseBotRepository, BaseBotRepository>();
         services.AddTransient<IBotUpdateRepository, BotUpdateRepository>();
         services.AddTransient<SaveUpdateService>();
         services.AddTransient<ISavedMessageService, SavedMessageService>();
-        services.AddTransient<IBotsManagerService, BotsManagerService>();
         services.AddTransient<BotChatHistoryService>();
-        services.AddTransient<IBotFactory, BotFactory>();
         services.AddHttpContextAccessor();
-        services.AddTransient<BotUpdateDispatcher>();
         
+        return services;
+    }
+    
+    public static IServiceCollection AddMultipleBotDb(this IServiceCollection services, string dbConnection)
+    {
+        /// Регистрируем контекст
+        services.AddDbContext<BotDbContext>(options =>
+        {
+            options.UseNpgsql(dbConnection);
+        });
         return services;
     }
 }

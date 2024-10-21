@@ -30,7 +30,7 @@ public class SaveUpdateService
         {
             BotChatId = chat?.Id ?? 0,
             Type = update.Type().ToString(),
-            TelegramId = update.UpdateId,
+            TelegramId = update?.Message?.MessageId ?? update.UpdateId,
             Content = "NULL"
         };
 
