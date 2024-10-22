@@ -28,7 +28,8 @@ public class SaveUpdateService
     {
         SaveUpdateDto saveUpdateDto = new()
         {
-            BotChatId = chat?.Id ?? 0,
+            BotChatId = chat?.Id,
+            BotUserId = user?.Id,
             Type = update.Type().ToString(),
             TelegramId = update?.Message?.MessageId ?? update.UpdateId,
             Content = "NULL"
@@ -45,7 +46,7 @@ public class SaveUpdateService
         if (update.Type() == UpdateType.Message ||
             update.Type() == UpdateType.Command)
         {
-            saveUpdateDto.Content = GetContentByMessageType(update.Message);
+            saveUpdateDto.Content = update.ToJson(); //GetContentByMessageType(update.Message);
         }
         
         saveUpdateDto.Content ??= "NULL";
@@ -55,6 +56,7 @@ public class SaveUpdateService
             BotId = botId,
             TelegramMessageId = saveUpdateDto.TelegramId,
             ChatId = saveUpdateDto.BotChatId,
+            UserId = saveUpdateDto.BotUserId,
             Type = saveUpdateDto.Type,
             Content = saveUpdateDto.Content
         };

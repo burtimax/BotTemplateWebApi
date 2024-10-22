@@ -13,8 +13,15 @@ namespace MultipleBotFramework.Db.Entity
         /// Внешний ключ на сущность BotChat
         /// </summary>
         [Comment("Внешний ключ на таблицу чатов.")]
-        public long ChatId { get; set; }
-        public BotChatEntity Chat { get; set; }
+        public long? ChatId { get; set; }
+        public BotChatEntity? Chat { get; set; }
+        
+        /// <summary>
+        /// Внешний ключ на сущность BotChat
+        /// </summary>
+        [Comment("Внешний ключ на таблицу пользователей.")]
+        public long? UserId { get; set; }
+        public BotUserEntity? User { get; set; }
         
         /// <summary>
         /// Telegram Message Id

@@ -9,7 +9,12 @@
         /// Идентификатор сущности чата, которому принадлежит сообщение.
         /// Внешний ключ для сообщения. 
         /// </summary>
-        public long BotChatId { get; set; }
+        public long? BotChatId { get; set; }
+        
+        /// <summary>
+        /// Идентификатор сущности чата, которому принадлежит обновление.
+        /// </summary>
+        public long? BotUserId { get; set; }
 
         /// <summary>
         /// Telegram идентификатор сообщения.
