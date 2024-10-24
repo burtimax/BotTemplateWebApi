@@ -2,6 +2,7 @@
 
 namespace BotFramework.Attributes;
 
+[AttributeUsage(AttributeTargets.Class)]
 public class BotStateAttribute : Attribute
 {
     public string StateName { get; set; }

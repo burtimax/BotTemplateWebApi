@@ -1,25 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 <!--    <LangVersion>9</LangVersion>-->
     <RootNamespace>BotFramework</RootNamespace>
     <Nullable>enable</Nullable>
     <PackageId>Burtimax.TelegramBot.Framework</PackageId>
-    <PackageVersion>1.1.2</PackageVersion>
+    <Description>Framework для Telegram ботов. Пакет, который помогает создавать Telegram ботов быстро и качественно. Для правильного использования пакета смотри руководство README.md в репозитории (https://github.com/burtimax/BotTemplateWebApi).</Description>
+    <RepositoryUrl>https://github.com/burtimax/BotTemplateWebApi</RepositoryUrl>
+    <PackageTags>telegram bot telegrambot framework</PackageTags>
+    <PackageVersion>2.0.6</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.11">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
-    <PackageReference Include="Telegram.Bot" Version="18.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
+    <PackageReference Include="Telegram.Bot" Version="20.0.0-alpha.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +37,7 @@
 
   <ItemGroup>
     <Folder Include="Db\Migrations" />
+    <Folder Include="Extensions\ITelegramApiClient\Messages\" />
   </ItemGroup>
 
   <ItemGroup>

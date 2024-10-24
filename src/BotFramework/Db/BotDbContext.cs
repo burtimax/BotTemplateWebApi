@@ -19,6 +19,7 @@ namespace BotFramework.Db
         public DbSet<BotClaim> Claims { get; set; }
         public DbSet<BotUserClaim> UserClaims { get; set; }
         public DbSet<BotException> Exceptions { get; set; }
+        public DbSet<BotSavedMessage> SavedMessages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -37,7 +38,7 @@ namespace BotFramework.Db
         public override Task<int> SaveChangesAsync(CancellationToken ct = default)
         {
             foreach (var e in
-                     ChangeTracker.Entries<BaseBotEntity<long>>())
+                     ChangeTracker.Entries<IBaseBotEntityWithoutIdentity>())
             {
                 switch (e.State)
                 {

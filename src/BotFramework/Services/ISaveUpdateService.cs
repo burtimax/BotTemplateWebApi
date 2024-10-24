@@ -16,5 +16,5 @@ public interface ISaveUpdateService
     /// <param name="chat"></param>
     /// <param name="update"></param>
     /// <returns></returns>
-    public Task<BotUpdate> SaveUpdateInBotHistory(BotUser user, BotChat chat, Update update);
+    public Task<BotUpdate> SaveUpdateInBotHistory(BotUser? user, BotChat? chat, Update update);
 }

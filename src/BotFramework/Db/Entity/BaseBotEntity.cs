@@ -6,7 +6,7 @@ namespace BotFramework.Db.Entity
     /// <summary>
     /// Базовая модель сущности (базовые поля).
     /// </summary>
-    public class BaseBotEntity<T>
+    public class BaseBotEntity<T> : IBaseBotEntityWithoutIdentity
     {
         /// <summary>
         /// Идентификатор сущности.
@@ -14,22 +14,13 @@ namespace BotFramework.Db.Entity
         [Comment("Идентификатор сущности.")]
         public T Id { get; set; }
         
-        /// <summary>
-        /// Дата и время создания сущности в БД.
-        /// </summary>
-        [Comment("Дата и время создания сущности в БД.")]
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt { get; set; }
         
-        /// <summary>
-        /// Дата и время последнего обновления сущности в БД.
-        /// </summary>
-        [Comment("Дата и время последнего обновления сущности в БД.")]
+        /// <inheritdoc />
         public DateTimeOffset? UpdatedAt { get; set; }
         
-        /// <summary>
-        /// Дата и время удаления сущности в БД.
-        /// </summary>
-        [Comment("Дата и время удаления сущности в БД.")]
+        /// <inheritdoc />
         public DateTimeOffset? DeletedAt { get; set; }
     }
 }

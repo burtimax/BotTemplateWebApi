@@ -20,34 +20,36 @@ public class SaveUpdateService : ISaveUpdateService
     }
     
     /// <inheritdoc />
-    public async Task<BotUpdate> SaveUpdateInBotHistory(BotUser user, BotChat chat, Update update)
+    public async Task<BotUpdate> SaveUpdateInBotHistory(BotUser? user, BotChat? chat, Update update)
     {
         SaveUpdateDto saveUpdateDto = new()
         {
-            BotChatId = chat.Id,
+            BotChatId = chat?.Id ?? 0,
             Type = update.Type.ToString(),
-            TelegramId = update.Id,
+            TelegramId = update.Message?.MessageId ?? update.Id,
             Content = "NULL"
         };
 
         saveUpdateDto.Content = update.Type switch
         {
             UpdateType.Message => GetContentByMessageType(update.Message), 
-            UpdateType.CallbackQuery => update.CallbackQuery?.Data,
-            UpdateType.EditedMessage => update.EditedMessage?.Text,
-            UpdateType.Poll => update.Poll?.Question,
+            UpdateType.CallbackQuery => update.CallbackQuery?.Data ?? "",
+            UpdateType.EditedMessage => update.EditedMessage?.Text ?? "",
+            UpdateType.Poll => update.Poll?.Question ?? "",
             UpdateType.ChannelPost => $"{update.ChannelPost?.Caption} \n {update.ChannelPost?.Text}",
             UpdateType.ChatMember => $"{update.ChatMember?.From?.Id} : {update.ChatMember?.From?.Username}",
-            UpdateType.InlineQuery => update.InlineQuery?.Query,
-            UpdateType.PollAnswer => update.PollAnswer?.PollId,
-            UpdateType.ShippingQuery => update.ShippingQuery?.InvoicePayload,
-            UpdateType.ChatJoinRequest => update.ChatJoinRequest?.Bio,
-            UpdateType.ChosenInlineResult => update.ChosenInlineResult?.Query,
+            UpdateType.InlineQuery => update.InlineQuery?.Query ?? "",
+            UpdateType.PollAnswer => update.PollAnswer?.PollId ?? "",
+            UpdateType.ShippingQuery => update.ShippingQuery?.InvoicePayload ?? "",
+            UpdateType.ChatJoinRequest => update.ChatJoinRequest?.Bio ?? "",
+            UpdateType.ChosenInlineResult => update.ChosenInlineResult?.Query ?? "",
             UpdateType.EditedChannelPost => $"{update.EditedChannelPost?.Caption} \n {update.EditedChannelPost?.Text}",
             UpdateType.MyChatMember => $"{update.MyChatMember?.From?.Id} : {update.MyChatMember?.From?.Username}",
-            UpdateType.PreCheckoutQuery => update.PreCheckoutQuery?.InvoicePayload,
-            UpdateType.Unknown => null,
+            UpdateType.PreCheckoutQuery => update.PreCheckoutQuery?.InvoicePayload ?? "",
+            UpdateType.Unknown => "UNKNOWN UPDATE",
         };
+        
+        saveUpdateDto.Content ??= "";
 
         return await _botRepository.AddUpdate(saveUpdateDto);
     }
@@ -67,7 +69,7 @@ public class SaveUpdateService : ISaveUpdateService
     /// </summary>
     /// <param name="message">Сообщение.</param>
     /// <returns></returns>
-    private object GetObjectByMessageType(Message message)
+    private object? GetObjectByMessageType(Message message)
     {
         return message.Type switch
         {
@@ -107,6 +109,8 @@ public class SaveUpdateService : ISaveUpdateService
             MessageType.WebAppData => message.WebAppData,
             MessageType.VideoChatParticipantsInvited => message.VideoChatParticipantsInvited,
             MessageType.MessageAutoDeleteTimerChanged => message.MessageAutoDeleteTimerChanged,
+            MessageType.WriteAccessAllowed => new { Value = message.WriteAccessAllowed?.WebAppName ?? "NULL" },
+            _ => new{ Value = "UNKNOWN MESSAGE TYPE" },
         };
     }
         

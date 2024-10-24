@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using BotFramework.Other;
+using BotFramework.Utils;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BotFramework.Extensions;

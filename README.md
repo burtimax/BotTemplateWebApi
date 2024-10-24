@@ -173,6 +173,7 @@ public class MainBotDispatcherController : BotDispatcherController
 - `/block {params @user || ID}` - заблокировать пользователя. (Могут использовать модеры)
 - `/unblock {params @user || ID}` - заблокировать пользователя.
 - `/me` - показать меня, разрешения и т.д.
+- `/msg` - показать данные по сообщению, команду надо вводит на ответ к какому-либо сообщению.
 
 Для использования каждой команды у пользователя должно быть соответствующее разрешение. Разрешения может раздавать администратор бота.
 
@@ -207,7 +208,7 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();  
   
 var app = builder.Build();  
-  
+ 
 // Configure the HTTP request pipeline.  
 if (app.Environment.IsDevelopment())  
 {  

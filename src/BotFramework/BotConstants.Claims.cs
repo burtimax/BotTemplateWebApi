@@ -18,8 +18,8 @@ namespace BotFramework
             /// <summary>
             /// Все разрешения доступны, можешь делать что хочешь.
             /// </summary>
-            internal const string IAmBruceAlmighty = "я.есть.брюс.всемогущий"; // Internal потому что внешнее приложение не должно раздавать доступ админа, его можно получить только авторизовавшись, как админ.
-            internal const string IAmBruceAlmightyDescription = "Все разрешения доступны, можешь делать что хочешь.";
+            public const string IAmBruceAlmighty = "я.есть.брюс.всемогущий"; // Internal потому что внешнее приложение не должно раздавать доступ админа, его можно получить только авторизовавшись, как админ.
+            public const string IAmBruceAlmightyDescription = "Все разрешения доступны, можешь делать что хочешь.";
 
             /// <summary>
             /// Добавление разрешений пользователям.
@@ -94,7 +94,7 @@ namespace BotFramework
             /// Получить все базовые клэймы бота.
             /// </summary>
             /// <returns>Возвращает все константные значения клэймов в виде списка <see cref="ClaimValue"/>.</returns>
-            internal static IEnumerable<ClaimValue> GetBaseBotClaims()
+            public static IEnumerable<ClaimValue> GetBaseBotClaims()
             {
                 BaseBotClaims instance = new(); 
                 List<FieldInfo> claimNameFields = typeof(BaseBotClaims).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
@@ -107,6 +107,10 @@ namespace BotFramework
 
                 foreach (var fieldClaimName in claimNameFields)
                 {
+                    if(fieldClaimName is null 
+                       || string.IsNullOrEmpty(fieldClaimName.Name)
+                       || fieldClaimName.Name == nameof(IAmBruceAlmighty)) continue;
+                    
                     FieldInfo? prop = typeof(BaseBotClaims).GetField($"{fieldClaimName.Name}Description", BindingFlags.Public | BindingFlags.Static) ??
                                       typeof(BaseBotClaims).GetField($"{fieldClaimName.Name}Description", BindingFlags.NonPublic | BindingFlags.Static);
                     claimsRes = claimsRes.Append(new ClaimValue(fieldClaimName.GetValue(instance) as string,

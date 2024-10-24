@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BotFramework.Db;
 using BotFramework.Db.Entity;
 using BotFramework.Dto;
+using BotFramework.Extensions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -13,12 +14,20 @@ public interface IBaseBotHandler
     /// <summary>
     /// Сущность пользователя (отслеживаемая EF core).
     /// </summary>
-    public BotUser User { get; set; }
+    /// <remarks>
+    /// Может быть NULL в определенных типах запроса.
+    /// <seealso cref="UpdateExtensions.GetUser"/>
+    /// </remarks>
+    public BotUser? User { get; set; }
 
     /// <summary>
     /// Сущность чата (отслеживаемая EF core).
     /// </summary>
-    public BotChat Chat { get; set; }
+    /// <remarks>
+    /// Может быть NULL в определенных типах запроса.
+    /// <seealso cref="UpdateExtensions.GetUser"/>
+    /// </remarks>
+    public BotChat? Chat { get; set; }
 
     /// <summary>
     /// Запрос.

@@ -18,9 +18,10 @@ namespace BotFramework.Db.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.11")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "hstore");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("BotFramework.Db.Entity.BotChat", b =>
@@ -40,13 +41,11 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasComment("Дата и время создания сущности в БД.");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at")
-                        .HasComment("Дата и время удаления сущности в БД.");
+                        .HasColumnName("deleted_at");
 
                     b.Property<long?>("TelegramId")
                         .HasColumnType("bigint")
@@ -60,8 +59,7 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasComment("Дата и время последнего обновления сущности в БД.");
+                        .HasColumnName("updated_at");
 
                     b.Property<Dictionary<string, string>>("_dataDatabaseDictionary")
                         .IsRequired()
@@ -80,9 +78,10 @@ namespace BotFramework.Db.Migrations
                     b.HasIndex("BotUserId")
                         .HasDatabaseName("ix_chats_bot_user_id");
 
-                    b.ToTable("chats", "bot");
-
-                    b.HasComment("Сущность чата.");
+                    b.ToTable("chats", "bot", t =>
+                        {
+                            t.HasComment("Сущность чата.");
+                        });
                 });
 
             modelBuilder.Entity("BotFramework.Db.Entity.BotClaim", b =>
@@ -97,13 +96,11 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasComment("Дата и время создания сущности в БД.");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at")
-                        .HasComment("Дата и время удаления сущности в БД.");
+                        .HasColumnName("deleted_at");
 
                     b.Property<string>("Description")
                         .HasColumnType("text")
@@ -118,15 +115,15 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasComment("Дата и время последнего обновления сущности в БД.");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id")
                         .HasName("pk_claims");
 
-                    b.ToTable("claims", "bot");
-
-                    b.HasComment("Таблица разрешений.");
+                    b.ToTable("claims", "bot", t =>
+                        {
+                            t.HasComment("Таблица разрешений.");
+                        });
                 });
 
             modelBuilder.Entity("BotFramework.Db.Entity.BotException", b =>
@@ -146,13 +143,11 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasComment("Дата и время создания сущности в БД.");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at")
-                        .HasComment("Дата и время удаления сущности в БД.");
+                        .HasColumnName("deleted_at");
 
                     b.Property<string>("ExceptionMessage")
                         .HasColumnType("text")
@@ -181,8 +176,7 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasComment("Дата и время последнего обновления сущности в БД.");
+                        .HasColumnName("updated_at");
 
                     b.Property<long?>("UserId")
                         .HasColumnType("bigint")
@@ -201,9 +195,71 @@ namespace BotFramework.Db.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_exceptions_user_id");
 
-                    b.ToTable("exceptions", "bot");
+                    b.ToTable("exceptions", "bot", t =>
+                        {
+                            t.HasComment("Сообщения об ошибке в боте.");
+                        });
+                });
 
-                    b.HasComment("Сообщения об ошибке в боте.");
+            modelBuilder.Entity("BotFramework.Db.Entity.BotSavedMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id")
+                        .HasComment("Идентификатор сущности.");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("text")
+                        .HasColumnName("comment")
+                        .HasComment("Комментарий к сообщению.");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("MediaGroupId")
+                        .HasColumnType("text")
+                        .HasColumnName("media_group_id")
+                        .HasComment("Медиа группа сообщения. Приадлежит ли сообщение медиа группе?");
+
+                    b.Property<long?>("TelegramChatId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("telegram_chat_id")
+                        .HasComment("Внешний ключ на таблицу чатов.");
+
+                    b.Property<int>("TelegramMessageId")
+                        .HasColumnType("integer")
+                        .HasColumnName("telegram_message_id")
+                        .HasComment("Идентификатор сообщения в Telegram чате.");
+
+                    b.Property<string>("TelegramMessageJson")
+                        .HasColumnType("text")
+                        .HasColumnName("telegram_message_json")
+                        .HasComment("Сериализованное в json сообщение.");
+
+                    b.Property<long?>("TelegramUserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("telegram_user_id")
+                        .HasComment("Внешний ключ на таблицу чатов.");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_saved_messages");
+
+                    b.ToTable("saved_messages", "bot", t =>
+                        {
+                            t.HasComment("Таблица сохраненных сообщений бота. Для последующего использования");
+                        });
                 });
 
             modelBuilder.Entity("BotFramework.Db.Entity.BotUpdate", b =>
@@ -227,13 +283,11 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasComment("Дата и время создания сущности в БД.");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at")
-                        .HasComment("Дата и время удаления сущности в БД.");
+                        .HasColumnName("deleted_at");
 
                     b.Property<long>("TelegramMessageId")
                         .HasColumnType("bigint")
@@ -248,8 +302,7 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasComment("Дата и время последнего обновления сущности в БД.");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id")
                         .HasName("pk_updates");
@@ -257,9 +310,10 @@ namespace BotFramework.Db.Migrations
                     b.HasIndex("BotChatId")
                         .HasDatabaseName("ix_updates_bot_chat_id");
 
-                    b.ToTable("updates", "bot");
-
-                    b.HasComment("Таблица сообщений (запросов) бота.");
+                    b.ToTable("updates", "bot", t =>
+                        {
+                            t.HasComment("Таблица сообщений (запросов) бота.");
+                        });
                 });
 
             modelBuilder.Entity("BotFramework.Db.Entity.BotUser", b =>
@@ -274,13 +328,11 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasComment("Дата и время создания сущности в БД.");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at")
-                        .HasComment("Дата и время удаления сущности в БД.");
+                        .HasColumnName("deleted_at");
 
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("boolean")
@@ -327,8 +379,7 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasComment("Дата и время последнего обновления сущности в БД.");
+                        .HasColumnName("updated_at");
 
                     b.Property<Dictionary<string, string>>("_propertiesDatabaseDictionary")
                         .IsRequired()
@@ -342,9 +393,10 @@ namespace BotFramework.Db.Migrations
                     b.HasIndex("TelegramId")
                         .HasDatabaseName("ix_users_telegram_id");
 
-                    b.ToTable("users", "bot");
-
-                    b.HasComment("Таблица пользователей бота.");
+                    b.ToTable("users", "bot", t =>
+                        {
+                            t.HasComment("Таблица пользователей бота.");
+                        });
                 });
 
             modelBuilder.Entity("BotFramework.Db.Entity.BotUserClaim", b =>
@@ -364,18 +416,15 @@ namespace BotFramework.Db.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasComment("Дата и время создания сущности в БД.");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at")
-                        .HasComment("Дата и время удаления сущности в БД.");
+                        .HasColumnName("deleted_at");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasComment("Дата и время последнего обновления сущности в БД.");
+                        .HasColumnName("updated_at");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint")
@@ -392,9 +441,10 @@ namespace BotFramework.Db.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_user_claims_user_id_claim_id");
 
-                    b.ToTable("user_claims", "bot");
-
-                    b.HasComment("Таблица сопоставлений пользователей и разрешений.");
+                    b.ToTable("user_claims", "bot", t =>
+                        {
+                            t.HasComment("Таблица сопоставлений пользователей и разрешений.");
+                        });
                 });
 
             modelBuilder.Entity("BotFramework.Db.Entity.BotChat", b =>
@@ -455,7 +505,7 @@ namespace BotFramework.Db.Migrations
                         .HasConstraintName("fk_user_claims_claims_claim_id");
 
                     b.HasOne("BotFramework.Db.Entity.BotUser", "User")
-                        .WithMany("UserClaims")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -464,11 +514,6 @@ namespace BotFramework.Db.Migrations
                     b.Navigation("Claim");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BotFramework.Db.Entity.BotUser", b =>
-                {
-                    b.Navigation("UserClaims");
                 });
 #pragma warning restore 612, 618
         }

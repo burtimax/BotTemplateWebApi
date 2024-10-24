@@ -62,7 +62,7 @@ public class ChatStates
                 CurrentState = stateName;
                 return;
             case ChatStateSetterType.SetRoot:
-                _states = new List<string>();
+                _states.RemoveAll(i => true);
                 _states.Add(stateName);
                 return;
             default: throw new NotImplementedException();
@@ -82,7 +82,7 @@ public class ChatStates
                 return;
             case ChatStateGoBackType.GoToRoot:
                 string rootState = RootState;
-                _states = new List<string>();
+                _states.RemoveAll(i => true);
                 _states.Add(rootState);
                 return;
             default: throw new NotImplementedException();

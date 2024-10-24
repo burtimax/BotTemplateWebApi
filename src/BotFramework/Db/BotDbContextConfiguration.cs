@@ -27,8 +27,8 @@ public class BotDbContextConfiguration
 
     public static void SetBaseConfiguration(ModelBuilder builder)
     {
-        SetFilters(builder);
-        SetAllTableNamesToSnakeCase(builder);
+        builder.SetFilters();
+        builder.SetAllToSnakeCase();
     }
 
     private static void SetTableAndSchema(ModelBuilder builder)
@@ -39,60 +39,37 @@ public class BotDbContextConfiguration
         builder.Entity<BotClaim>().ToTable("claims", schema);
         builder.Entity<BotUserClaim>().ToTable("user_claims", schema);
         builder.Entity<BotException>().ToTable("exceptions", schema);
+        builder.Entity<BotSavedMessage>().ToTable("saved_messages", schema);
     }
     
     /// <summary>
     /// Сделать SnakeCase для всех сущностей, полей, внешних ключей, индексов и прочее...)
     /// </summary>
     /// <param name="builder"></param>
-    private static void SetAllTableNamesToSnakeCase(ModelBuilder builder)
-    {
-        foreach (var entityType in builder.Model.GetEntityTypes())
-        {
-            entityType.SetTableName(entityType.GetTableName().ToSnakeCase());
-
-            foreach (var property in entityType.GetProperties())
-            {
-                var schema = entityType.GetSchema();
-                var tableName = entityType.GetTableName();
-                var storeObjectIdentifier = StoreObjectIdentifier.Table(tableName, schema);
-                property.SetColumnName(property.GetColumnName(storeObjectIdentifier).ToSnakeCase());
-            }
-
-            foreach (var key in entityType.GetKeys())
-                key.SetName(key.GetName().ToSnakeCase());
-
-            foreach (var key in entityType.GetForeignKeys())
-                key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
-
-            foreach (var index in entityType.GetIndexes())
-                index.SetDatabaseName(index.GetDatabaseName().ToSnakeCase());
-        }
-    }
-    
-    private static void SetFilters(ModelBuilder modelBuilder)
-    {
-        var entities = modelBuilder.Model
-            .GetEntityTypes()
-            .Where(e => e.ClrType.BaseType == typeof(BaseBotEntity<long>))
-            .Select(e => e.ClrType);
-
-        Expression<Func<BaseBotEntity<long>, bool>> 
-            expression = del => del.DeletedAt == null;
-
-        foreach (var e in entities)
-        {
-            ParameterExpression p = Expression.Parameter(e);
-            Expression body =
-                ReplacingExpressionVisitor
-                    .Replace(expression.Parameters.Single(),
-                        p, expression.Body);
-
-            modelBuilder.Entity(e)
-                .HasQueryFilter(
-                    Expression.Lambda(body, p));
-        }
-    }
+    // private static void SetAllTableNamesToSnakeCase(ModelBuilder builder)
+    // {
+    //     foreach (var entityType in builder.Model.GetEntityTypes())
+    //     {
+    //         entityType.SetTableName(entityType.GetTableName().ToSnakeCase());
+    //
+    //         foreach (var property in entityType.GetProperties())
+    //         {
+    //             var schema = entityType.GetSchema();
+    //             var tableName = entityType.GetTableName();
+    //             var storeObjectIdentifier = StoreObjectIdentifier.Table(tableName, schema);
+    //             property.SetColumnName(property.GetColumnName(storeObjectIdentifier).ToSnakeCase());
+    //         }
+    //
+    //         foreach (var key in entityType.GetKeys())
+    //             key.SetName(key.GetName().ToSnakeCase());
+    //
+    //         foreach (var key in entityType.GetForeignKeys())
+    //             key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
+    //
+    //         foreach (var index in entityType.GetIndexes())
+    //             index.SetDatabaseName(index.GetDatabaseName().ToSnakeCase());
+    //     }
+    // }
     
     private static void SetOtherConfigs(ModelBuilder modelBuilder)
     {

@@ -113,8 +113,10 @@ namespace BotFramework.Repository
         }
 
         /// <inheritdoc />
-        public async Task<BotUser> UpsertUser(User user)
+        public async Task<BotUser?> UpsertUser(User? user)
         {
+            if (user == null) return null;
+            
             bool isUserExisted = await IsUserExists(user.Id);
 
             if (isUserExisted == false)
@@ -137,27 +139,23 @@ namespace BotFramework.Repository
         }
 
         /// <inheritdoc />
-        public Task<BotChat?> GetChat(ChatId chatId)
+        public Task<BotChat?> GetChat(ChatId chatId, long botUserId)
         {
             if (chatId.Username != null)
             {
-                return _db.Chats.SingleOrDefaultAsync(c => c.TelegramUsername == chatId.Username);
+                return _db.Chats.SingleOrDefaultAsync(c => c.TelegramUsername == chatId.Username && c.BotUserId == botUserId);
             }
             else
             {
-                return _db.Chats.SingleOrDefaultAsync(c => c.TelegramId == chatId.Identifier);
+                return _db.Chats.SingleOrDefaultAsync(c => c.TelegramId == chatId.Identifier && c.BotUserId == botUserId);
             }
         }
 
         /// <inheritdoc />
-        public Task<BotChat?> GetChat(long botUserId)
+        public async Task<BotChat?> AddChat(Chat? chat, BotUser? chatOwner)
         {
-            return _db.Chats.SingleOrDefaultAsync(c => c.BotUserId == botUserId);
-        }
-
-        /// <inheritdoc />
-        public async Task<BotChat> AddChat(Chat chat, BotUser chatOwner)
-        {
+            if (chat == null || chatOwner == null) return null;
+            
             BotChat newChat = chat.ToBotChatEntity(chatOwner.Id);
             newChat.States.CurrentState = BotConstants.StartState;
             newChat.CreatedAt = DateTimeOffset.Now;
@@ -210,6 +208,9 @@ namespace BotFramework.Repository
 
             if (existed == null) throw new NotFoundBotClaim(claim);
 
+            bool hasUserClaim = await HasUserClaims(userId, claim);
+            if(hasUserClaim) return;
+            
             BotUserClaim botUserClaim = new()
             {
                 UserId = userId,

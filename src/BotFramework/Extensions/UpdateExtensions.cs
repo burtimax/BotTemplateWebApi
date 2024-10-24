@@ -68,7 +68,7 @@ namespace BotFramework.Extensions
         /// </summary>
         /// <param name="update">Объект запроса от бота.</param>
         /// <returns>User object</returns>
-        public static User GetUser(this Update update)
+        public static User? GetUser(this Update update)
         {
             return update.Type switch
             {
