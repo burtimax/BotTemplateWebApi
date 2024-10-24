@@ -23,6 +23,7 @@ public class SavedMessageService : ISavedMessageService
 
         BotSavedMessageEntity savedMessageEntity = new()
         {
+            BotId = botId,
             TelegramChatId = chat?.TelegramId,
             TelegramUserId = user?.TelegramId,
             MediaGroupId = string.IsNullOrEmpty(message.MediaGroupId) ? Guid.NewGuid().ToString() : message.MediaGroupId,
