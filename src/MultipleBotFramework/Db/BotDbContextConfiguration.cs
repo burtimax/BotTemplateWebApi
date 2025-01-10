@@ -1,7 +1,11 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Generic;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Extensions;
+using MultipleBotFramework.Models;
+using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Db;
 
@@ -90,6 +94,19 @@ public class BotDbContextConfiguration
         modelBuilder.Entity<BotUserClaimEntity>()
             .HasIndex(uc => new { uc.UserId, uc.ClaimId })
             .IsUnique();
+        
+        // modelBuilder.Entity<BotUserEntity>(entity =>
+        // {
+        //     entity
+        //         .Property(x => x.Photos)
+        //         .HasColumnName("photos")
+        //         .HasColumnType("JSONB")
+        //         .HasConversion(
+        //             ctp => JsonSerializer.Serialize(ctp, jsonSerializerOptions),
+        //             cfp => JsonSerializer.Deserialize<UserProfilePhotosModel?>(cfp, jsonSerializerOptions),
+        //             ValueComparer.CreateDefault(typeof(UserProfilePhotosModel), true)
+        //         );
+        // });
     }
 
     private static void SetIndexes(ModelBuilder modelBuilder)

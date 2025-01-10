@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Constants;
 using MultipleBotFramework.Models;
+using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Db.Entity
 {
@@ -31,6 +32,9 @@ namespace MultipleBotFramework.Db.Entity
         [MaxLength(20)]
         [Comment("Номер телефона пользователя.")]
         public string? Phone { get; set; }
+
+        // [Comment("Фотографии пользователя")]
+        // public UserProfilePhotosModel? Photos { get; set; }
 
         /// <summary>
         /// Роль пользователя (user, moderator, admin).

@@ -22,7 +22,7 @@ public class DeleteBotEndpoint : Endpoint<DeleteBotRequest>
 
     public override void Configure()
     {
-        Delete("/delete");
+        Delete("/delete/{Id}");
         AllowAnonymous();
         Group<BotGroup>();
         Summary(s =>

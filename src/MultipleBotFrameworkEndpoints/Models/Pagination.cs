@@ -2,8 +2,14 @@
 
 namespace MultipleBotFrameworkEndpoints.Models;
 
-public abstract class Pagination
+public class Pagination
 {
+    public static Pagination All = new Pagination()
+    {
+        PageNumber = 1,
+        PageSize = int.MaxValue,
+    };
+    
     /// <summary>
     /// Номер страницы.
     /// </summary>

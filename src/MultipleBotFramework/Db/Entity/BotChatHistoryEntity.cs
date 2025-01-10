@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Enums;
 
@@ -41,13 +42,25 @@ namespace MultipleBotFramework.Db.Entity
         /// Строковое представление содержимого сообщения.
         /// </summary>
         [Comment("Строковое представление содержимого сообщения.")]
-        public string? Content { get; set; }
+        public string? Text { get; set; }
         
         /// <summary>
         /// JSON представление содержимого сообщения.
         /// </summary>
         [Comment("JSON представление содержимого сообщения.")]
-        public string? JsonObject { get; set; }
+        public string? JsonData { get; set; }
+        
+        /// <summary>
+        /// JSON представление клавиатуры пользователя.
+        /// </summary>
+        [Comment("JSON представление клавиатуры пользователя.")]
+        public string? ReplyKeyboard { get; set; }
+        
+        /// <summary>
+        /// JSON представление inline клавиатуры сообщения.
+        /// </summary>
+        [Comment("JSON представление inline клавиатуры сообщения.")]
+        public string? InlineKeyboard { get; set; }
         
         /// <summary>
         /// Заполняется при наличии файла в сообщении.
@@ -74,5 +87,17 @@ namespace MultipleBotFramework.Db.Entity
         [Comment("Внешний ключ на бота.")]
         public long BotId { get; set; }
         public BotEntity? Bot { get; set; }
+        
+        /// <summary>
+        /// Ответ на сообщение. ИД сообщения, на которое отвечаем.
+        /// </summary>
+        [Comment("Ответ на сообщение. ИД сообщения, на которое отвечаем. Telegram идентификатор.")]
+        public long? ReplyToMessageId { get; set; }
+
+        /// <summary>
+        /// Сообщение, на которое ответили.
+        /// </summary>
+        [NotMapped]
+        public BotChatHistoryEntity? ReplyToMessage { get; set; }
     }
 }

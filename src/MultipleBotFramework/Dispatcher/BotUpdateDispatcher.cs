@@ -83,7 +83,7 @@ public class BotUpdateDispatcher
             Chat? telegramChat = update.GetChat();
             
             // Сохраняем или обновляем информацию о пользователе.
-            user = await _botRepository.UpsertUser(botId, telegramUser);
+            user = await _botRepository.UpsertUser(botId, telegramUser, botClient);
             userClaims = (await _botRepository.GetUserClaims(botId, user?.Id ?? -1))?.Select(c => new ClaimValue(c.Id, c.Name, c?.Description ?? ""));
             bool isOwner = await _botRepository.IsUserOwner(botId, user?.TelegramId ?? -1);
 
@@ -91,8 +91,11 @@ public class BotUpdateDispatcher
             if (telegramChat is not null)
             {
                 chat = existedChat ?? await _botRepository.UpsertChat(botId, telegramChat, telegramUser);
-                await _chatHistoryService.SaveInChatHistoryIfNeed(botId, chat.TelegramId, false, update);
+                await _chatHistoryService.SaveInChatHistoryIfNeed(botId, chat.TelegramId, false, data:update);
             }
+
+            // Если поменялся статус пользователя в боте.
+            await UserStatusUpdateIfNeeded(update, user);
             
             // Если пользователь заблокирован, тогда ему не отвечаем!!!
             if (user != null && user.IsBlocked)
@@ -243,5 +246,26 @@ public class BotUpdateDispatcher
             savedUpdate != null ? savedUpdate.Id.ToString() : "NULL");
 
         return result;
+    }
+
+    private async Task UserStatusUpdateIfNeeded(Update update, BotUserEntity? user)
+    {
+        if (update.Type() != UpdateType.MyChatMember) return;
+        
+        ChatMemberUpdated data = update.MyChatMember!;
+
+        // Пользователь зашел в бота.
+        if (data.NewChatMember is not null)
+        {
+            user.Status = data.NewChatMember.Status;
+            _db.Users.Update(user);
+            await _db.SaveChangesAsync();
+        }
+
+        // Если пользователь заблокировал бота.
+        if (data.NewChatMember is ChatMemberBanned)
+        {
+            // ToDo можно сюда сделать вызов события какого-нибудь.
+        }
     }
 }
