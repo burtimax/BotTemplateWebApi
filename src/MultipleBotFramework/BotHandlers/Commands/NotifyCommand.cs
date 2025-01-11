@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
+using MultipleBotFramework.Quartz.Jobs.Notification;
+using MultipleBotFramework.Services.Interfaces;
 using MultipleBotFramework.Utils;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
@@ -21,15 +25,17 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
 [BotHandler(command:Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class NotifyCommand : BaseBotHandler
+public class NotifyAllCommand : BaseBotHandler
 {
     public const string Name = "/notify";
 
     private readonly string _dbConnection;
+    private readonly IBotNotificationTasksService _notificationTasksService;
     
-    public NotifyCommand(IServiceProvider serviceProvider) : base(serviceProvider)
+    public NotifyAllCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _dbConnection = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value.DbConnection;
+        _notificationTasksService = serviceProvider.GetRequiredService<IBotNotificationTasksService>();
     }
 
     public override async Task HandleBotRequest(Update update)
@@ -40,29 +46,20 @@ public class NotifyCommand : BaseBotHandler
             return;
         }
 
-        // Не будем ждать окончания работы.
-        Task.Factory.StartNew(async () =>
+        var users = await BotDbContext.Users
+            .Where(u => u.IsBlocked == false && u.Status != BotUserStatus.Banned)
+            .Select(u => u.TelegramId)
+            .ToListAsync();
+
+        BotNotificationTask botTask = new()
         {
-            // Создаем DbContext чтобы задача могла в фоне выполняться.
-            var ob = new DbContextOptionsBuilder<BotDbContext>();
-            ob.UseNpgsql(_dbConnection);
-            
-            using (BotDbContext db = new BotDbContext(ob.Options))
-            {
-                await BotHelper.ExecuteForAllUsers(db, BotId,async tuple =>
-                {
-                    try
-                    {
-                        await BotClient.CopyMessageAsync(tuple.chat.ChatId, Chat.ChatId,
-                            update.Message.ReplyToMessage.MessageId);
-                        await Task.Delay(100); // Чтобы не выйти за лимиты бота и его не заблокировали.
-                    }
-                    catch (BotRequestException e) when (e.ErrorCode == 403)
-                    {
-                        Debug.WriteLine(e.Message, "ERROR");
-                    }
-                });
-            }
-        }, TaskCreationOptions.LongRunning);
+            BotId = BotId,
+            ChatIds = users,
+            Action = async (client, chatId) => await BotClient.CopyMessageAsync(chatId, Chat.ChatId,
+                update.Message.ReplyToMessage.MessageId)
+        };
+
+        await _notificationTasksService.AddNotificationTask(botTask);
+
     }
 }
