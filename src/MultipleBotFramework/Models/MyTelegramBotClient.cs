@@ -90,7 +90,7 @@ public class MyTelegramBotClient : TelegramBotClient, ITelegramBotClient
         if(db is null) return;
         
         BotChatHistoryService chatHistoryService = new(db);
-        await chatHistoryService.SaveInChatHistoryIfNeed(BotId.Value, chatId, true, result);
+        await chatHistoryService.SaveInChatHistoryIfNeed(BotId.Value, chatId, true, result, args);
     }
     
     private BotDbContext? GetDb()

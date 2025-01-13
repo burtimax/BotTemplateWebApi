@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dto;
+using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Repository
@@ -75,7 +76,7 @@ namespace MultipleBotFramework.Repository
         /// Обновляет информацию (Firstname, Lastname, Username)
         /// Потому что с прошествием времени может поменяться эта информация.
         /// </summary>
-        Task<BotUserEntity?> UpsertUser(long botId, User user);
+        Task<BotUserEntity?> UpsertUser(long botId, User user, ITelegramBotClient botClient);
 
         /// <summary>
         /// Добавить чат или обновить информацию по нему.

@@ -18,8 +18,6 @@ builder.Services.AddLogging();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwagger("Telegram Bot API");
 builder.Services.AddFastEndpoints(o =>
     {
         o.Assemblies = new[]
@@ -70,12 +68,6 @@ services.AddMapster();
 // Регистрируем контексты к базам данных.
 
 var app = builder.Build();
-// app.UseSwagger();
-// app.UseSwaggerUI(options =>
-// {
-//     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-//     // options.RoutePrefix = string.Empty;
-// });
 
 app.UseFastEndpoints().UseSwaggerGen();
 

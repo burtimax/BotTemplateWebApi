@@ -4,6 +4,7 @@ using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFrameworkEndpoints.Extensions;
 using MultipleBotFrameworkEndpoints.Models;
+using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFrameworkEndpoints.Enpdoints.Chat.GetChatHistory;
@@ -57,8 +58,46 @@ public class GetChatHistoryEndpoint : Endpoint<GetChatHistoryRequest, PagedList<
         {
             await UpdateIsViewed(r.BotIds.First(), r.ChatTelegramIds.First(),result.Data);
         }
+
+        // Подгружаем ответные сообщения.
+        if (result.Data is not null && result.Data.Any())
+        {
+            List<(long chatId, long messageId)> required = result.Data.Where(r => r.ReplyToMessageId is not null)
+                .Select(r => (r.TelegramChatId, r.ReplyToMessageId!.Value)).ToList();
+            if (required is not null && required.Any())
+            {
+                var repliedMessages = await GetRepliedMessages(required);
+                for (int i = 0; i < result.Data.Count; i++)
+                {
+                    var item = result.Data[i];
+                    var replied = repliedMessages.FirstOrDefault(r => r.MessageId == item.ReplyToMessageId && r.TelegramChatId == item.TelegramChatId);
+                    if (replied is not null)
+                    {
+                        item.ReplyToMessage = replied;
+                    }
+                }
+            }
+            
+        }
+        
+        
         
         await SendAsync(result);
+    }
+
+    private async Task<List<BotChatHistoryEntity>?> GetRepliedMessages(List<(long chatId, long messageId)> required)
+    {
+        if (required is null || required.Any() == false) return null;
+        
+        IQueryable<BotChatHistoryEntity> q = _db.ChatHistory;   
+
+        for(var i = 0; i < required.Count; i++){
+            var chatId = required[i].chatId;
+            var messageId = required[i].messageId;
+            q = q.Where(e => e.TelegramChatId == chatId && e.MessageId == messageId); 
+        }
+
+        return await q.ToListAsync();
     }
 
     private async Task UpdateIsViewed(long botId, long telegramChatId, List<BotChatHistoryEntity> items)

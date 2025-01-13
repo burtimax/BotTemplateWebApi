@@ -51,6 +51,13 @@ sealed class GetMediaEndpoint : Endpoint<GetMediaRequest, List<BotUserEntity>>
 
         DownloadedTelegramFile telegramFile = await botClient.DownloadFileAsync(r.FileId);
         
+        // Если у телеграм файла нет расширения, то расширение будет png по умолчанию.
+        if (string.IsNullOrEmpty(Path.GetExtension(telegramFile.FileName)))
+        {
+            telegramFile.FileNameWithExtension = telegramFile.FileName + ".png";
+            telegramFile.FileExtension = ".png";
+        }
+        
         var fileContentTypeProvider = new FileExtensionContentTypeProvider();
         string mimeType = fileContentTypeProvider.TryGetContentType(telegramFile.FileNameWithExtension, out string mime)
             ? mime

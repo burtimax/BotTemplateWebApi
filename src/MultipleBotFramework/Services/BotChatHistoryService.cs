@@ -8,6 +8,9 @@ using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Enums;
 using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Services.Interfaces;
+using MultipleBotFramework.Utils.Keyboard;
+using Newtonsoft.Json;
+using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
@@ -22,19 +25,27 @@ public class BotChatHistoryService
         _db = db;
     }
 
-    public async Task<BotChatHistoryEntity?> SaveInChatHistoryIfNeed(long botId, long telegramChatId, bool isBot, object obj)
+    public async Task<BotChatHistoryEntity?> SaveInChatHistoryIfNeed(long botId, long telegramChatId, bool isBot, object data, object? args = null)
     {
+        var inline = GetInlineKeyboardFromResult(data);
+        var inlineData = inline != null ? new{ReplyMarkup = inline}.ToJson() : null;
+        var reply = GetReplyKeyboardFromArgs(args);
+        var replyData = reply != null ? new{ReplyMarkup = reply}.ToJson() : null;
+        
         BotChatHistoryEntity item = new()
         {
             BotId = botId,
             TelegramChatId = telegramChatId,
             IsBot = isBot,
-            JsonObject = obj?.ToJson(),
+            JsonData = data?.ToJson(),
+            ReplyKeyboard = replyData,
+            InlineKeyboard = inlineData,
+            ReplyToMessageId = GetReplyToMessageIdFromData(data),
         };
 
         bool saveItem = false;
 
-        if (obj is Update update)
+        if (data is Update update)
         {
             if (update.TrySetContentToChatHistory(ref item))
             {
@@ -42,7 +53,7 @@ public class BotChatHistoryService
             }
         }
         
-        if (obj is Message mes)
+        if (data is Message mes)
         {
             item.Type = ChatHistoryType.Message;
             if (mes.TrySetContentToChatHistory(ref item))
@@ -51,18 +62,18 @@ public class BotChatHistoryService
             }
         }
 
-        if (obj is MessageId mesId)
+        if (data is MessageId mesId)
         {
             item.Type = ChatHistoryType.Message;
-            item.Content = $"#[Бот прислал скопированное сообщение] {mesId.Id}";
+            item.Text = $"#[Бот прислал скопированное сообщение] {mesId.Id}";
             item.MessageId = mesId.Id;
             saveItem = true;
         }
 
-        if (obj is IEnumerable<MessageId> messageIds)
+        if (data is IEnumerable<MessageId> messageIds)
         {
             item.Type = ChatHistoryType.Message;
-            item.Content = $"#[Бот прислал копии сообщений] {string.Join(',', messageIds)}";
+            item.Text = $"#[Бот прислал копии сообщений] {string.Join(',', messageIds)}";
             item.MessageId = messageIds.Last().Id;
             saveItem = true;
         }
@@ -72,6 +83,44 @@ public class BotChatHistoryService
             _db.ChatHistory.Add(item);
             await _db.SaveChangesAsync();
             return item;
+        }
+
+        return null;
+    }
+
+    private IEnumerable<IEnumerable<KeyboardButton>>? GetReplyKeyboardFromArgs(object? args)
+    {
+        if (args is not null 
+            && args is IDictionary<string, object> dict)
+        {
+            if (dict.ContainsKey(PropertyNames.ReplyMarkup) 
+                && dict[PropertyNames.ReplyMarkup] is ReplyKeyboardMarkup replyMarkup)
+            {
+                return replyMarkup.Keyboard;
+            }
+        }
+
+        return null;
+    }
+
+    private int? GetReplyToMessageIdFromData(object data)
+    {
+        if (data is not null && data is Update update
+                             && update.Message is not null
+                             && update.Message.ReplyToMessage is not null)
+        {
+            return update.Message.ReplyToMessage.MessageId;
+        }
+
+        return null;
+    }
+    
+    private IEnumerable<IEnumerable<InlineKeyboardButton>>? GetInlineKeyboardFromResult(object? result)
+    {
+        if (result is not null 
+            && result is Message mes)
+        {
+            return mes.ReplyMarkup?.InlineKeyboard;
         }
 
         return null;

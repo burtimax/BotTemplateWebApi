@@ -82,7 +82,7 @@ public class CommandsCommand: BaseBotHandler
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserNotificationSend))
         {
             sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserNotificationSend}</code>");
-            sb.AppendLine($"{NotifyCommand.Name} - <i>Отправить уведомление всем пользователям (в ответ на сообщение).</i>");
+            sb.AppendLine($"{NotifyAllCommand.Name} - <i>Отправить уведомление всем пользователям (в ответ на сообщение).</i>");
             sb.AppendLine($"{NotifyTestCommand.Name} - <i>Тестовое уведомление для меня (в ответ на сообщение).</i>");
         }
         

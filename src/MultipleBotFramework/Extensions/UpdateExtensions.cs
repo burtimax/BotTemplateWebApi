@@ -131,7 +131,7 @@ namespace MultipleBotFramework.Extensions
 
         public static bool TrySetContentToChatHistory(this Update u, ref BotChatHistoryEntity item)
         {
-            item.JsonObject = u.GetPayload()?.ToJson();
+            item.JsonData = u.GetPayload()?.ToJson();
             item.MessageType = u.Type().ToString();
 
             ChatHistoryType? type = null;
@@ -171,7 +171,7 @@ namespace MultipleBotFramework.Extensions
                 default: return false;
             }
 
-            item.Content = content;
+            item.Text = content;
             if(type is not null) item.Type = type.Value;
             return true;
         }

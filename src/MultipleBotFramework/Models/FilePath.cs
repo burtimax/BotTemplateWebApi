@@ -62,7 +62,7 @@ namespace MultipleBotFramework.Models
             return
                 string.IsNullOrEmpty(DirectoryName) == false &&
                 string.IsNullOrEmpty(FileNameWithoutExtension) == false &&
-                string.IsNullOrEmpty(Extension) == false &&
+                // string.IsNullOrEmpty(Extension) == false && // расширение может быть пустым.
                 FullFilePath.IndexOfAny(Path.GetInvalidPathChars()) < 0;
 
         }

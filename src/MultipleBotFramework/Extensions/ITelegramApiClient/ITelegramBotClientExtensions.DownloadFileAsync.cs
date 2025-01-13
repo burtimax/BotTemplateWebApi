@@ -56,11 +56,11 @@ public static partial class ITelegramBotClientExtensions
                 byte[] bytes = await httpResponse.Content.ReadAsByteArrayAsync()
                     .ConfigureAwait(false);
                 
-                return new(fileData, bytes);
+                return new DownloadedTelegramFile(fileData, bytes);
             }
             catch (Exception exception)
             {
-                throw new Exception("Exception during file download");
+                throw new Exception($"Exception during file download: {exception.Message}");
                 // throw new RequestException(
                 //     message: "Exception during file download",
                 //     httpResponse.StatusCode,

@@ -8,6 +8,9 @@ using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dto;
 using MultipleBotFramework.Exceptions;
 using MultipleBotFramework.Extensions;
+using MultipleBotFramework.Models;
+using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Repository
@@ -123,7 +126,7 @@ namespace MultipleBotFramework.Repository
         }
 
         /// <inheritdoc />
-        public async Task<BotUserEntity?> UpsertUser(long botId, User user)
+        public async Task<BotUserEntity?> UpsertUser(long botId, User user, ITelegramBotClient botClient)
         {
             if (user == null) return null;
             
@@ -147,6 +150,11 @@ namespace MultipleBotFramework.Repository
 
             return existedUser;
         }
+
+        // public async Task<BotUserEntity?> UpdatePhotos(long botId, long telegramUserId, UserProfilePhotos photos)
+        // {
+        //     
+        // }
 
         public async Task<BotChatEntity?> UpsertChat(long botId, Chat chat, User? user)
         {

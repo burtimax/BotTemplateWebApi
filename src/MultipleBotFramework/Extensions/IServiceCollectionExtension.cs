@@ -7,10 +7,13 @@ using MultipleBotFramework.Db;
 using MultipleBotFramework.Dispatcher;
 using MultipleBotFramework.Dto;
 using MultipleBotFramework.Options;
+using MultipleBotFramework.Quartz.Jobs;
+using MultipleBotFramework.Quartz.Jobs.Notification;
 using MultipleBotFramework.Repository;
 using MultipleBotFramework.Services;
 using MultipleBotFramework.Services.Interfaces;
 using MultipleBotFramework.Utils;
+using Quartz;
 
 namespace MultipleBotFramework.Extensions;
 
@@ -46,8 +49,8 @@ public static class IServiceCollectionExtension
         services.AddTransient<IBotFactory, BotFactory>();
         services.AddTransient<IBotsManagerService, BotsManagerService>();
         services.AddTransient<BotUpdateDispatcher>();
-        AddMultipleBotServices(services);
-        
+        services.AddMultipleBotServices();
+        services.AddQuartzes();
         return services;
     }
     
@@ -58,6 +61,7 @@ public static class IServiceCollectionExtension
         services.AddTransient<IBotUpdateRepository, BotUpdateRepository>();
         services.AddTransient<SaveUpdateService>();
         services.AddTransient<ISavedMessageService, SavedMessageService>();
+        services.AddTransient<IBotNotificationTasksService, BotNotificationTasksService>();
         services.AddTransient<BotChatHistoryService>();
         services.AddHttpContextAccessor();
         
@@ -71,6 +75,29 @@ public static class IServiceCollectionExtension
         {
             options.UseNpgsql(dbConnection);
         });
+        return services;
+    }
+    
+    public static IServiceCollection AddQuartzes(this IServiceCollection services)
+    {
+        services.AddQuartz(quartzConfigurator =>
+        {
+            quartzConfigurator.UseMicrosoftDependencyInjectionJobFactory();
+            quartzConfigurator.AddJob<BotNotificationJob>(jobConfigurator =>
+            {
+                jobConfigurator.WithIdentity(BotNotificationJob.Key);
+            });
+            quartzConfigurator.AddTrigger(triggerConfigurator =>
+            {
+                triggerConfigurator.ForJob(BotNotificationJob.Key)
+                    .WithIdentity(new TriggerKey("bot-notification-job", "bot-triggers"))
+                    .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(10)).RepeatForever())
+                    .StartNow();
+            });
+        });
+
+        services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
+        
         return services;
     }
 }

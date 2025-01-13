@@ -113,10 +113,11 @@ public static class MessageExtensions
         item.MessageId = m.MessageId;
         item.MediaGroupId = m.MediaGroupId;
         item.MessageType = UpdateType.Message.ToString() + "." + m.Type().ToString();
-        item.JsonObject = GetPayload(m)?.ToJson();
+        item.JsonData = GetPayload(m)?.ToJson();
         item.IsViewed = false;
 
-        string content = $"#[{m.Type().ToString()}]\n";
+        //string content = $"#[{m.Type().ToString()}]\n";
+        string content = "";
         string? fileId = "";
         
         switch(m.Type())
@@ -162,7 +163,7 @@ public static class MessageExtensions
         };
 
         item.FileId = fileId;
-        item.Content = content;
+        item.Text = content;
         
         return true;
     }
