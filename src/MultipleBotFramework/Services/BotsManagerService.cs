@@ -193,7 +193,7 @@ public class BotsManagerService : IBotsManagerService
         
             MyTelegramBotClient botClient = new(bot.Id, bot.Token);
         
-            await botClient.SetWebhookAsync(BotWebhook.GetWebhookForBot(bot.Id));
+            await botClient.SetWebhookAsync(BotWebhook.GetWebhookForBot(bot.Id), allowedUpdates: BotConfiguration.AllAllowedUpdates);
 
             if (bot.Webhook != BotWebhook.GetWebhookForBot(bot.Id))
             {

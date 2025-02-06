@@ -27,7 +27,7 @@ public class BotFactory : IBotFactory
             {
                 TelegramBotClient botClient = new(bot.Token);
                 string webhook = config.Webhook.TrimEnd('/') + '/' + bot.Id;
-                botClient.SetWebhookAsync(webhook).Wait();
+                botClient.SetWebhookAsync(webhook, allowedUpdates: BotConfiguration.AllAllowedUpdates).Wait();
                 
                 if (botOptions != null && botOptions.BoundRequestsInSecond != null)
                 {
