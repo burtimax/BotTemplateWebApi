@@ -1,4 +1,8 @@
-﻿namespace MultipleBotFramework.Options;
+﻿using System.Collections.Generic;
+using MultipleBotFramework.Enums;
+using Telegram.BotAPI;
+
+namespace MultipleBotFramework.Options;
 
 public class BotConfiguration
 {
@@ -41,4 +45,22 @@ public class BotConfiguration
     /// Директория для хранения файлов-отчетов ошибок бота.
     /// </summary>
     public string ExceptionDirectory { get; set; }
+    
+    public static IEnumerable<string> AllAllowedUpdates = new List<string>()
+    {
+        PropertyNames.Message,
+        PropertyNames.CallbackQuery,
+        PropertyNames.ChannelPost,
+        PropertyNames.ChatMember,
+        PropertyNames.EditedMessage,
+        PropertyNames.ChatJoinRequest,
+        PropertyNames.MyChatMember,
+        PropertyNames.InlineQuery,
+        PropertyNames.ShippingQuery,
+        PropertyNames.PollAnswer,
+        PropertyNames.ChosenInlineResult,
+        PropertyNames.EditedChannelPost,
+        PropertyNames.PreCheckoutQuery,
+        PropertyNames.Poll
+    };
 }

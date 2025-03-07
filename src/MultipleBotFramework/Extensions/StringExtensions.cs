@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace MultipleBotFramework.Extensions;
@@ -40,5 +41,49 @@ public static class StringExtensions
     public static TResult? To<TResult>(this string json)
     {
         return JsonSerializer.Deserialize<TResult>(json);
+    }
+    
+    /// <summary>
+    /// Превращает строку в паттерн поиска.
+    /// </summary>
+    /// <remarks>
+    /// Из строки [как дела] сделает строку [%как%дела%].
+    /// </remarks>
+    /// <param name="input"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static string ToILikePattern(this string input, ILikePatternType type = ILikePatternType.StartsWith)
+    {
+        input = input.Trim(' ');
+
+        if (string.IsNullOrEmpty(input)) return "";
+        
+        var words = input.Split(' ');
+        StringBuilder sb = new();
+        
+        sb.Append("%");
+        foreach (var word in words)
+        {
+            sb.Append(word + "%");
+        }
+
+        string resultPattern = sb.ToString();
+
+        switch (type)
+        {
+            case ILikePatternType.StartsWith:
+                return resultPattern.TrimStart('%');
+            case ILikePatternType.EndsWith:
+                return resultPattern.TrimEnd('%');
+            default: return resultPattern;
+        }
+        
+    }
+
+    public enum ILikePatternType
+    {
+        StartsWith = 1,
+        EndsWith = 2,
+        Contains = 3,
     }
 }
