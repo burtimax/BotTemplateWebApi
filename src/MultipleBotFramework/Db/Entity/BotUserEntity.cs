@@ -60,6 +60,18 @@ namespace MultipleBotFramework.Db.Entity
         public string? Status { get; set; }
         
         /// <summary>
+        /// Является ли пользователь ботом.
+        /// </summary>
+        [Comment("Является ли Telegram пользователь ботом.")]
+        public bool IsBot { get; set; } = false;
+        
+        /// <summary>
+        /// Является ли аккаунт пользователя Премиумом.
+        /// </summary>
+        [Comment("Является ли аккаунт премиумом.")]
+        public bool IsPremium { get; set; } = false;
+        
+        /// <summary>
         /// Имя пользователя в Telegram.
         /// </summary>
         [Comment("Имя пользователя в Telegram.")]

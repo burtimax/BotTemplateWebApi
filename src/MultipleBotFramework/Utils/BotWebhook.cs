@@ -14,7 +14,7 @@ public class BotWebhook
     /// 0 - Наименование параметра для передачи идентификатора.
     /// </summary>
     public const string WebhookRouteFormat = WebhookRoute + "/{0}";
-    private const string WebhookRoute = "/bot-update";
+    public const string WebhookRoute = "/bot-update";
     public static string BaseAddress;
 
     /// <summary>

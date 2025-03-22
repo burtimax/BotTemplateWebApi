@@ -72,6 +72,9 @@ namespace MultipleBotFramework.Db.Entity
         [Comment("Бот не отвечает/не реагирует чату до определенного времени.")]
         public DateTimeOffset? DisabledUntil { get; set; }
         
+        [Comment("Кол-во запросов в бота")]
+        public long RequestCount { get; set; }
+        
         #region NotMappedData
         
         private ComplexDictionary? _chatData = null;

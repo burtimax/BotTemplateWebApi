@@ -103,8 +103,9 @@ public class BotExceptionHandler
             // Отправляем модераторам и админу.
             IEnumerable<long> moderatorUserIds = await db.UserClaims.Include(uc => uc.Claim)
                 .Where(uc =>
-                    uc.Claim.Name == BotConstants.BaseBotClaims.BotExceptionsGet ||
-                    uc.Claim.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty)
+                    uc.BotId == botId &&
+                    (uc.Claim.Name == BotConstants.BaseBotClaims.BotExceptionsGet ||
+                    uc.Claim.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty))
                 .Select(uc => uc.UserId)
                 .ToListAsync();
             IEnumerable<BotChatEntity> moderatorChats =

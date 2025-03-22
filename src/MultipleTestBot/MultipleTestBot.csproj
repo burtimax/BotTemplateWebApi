@@ -20,12 +20,12 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.8" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
-        <PackageReference Include="Telegram.BotAPI" Version="7.9.0" />
+        <PackageReference Include="Telegram.BotAPI" Version="8.3.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Db\AppDb\MIgrations\" />
-      <Folder Include="Resources\Nested\" />
+      <Folder Include="ResourceClasses\Nested\" />
       <Folder Include="Services\" />
     </ItemGroup>
 
@@ -40,6 +40,39 @@
 
     <ItemGroup>
       <ProjectReference Include="..\MultipleBotFrameworkEndpoints\MultipleBotFrameworkEndpoints.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\Localization\Localization.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Localization.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\Localization.en.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Localization.ru-ru.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\Localization.ru.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Localization.ru.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\Localization\Localization.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Localization.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\Localization.en.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Localization.en.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\Localization.ru.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Localization.ru.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

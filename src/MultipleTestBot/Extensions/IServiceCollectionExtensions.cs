@@ -6,7 +6,7 @@ using MultipleBotFramework.Utils;
 using MultipleTestBot.Endpoints.User.GetUsers.RequestResponse;
 using MultipleTestBot.Repository.Bot;
 using MultipleTestBot.Repository.User;
-using MultipleTestBot.Resources;
+using MultipleTestBot.ResourceClasses;
 
 namespace MultipleTestBot.Extensions;
 

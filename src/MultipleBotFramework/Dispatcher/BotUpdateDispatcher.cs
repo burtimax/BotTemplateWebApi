@@ -91,7 +91,11 @@ public class BotUpdateDispatcher
             if (telegramChat is not null)
             {
                 chat = existedChat ?? await _botRepository.UpsertChat(botId, telegramChat, telegramUser);
-                await _chatHistoryService.SaveInChatHistoryIfNeed(botId, chat.TelegramId, false, data:update);
+                // Сохраняем сообщение пользователя в БД.
+                if (_botOptions.SaveUserMessagesInDatabase)
+                {
+                    await _chatHistoryService.SaveInChatHistoryIfNeed(botId, chat.TelegramId, false, data:update);
+                }
             }
 
             // Если поменялся статус пользователя в боте.

@@ -8,6 +8,7 @@ using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dispatcher.HandlerResolvers;
+using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
 using Telegram.BotAPI.AvailableMethods;
@@ -30,6 +31,7 @@ public class BlockUserCommand: BaseBotHandler
     
     public BlockUserCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
+        HandlerDescription = BlockCommandDescription;
         _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
         _baseBotRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
     }
@@ -41,8 +43,7 @@ public class BlockUserCommand: BaseBotHandler
 
         if (users == null || users.Any() == false)
         {
-            await BotClient.SendMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
-                                                        "Например [/block {@user|user_id} {@user|user_id} ...]");
+            await BotClient.SendMessageAsync(Chat.ChatId, BlockCommandTutorial);
             return;
         }
 
@@ -62,9 +63,7 @@ public class BlockUserCommand: BaseBotHandler
 
             if (user == null)
             {
-                await BotClient.SendMessageAsync(Chat.ChatId, $"Не найден пользователь [{userIdentity}].\n" + 
-                                                                  "Необходимо указать параметры команды.\n" +
-                                                                  "Например [/block {@user|user_id} {@user|user_id} ...]");
+                await BotClient.SendMessageAsync(Chat.ChatId, NotFoundUser.F(userIdentity) + "\n" + BlockCommandTutorial);
                 return;
             }
             

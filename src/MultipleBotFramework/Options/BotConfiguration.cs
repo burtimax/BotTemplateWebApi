@@ -6,6 +6,8 @@ namespace MultipleBotFramework.Options;
 
 public class BotConfiguration
 {
+    public const string Section = "Bot";
+    
     /// <summary>
     /// Наименование бота.
     /// </summary>

@@ -145,16 +145,13 @@ namespace MultipleBotFramework.Repository
             existedUser.TelegramFirstname = user.FirstName;
             existedUser.TelegramLastname = user.LastName;
             existedUser.TelegramUsername = user.Username;
-
+            existedUser.IsBot = user.IsBot;
+            existedUser.IsPremium = user.IsPremium ?? false;
+            existedUser.LanguageCode = user.LanguageCode;
             await _db.SaveChangesAsync();
 
             return existedUser;
         }
-
-        // public async Task<BotUserEntity?> UpdatePhotos(long botId, long telegramUserId, UserProfilePhotos photos)
-        // {
-        //     
-        // }
 
         public async Task<BotChatEntity?> UpsertChat(long botId, Chat chat, User? user)
         {
@@ -174,6 +171,7 @@ namespace MultipleBotFramework.Repository
 
             existed.TelegramUsername = chat.Username ?? null;
             existed.Title = chat.Title ?? user?.FirstName + user?.LastName ?? null;
+            existed.RequestCount += 1;
             if (string.IsNullOrEmpty(chat.Type) == false) existed.Type = chat.Type;
 
             _db.Chats.Update(existed);
@@ -196,6 +194,9 @@ namespace MultipleBotFramework.Repository
             BotChatEntity newChatEntity = chat.ToBotChatEntity(botId, chatOwner?.Id);
             newChatEntity.States.CurrentState = BotConstants.StartState;
             newChatEntity.CreatedAt = DateTimeOffset.Now;
+            newChatEntity.TelegramUsername = chat.Username ?? null;
+            newChatEntity.Title = chat.Title ?? chat?.FirstName + chat?.LastName ?? null;
+            newChatEntity.RequestCount = 1;
             _db.Chats.Add(newChatEntity);
             await _db.SaveChangesAsync();
             return newChatEntity;

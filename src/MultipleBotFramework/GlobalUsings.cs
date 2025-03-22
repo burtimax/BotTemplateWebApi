@@ -1,0 +1,1 @@
+﻿global using static MultipleBotFramework.Resources.Localization.Localization;

@@ -42,6 +42,7 @@ public class BotsManagerService : IBotsManagerService
             throw new Exception("Required webhook address in configuratin");
         BotWebhook.BaseAddress = c.Webhook;
         MyTelegramBotClient.BotDbConnection = c.DbConnection;
+        MyTelegramBotClient.SaveBotMessages = botOptions.SaveBotMessagesInDatabase;
     }
 
     public async Task<MyTelegramBotClient?> GetBotClientById(long botId)

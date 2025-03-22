@@ -37,6 +37,15 @@ public static class StringExtensions
     //     StringMarkupBuilder<T> smb = new();
     //     return smb.Build(str);
     // }
+
+    /// <summary>
+    /// Форматирование строки
+    /// </summary>
+    /// <returns></returns>
+    public static string F(this string str, params object[] args)
+    {
+        return string.Format(str, args);
+    }
     
     public static TResult? To<TResult>(this string json)
     {
