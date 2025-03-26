@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using MultipleBotFramework.Db.Entity;
+using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Repository;
 using Telegram.BotAPI.GettingUpdates;
 
@@ -20,7 +21,7 @@ public class ExceptionMessageReportGenerator
         sb.AppendLine($"# ERROR")
             .AppendLine()
             .AppendLine($"InputTelegramUpdate:")
-            .AppendLine(JsonSerializer.Serialize(update, new JsonSerializerOptions(){ WriteIndented = true }))
+            .AppendLine(update.ToJson())
             .AppendLine()
             .AppendLine($"ErrorMessage:")
             .AppendLine(e.Message)

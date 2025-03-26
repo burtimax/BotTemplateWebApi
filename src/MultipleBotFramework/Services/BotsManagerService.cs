@@ -25,11 +25,6 @@ public class BotsManagerService : IBotsManagerService
     private static bool cacheInitialized = false;
     private BotDbContext _db;
     private BotOptions _botOptions;
-    
-    public BotsManagerService(BotDbContext db, IOptions<BotOptions> botOptions,
-        IOptions<BotConfiguration> config) : this(db, botOptions.Value, config.Value)
-    {
-    }
 
     public BotsManagerService(BotDbContext db, BotOptions botOptions,
         BotConfiguration config)

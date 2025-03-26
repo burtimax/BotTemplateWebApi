@@ -30,7 +30,7 @@ public class UnblockUserCommand: BaseBotHandler
     
     public UnblockUserCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        _botConfiguration = serviceProvider.GetRequiredService<BotConfiguration>();
         _baseBotRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
     }
 

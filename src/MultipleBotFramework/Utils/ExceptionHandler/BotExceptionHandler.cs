@@ -58,8 +58,8 @@ public class BotExceptionHandler
         
         IBotUpdateRepository botUpdateRepository = serviceProvider.GetRequiredService<IBotUpdateRepository>();
         BotDbContext db = serviceProvider.GetRequiredService<BotDbContext>();
-        BotConfiguration botConfig = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
-        BotOptions botOptions = serviceProvider.GetRequiredService<IOptions<BotOptions>>()?.Value ?? new();
+        BotConfiguration botConfig = serviceProvider.GetRequiredService<BotConfiguration>();
+        BotOptions botOptions = serviceProvider.GetRequiredService<BotOptions>();
 
         ExceptionMessageReportGenerator reportGenerator = new();
         string messageReport =

@@ -32,9 +32,9 @@ public class GetProjectEndpoint : Endpoint<GetProjectRequest, GetProjectResponse
 {
     private readonly BotConfiguration _config;
 
-    public GetProjectEndpoint(IOptions<BotConfiguration> config)
+    public GetProjectEndpoint(BotConfiguration config)
     {
-        _config = config.Value;
+        _config = config;
     }
 
     public override void Configure()

@@ -76,7 +76,7 @@ public class BaseBotHandler : ControllerBase, IBaseBotHandler
     {
         ServiceProvider = serviceProvider;
         BotDbContext = serviceProvider.GetRequiredService<BotDbContext>();
-        var botConfig = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        var botConfig = serviceProvider.GetRequiredService<BotConfiguration>();
         MediaDirectory = botConfig.MediaDirectory;
     }
 
@@ -169,19 +169,23 @@ public class BaseBotHandler : ControllerBase, IBaseBotHandler
     }
 
     
-    protected virtual Task<Message> Answer(string text, string parseMode = ParseMode.Html, ReplyMarkup replyMarkup = default)
+    protected virtual Task<Message> Answer(string text, string parseMode = ParseMode.Html,  LinkPreviewOptions? linkPreviewOptions = null, ReplyMarkup replyMarkup = default)
     {
-        return AnswerTo(Chat.ChatId, text:text, parseMode:parseMode, replyMarkup:replyMarkup);
+        return AnswerTo(Chat.ChatId, text:text, parseMode:parseMode, 
+            linkPreviewOptions: linkPreviewOptions,
+            replyMarkup:replyMarkup);
     }
     
-    protected virtual Task<Message> AnswerTo(long chatId, string text, string parseMode = ParseMode.Html, ReplyMarkup replyMarkup = default)
+    protected virtual Task<Message> AnswerTo(long chatId, string text, string parseMode = ParseMode.Html,  LinkPreviewOptions? linkPreviewOptions = null, ReplyMarkup replyMarkup = default)
     {
         if (text.Length > BotConstants.Constraints.MaxMessageLength)
         {
             text = text.Substring(0, BotConstants.Constraints.MaxMessageLength - 1);
         }
         
-        return BotClient.SendMessageAsync(chatId, text:text, parseMode:parseMode, replyMarkup: replyMarkup);
+        return BotClient.SendMessageAsync(chatId, text:text, parseMode:parseMode, 
+            linkPreviewOptions: linkPreviewOptions,
+            replyMarkup: replyMarkup);
     }
     
     protected virtual async Task AnswerCallback()
@@ -208,5 +212,20 @@ public class BaseBotHandler : ControllerBase, IBaseBotHandler
         Chat.States.Set(stateName, setterType);
         await BotDbContext.SaveChangesAsync();
     }
-    
+
+    public async Task AnswerCallback(string callbackQueryId, string? text, bool? showAlert = null, string? url = null, int? cacheTime = null)
+    {
+        try
+        {
+            await BotClient.AnswerCallbackQueryAsync(callbackQueryId: callbackQueryId,
+                text: text,
+                showAlert: showAlert,
+                url: url,
+                cacheTime: cacheTime);
+        }
+        catch (Exception e)
+        {
+        }
+        
+    }
 }

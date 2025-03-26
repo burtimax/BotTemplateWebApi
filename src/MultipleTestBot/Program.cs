@@ -53,12 +53,7 @@ services.AddDbContext<AppDbContext>(options =>
 );
 
 // Регистрируем конфигурации.
-services.Configure<BotConfiguration>(builder.Configuration.GetSection(BotConfiguration.Section));
-services.Configure<BotOptions>(builder.Configuration.GetSection(BotOptions.Section));
-var botConfig = builder.Configuration.GetSection(BotConfiguration.Section).Get<BotConfiguration>();
-BotOptions botOptions = builder.Configuration.GetSection(BotOptions.Section).Get<BotOptions>();
-BotResources botResources = services.ConfigureBotResources(botConfig.ResourcesFilePath);
-services.AddBot(botConfig, botOptions: botOptions); // Подключаем бота
+services.AddBot(builder.Configuration); // Подключаем бота
 services.AddControllers();//.AddNewtonsoftJson(); //Обязательно подключаем NewtonsoftJson
 services.AddHttpContextAccessor();
 services.AddCors();

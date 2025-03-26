@@ -53,11 +53,11 @@ public class BotUpdateDispatcher
         _serviceProvider = serviceProvider;
         _botRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
         _saveUpdateService = _serviceProvider.GetRequiredService<SaveUpdateService>();
-        _botConfiguration = _serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        _botConfiguration = _serviceProvider.GetRequiredService<BotConfiguration>();
         _db = _serviceProvider.GetRequiredService<BotDbContext>();
         _chatHistoryService = serviceProvider.GetRequiredService<BotChatHistoryService>();
         var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
-        _botOptions = (_serviceProvider.GetRequiredService<IOptions<BotOptions>>())?.Value ?? new();
+        _botOptions = serviceProvider.GetRequiredService<BotOptions>();
         _savedMessageService = _serviceProvider.GetRequiredService<ISavedMessageService>();
         _logger = loggerFactory.CreateLogger("Bot");
     }

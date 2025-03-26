@@ -74,7 +74,7 @@ public class SaveUpdateService
     /// <returns></returns>
     private string GetContentByMessageType(Message message)
     {
-        return JsonConvert.SerializeObject(GetObjectByMessageType(message), Formatting.Indented);
+        return message.ToJson();
     }
 
     /// <summary>
