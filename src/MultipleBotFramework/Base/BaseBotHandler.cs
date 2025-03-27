@@ -184,7 +184,7 @@ public class BaseBotHandler : ControllerBase, IBaseBotHandler
         }
         
         return BotClient.SendMessageAsync(chatId, text:text, parseMode:parseMode, 
-            linkPreviewOptions: linkPreviewOptions,
+            linkPreviewOptions: linkPreviewOptions, 
             replyMarkup: replyMarkup);
     }
     

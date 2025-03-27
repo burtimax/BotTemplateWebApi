@@ -34,7 +34,6 @@ namespace MultipleBotFramework.Extensions
                 BotId = botId,
                 TelegramId = chat.Id,
                 TelegramUsername = chat.Username,
-                BotUserId = botUserId,
                 Type = chat.Type,
             };
         }

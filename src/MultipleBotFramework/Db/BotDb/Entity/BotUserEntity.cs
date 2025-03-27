@@ -50,14 +50,14 @@ namespace MultipleBotFramework.Db.Entity
         [Comment("Код языка пользователя. Ссылка на коды [https://en.wikipedia.org/wiki/IETF_language_tag]")]
         public string? LanguageCode { get; set; }
 
-        /// <summary>
-        /// Флаг заблокированного пользователя.
-        /// </summary>
-        [Comment("Флаг заблокированного пользователя.")]
-        public bool IsBlocked { get; set; } = false;
-
-        [Comment("Статус пользователя")]
-        public string? Status { get; set; }
+        // /// <summary>
+        // /// Флаг заблокированного пользователя.
+        // /// </summary>
+        // [Comment("Флаг заблокированного пользователя.")]
+        // public bool IsBlocked { get; set; } = false;
+        //
+        // [Comment("Статус пользователя")]
+        // public string? Status { get; set; }
         
         /// <summary>
         /// Является ли пользователь ботом.
@@ -130,15 +130,6 @@ namespace MultipleBotFramework.Db.Entity
                 : null;
         }
 
-        /// <summary>
-        /// Можно ли писать пользователю. Заблокировал ли пользователь бота.
-        /// </summary>
-        public bool IsLeftOrBanned
-        {
-            get
-            {
-                return Status == BotUserStatus.Banned || Status == BotUserStatus.Left;
-            }
-        }
+        
     }
 }

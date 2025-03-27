@@ -45,17 +45,17 @@ namespace MultipleBotFramework.Repository
         /// Заблокировать пользователей.
         /// Установить значение параметра <see cref="BotUserEntity.IsBlocked"/> true.
         /// </summary>
-        /// <param name="userIds">Список ИД пользователей.</param>
+        /// <param name="chatIds">Список ИД пользователей.</param>
         /// <returns></returns>
-        Task BlockUsers(long botId, params long[] userIds);
+        Task BlockChats(long botId, params long[] chatIds);
         
         /// <summary>
         /// Разблокировать пользователей.
         /// Установить значение параметра <see cref="BotUserEntity.IsBlocked"/> false.
         /// </summary>
-        /// <param name="userIds">Список ИД пользователей.</param>
+        /// <param name="chatIds">Список ИД пользователей.</param>
         /// <returns></returns>
-        Task UnblockUsers(long botId, params long[] userIds);
+        Task UnblockChats(long botId, params long[] chatIds);
 
         /// <summary>
         /// Получить пользователей, у которых есть разрешение.

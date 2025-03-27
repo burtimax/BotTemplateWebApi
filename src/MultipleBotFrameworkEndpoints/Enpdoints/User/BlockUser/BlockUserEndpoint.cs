@@ -14,7 +14,7 @@ sealed class BlockUserRequest
     public bool IsBlocked { get; set; }
 }
 
-sealed class BlockUserEndpoint : Endpoint<BlockUserRequest, List<BotUserEntity>>
+sealed class BlockUserEndpoint : Endpoint<BlockUserRequest, List<BotChatEntity>>
 {
     private BotDbContext _db;
 
@@ -41,24 +41,25 @@ sealed class BlockUserEndpoint : Endpoint<BlockUserRequest, List<BotUserEntity>>
             && (r.TelegramIds is null || r.TelegramIds.Any() == false))
             throw new Exception($"{nameof(r.TelegramIds)} или {nameof(r.Ids)} не должны быть пустые!");
         
-        List<BotUserEntity>? users = await _db.Users
+        List<BotChatEntity>? chats = await _db.Chats
             .WhereIf(r.TelegramIds is not null && r.TelegramIds.Any(), u => r.TelegramIds.Contains(u.TelegramId))
             .WhereIf(r.Ids is not null && r.Ids.Any(), u => r.Ids.Contains(u.Id))
             .WhereIf(r.BotIds is not null && r.BotIds.Any(), u => r.BotIds!.Contains(u.BotId))
             .ToListAsync();
 
-        if (users is null || users.Any() == false)
+        if (chats is null || chats.Any() == false)
         {
             throw new Exception("Пользователи не найдены");
             return;
         }
 
-        foreach (var user in users)
+        foreach (var chat in chats)
         {
-            user.IsBlocked = r.IsBlocked;
+            chat.IsBlocked = r.IsBlocked;
+            _db.Update(chat);
         }
         await _db.SaveChangesAsync();
         
-        await SendAsync(users);
+        await SendAsync(chats);
     }
 }

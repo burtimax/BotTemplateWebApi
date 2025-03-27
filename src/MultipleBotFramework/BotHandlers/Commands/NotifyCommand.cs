@@ -53,9 +53,8 @@ public class NotifyAllCommand : NotifyTestCommand
         }
         
         var users = await BotDbContext.Chats
-            .Include(c => c.BotUser)
-            .Where(c => c.BotUser != null && c.BotUser.IsBlocked == false && c.BotUser.Status != BotUserStatus.Banned
-            && c.Type == ChatTypes.Private && c.BotId == BotId)
+            .Where(c => c.IsBlocked == false && c.Status != BotChatStatus.Banned
+              && c.Type == ChatTypes.Private && c.BotId == BotId)
             .Select(c => c.ChatId)
             .ToListAsync();
         

@@ -116,12 +116,11 @@ public class BroadcastNotificationJob : IJob
         if (e.Message == "Bad Request: chat not found")
         {
             BotChatEntity? chat = await _botDb.Chats
-                .Include(c => c.BotUser)
                 .FirstOrDefaultAsync(x => x.Id == mes.ChatId && x.BotId == botId);
-            if (chat != null && chat.BotUser != null && chat.ChatId == chat.BotUser?.TelegramId)
+            if (chat != null)
             {
-                chat.BotUser.Status = "kicked";
-                _botDb.Update(chat.BotUser);
+                chat.Status = "kicked";
+                _botDb.Update(chat);
                 await _botDb.SaveChangesAsync();
             }
         }

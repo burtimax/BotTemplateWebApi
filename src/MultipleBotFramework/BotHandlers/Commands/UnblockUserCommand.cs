@@ -19,16 +19,15 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// Команда для разблокировки пользователей.
 /// /unblock {@user|user_id} {@user|user_id} ... 
 /// </summary>
-[BotCommand(Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserUnblock})]
 [BotHandler(command: Name, version: 1.0f,requiredUserClaims: new []{BotConstants.BaseBotClaims.BotUserUnblock})]
-public class UnblockUserCommand: BaseBotHandler
+public class UnblockChatCommand: BaseBotHandler
 {
     internal const string Name = "/unblock";
 
     private readonly BotConfiguration _botConfiguration;
     private readonly IBaseBotRepository _baseBotRepository;
     
-    public UnblockUserCommand(IServiceProvider serviceProvider) : base(serviceProvider)
+    public UnblockChatCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _botConfiguration = serviceProvider.GetRequiredService<BotConfiguration>();
         _baseBotRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
@@ -37,35 +36,36 @@ public class UnblockUserCommand: BaseBotHandler
     public override async Task HandleBotRequest(Update update)
     {
         string command = update.Message.Text?.Trim(' ', '.');
-        string[] users = command.Split(' ', ',', '.')[1..];
+        string[] chats = command.Split(' ', ',', '.')[1..];
 
-        if (users == null || users.Any() == false)
+        if (chats == null || chats.Any() == false)
         {
             await BotClient.SendMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
-                                                        "Например [/unblock {@user|user_id} {@user|user_id} ...]");
+                                                        "Например [/unblock {chat_id} {chat_id} ...]");
             return;
         }
 
-        List<BotUserEntity> usersToUnblock = new ();
+        List<BotChatEntity> usersToUnblock = new ();
 
-        foreach (string userIdentity in users)
+        foreach (string chatIdStr in chats)
         {
-            BotUserEntity? user = await _baseBotRepository.GetUserByIdentity(BotId, userIdentity);
+            long chatId = long.Parse(chatIdStr);
+            BotChatEntity? chat = await _baseBotRepository.GetChatById(BotId, chatId);
 
-            if (user == null)
+            if (chat == null)
             {
-                await BotClient.SendMessageAsync(Chat.ChatId, $"Не найден пользователь [{userIdentity}].\n" + 
+                await BotClient.SendMessageAsync(Chat.ChatId, $"Не найден пользователь [{chatId}].\n" + 
                                                                   "Необходимо указать параметры команды.\n" +
-                                                                  "Например [/unblock {@user|user_id} {@user|user_id} ...]");
+                                                                  "Например [/unblock {chat_id} {chat_id} ...]");
                 return;
             }
             
-            usersToUnblock.Add(user);
+            usersToUnblock.Add(chat);
         }
 
-        await _baseBotRepository.UnblockUsers(BotId, usersToUnblock.Select(u => u.Id).ToArray());
+        await _baseBotRepository.UnblockChats(BotId, usersToUnblock.Select(u => u.Id).ToArray());
 
-        await BotClient.SendMessageAsync(Chat.ChatId, "Пользователи разблокированы.");
+        await BotClient.SendMessageAsync(Chat.ChatId, "Чаты разблокированы.");
     }
     
 }

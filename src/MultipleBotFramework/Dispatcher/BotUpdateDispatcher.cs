@@ -99,10 +99,10 @@ public class BotUpdateDispatcher
             }
 
             // Если поменялся статус пользователя в боте.
-            await UserStatusUpdateIfNeeded(update, user);
+            await ChatStatusUpdateIfNeeded(update, chat);
             
             // Если пользователь заблокирован, тогда ему не отвечаем!!!
-            if (user != null && user.IsBlocked)
+            if (chat != null && chat.IsBlocked)
             {
                 // ToDo перенаправить на состояние блокированного пользователя!!!
                 if(chat != null)
@@ -252,7 +252,7 @@ public class BotUpdateDispatcher
         return result;
     }
 
-    private async Task UserStatusUpdateIfNeeded(Update update, BotUserEntity? user)
+    private async Task ChatStatusUpdateIfNeeded(Update update, BotChatEntity chat)
     {
         if (update.Type() != UpdateType.MyChatMember) return;
         
@@ -261,8 +261,8 @@ public class BotUpdateDispatcher
         // Пользователь зашел в бота.
         if (data.NewChatMember is not null)
         {
-            user.Status = data.NewChatMember.Status;
-            _db.Users.Update(user);
+            chat.Status = data.NewChatMember.Status;
+            _db.Chats.Update(chat);
             await _db.SaveChangesAsync();
         }
 

@@ -101,19 +101,19 @@ public class BotExceptionHandler
             }
 
             // Отправляем модераторам и админу.
-            IEnumerable<long> moderatorUserIds = await db.UserClaims.Include(uc => uc.Claim)
-                .Where(uc =>
-                    uc.BotId == botId &&
-                    (uc.Claim.Name == BotConstants.BaseBotClaims.BotExceptionsGet ||
-                    uc.Claim.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty))
-                .Select(uc => uc.UserId)
-                .ToListAsync();
-            IEnumerable<BotChatEntity> moderatorChats =
-                await db.Chats.Where(c => c.BotUserId != null && moderatorUserIds.Contains(c.BotUserId.Value)).ToListAsync();
+            // IEnumerable<long> moderatorUserIds = await db.UserClaims.Include(uc => uc.Claim)
+            //     .Where(uc =>
+            //         uc.BotId == botId &&
+            //         (uc.Claim.Name == BotConstants.BaseBotClaims.BotExceptionsGet ||
+            //         uc.Claim.Name == BotConstants.BaseBotClaims.IAmBruceAlmighty))
+            //     .Select(uc => uc.UserId)
+            //     .ToListAsync();
+            IEnumerable<BotChatEntity> exceptionChats =
+                await db.Chats.Where(c => c.Tags != null && c.Tags.Contains("exception")).ToListAsync();
 
             string fileFromTelegram = null;
             
-            foreach (BotChatEntity ch in moderatorChats)
+            foreach (BotChatEntity ch in exceptionChats)
             {
                 try
                 {

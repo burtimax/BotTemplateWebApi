@@ -1,2 +1,4 @@
 cd /src/MultipleBotFramework
-dotnet ef migrations add AddFieldsToUser --context BotDbContext -o Db/Migrations
+dotnet ef migrations add ReplaceChatFields --context BotDbContext -o Db/BotDb/Migrations
+
+dotnet ef migrations remove --context BotDbContext 

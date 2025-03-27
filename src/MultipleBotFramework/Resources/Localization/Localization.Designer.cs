@@ -90,7 +90,7 @@ namespace MultipleBotFramework.Resources.Localization {
         /// <summary>
         ///   Looks up a localized string similar to Not found user [{0}].
         /// </summary>
-        internal static string NotFoundUser {
+        internal static string NotFoundChat {
             get {
                 return ResourceManager.GetString("NotFoundUser", resourceCulture);
             }

@@ -75,26 +75,26 @@ namespace MultipleBotFramework.Repository
         }
 
         /// <inheritdoc />
-        public async Task BlockUsers(long botId, params long[] userIds)
+        public async Task BlockChats(long botId, params long[] chatIds)
         {
-            var users = await _db.Users.Where(u => u.BotId == botId 
-            && userIds.Contains(u.Id)).ToListAsync();
-            foreach (var user in users)
+            var chats = await _db.Chats.Where(ch => ch.BotId == botId 
+            && chatIds.Contains(ch.Id)).ToListAsync();
+            foreach (var chat in chats)
             {
-                user.IsBlocked = true;
+                chat.IsBlocked = true;
             }
 
             await _db.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public async Task UnblockUsers(long botId, params long[] userIds)
+        public async Task UnblockChats(long botId, params long[] chatIds)
         {
-            var users = await _db.Users.Where(u => u.BotId == botId 
-            && userIds.Contains(u.Id)).ToListAsync();
-            foreach (var user in users)
+            var chats = await _db.Chats.Where(u => u.BotId == botId 
+            && chatIds.Contains(u.Id)).ToListAsync();
+            foreach (var chat in chats)
             {
-                user.IsBlocked = false;
+                chat.IsBlocked = false;
             }
 
             await _db.SaveChangesAsync();

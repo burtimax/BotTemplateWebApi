@@ -1,6 +1,6 @@
 ﻿namespace MultipleBotFramework.Constants;
 
-public class BotUserStatus
+public class BotChatStatus
 {
     /// <summary>
     /// Участник чата.

@@ -66,12 +66,12 @@ public class CommandsCommand: BaseBotHandler
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserBlock))
         {
             sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserBlock}</code>");
-            sb.AppendLine($"{BlockUserCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Заблокировать пользователей.</i>");
+            sb.AppendLine($"{BlockChatCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Заблокировать пользователей.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserUnblock))
         {
             sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserUnblock}</code>");
-            sb.AppendLine($"{UnblockUserCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Разблокировать пользователей.</i>");
+            sb.AppendLine($"{UnblockChatCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Разблокировать пользователей.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserGet))
         {
