@@ -13,7 +13,7 @@ namespace MultipleBotFramework.Extensions;
 
 public static class IApplicationBuilderExtension
 {
-    public static IApplicationBuilder UseBot(this IApplicationBuilder builder, CultureInfo[] supportedCultures = null)
+    public static IApplicationBuilder UseBot(this IApplicationBuilder builder, CultureInfo defaultCulture = null, CultureInfo[] supportedCultures = null)
     {
         builder.UseMiddleware<LocalizationMiddleware>();
         
@@ -31,7 +31,7 @@ public static class IApplicationBuilderExtension
         
         builder.UseRequestLocalization(new RequestLocalizationOptions
         {
-            DefaultRequestCulture = new RequestCulture("en"),
+            DefaultRequestCulture = new RequestCulture(defaultCulture?.Name ?? "en"),
             SupportedCultures = supportedCultures,
             SupportedUICultures = supportedCultures,
             RequestCultureProviders = new List<IRequestCultureProvider>()

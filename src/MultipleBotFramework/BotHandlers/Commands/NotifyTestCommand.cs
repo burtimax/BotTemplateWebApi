@@ -63,6 +63,14 @@ public class NotifyTestCommand : BaseBotHandler
         }
     }
 
+    /// <summary>
+    /// [url::Название кнопки::https://www.youtube.com/][act::Название кнопки::callback_data]
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="errorStr"></param>
+    /// <param name="kb"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     protected bool TryParseInlineKeyboard(string input, out string? errorStr, out InlineKeyboardBuilder? kb)
     {
         kb = new();
