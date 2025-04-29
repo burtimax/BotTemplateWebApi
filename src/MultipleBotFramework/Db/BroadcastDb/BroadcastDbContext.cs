@@ -15,6 +15,7 @@ namespace MultipleBotFramework.Db.BroadcastDb
 
         public DbSet<BroadcastTask> BroadcastTasks { get; set; }
         public DbSet<BroadcastMessage> BroadcastMessages { get; set; }
+        public DbSet<BotNotification> BotNotifications { get; set; }
      
 
         // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -24,7 +25,6 @@ namespace MultipleBotFramework.Db.BroadcastDb
         //      optionsBuilder.UseNpgsql(mockString);
         //     base.OnConfiguring(optionsBuilder);
         // }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             BroadcastDbContextConfiguration.ConfigureContext(modelBuilder);

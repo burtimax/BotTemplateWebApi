@@ -9,7 +9,7 @@ dotnet ef migrations remove --context AppDbContext --project MultipleTestBot/Mul
 ```
 
 ```bash
-dotnet ef migrations add Init -o Db/BroadcastDb/Migrations --context BroadcastDbContext --project MultipleTestBot/MultipleTestBot --startup-project MultipleTestBot/MultipleTestBot
+dotnet ef migrations add AddBotNotification -o Db/BroadcastDb/Migrations --context BroadcastDbContext --project MultipleTestBot/MultipleTestBot --startup-project MultipleTestBot/MultipleTestBot
 
 dotnet ef database update --context AppDbContext --project MultipleTestBot/MultipleTestBot --startup-project MultipleTestBot/MultipleTestBot
 

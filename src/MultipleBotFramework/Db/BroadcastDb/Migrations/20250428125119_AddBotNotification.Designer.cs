@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MultipleBotFramework.Db.BroadcastDb;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BroadcastModule.Db.Migrations
+namespace MultipleBotFramework.Db.BroadcastDb.Migrations
 {
     [DbContext(typeof(BroadcastDbContext))]
-    partial class BroadcastDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250428125119_AddBotNotification")]
+    partial class AddBotNotification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

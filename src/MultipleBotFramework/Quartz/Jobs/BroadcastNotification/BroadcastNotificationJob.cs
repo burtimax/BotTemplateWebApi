@@ -10,6 +10,7 @@ using MultipleBotFramework.Db.BroadcastDb.Entity;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Options;
+using MultipleBotFramework.Services;
 using MultipleBotFramework.Services.Interfaces;
 using MultipleBotFramework.Utils.Keyboard;
 using Quartz;
@@ -21,20 +22,26 @@ namespace MultipleBotFramework.Quartz.Jobs.BroadcastNotification;
 
 public class BroadcastNotificationJob : IJob
 {
+    private const int NotificationInterval = 5;
+    private const int NotificationCountIfNoBroadcast = 20;
+    
+    
     public static readonly JobKey Key = new JobKey("bot-notification-job", "bot");
     private static bool IsWorkingNow = false;
 
     private readonly BroadcastConfiguration _config;
     private readonly IBroadcastTaskService _broadcastTaskService;
+    private readonly IBotNotificationService _botNotificationService;
     private readonly BroadcastDbContext _db;
     private readonly BotDbContext _botDb;
     
     public BroadcastNotificationJob(BroadcastConfiguration configuration,
-        IBroadcastTaskService broadcastTaskService, BroadcastDbContext db, BotDbContext botDb)
+        IBroadcastTaskService broadcastTaskService, BroadcastDbContext db, BotDbContext botDb, IBotNotificationService botNotificationService)
     {
         _broadcastTaskService = broadcastTaskService;
         _db = db;
         _botDb = botDb;
+        _botNotificationService = botNotificationService;
         _config = configuration;
     }
     
@@ -60,7 +67,11 @@ public class BroadcastNotificationJob : IJob
     private async Task PerformJob(IJobExecutionContext context, CancellationToken cancellationToken)
     {
         BroadcastTask broadcastTask = await _broadcastTaskService.GetNextBroadcastTask();
-        if (broadcastTask == null) return;
+        if (broadcastTask == null)
+        {
+            await SendMultipleNotifications();
+            return;
+        }
         
         await _broadcastTaskService.StartBroadcastTask(broadcastTask.Id);
         
@@ -70,7 +81,8 @@ public class BroadcastNotificationJob : IJob
         
         await botClient.SendMessageAsync(broadcastTask.FromChatId, $"Бот начинает рассылку [{broadcastTask.Id}]");
         await botClient.CopyMessageAsync(broadcastTask.FromChatId, broadcastTask.FromChatId, broadcastTask.FromMessageId, replyMarkup:reply);
-        
+
+        int c = 1;
         while(true)
         {
             var messages = await _broadcastTaskService.GetNextBroadcastTaskMessages(broadcastTask.Id);
@@ -79,6 +91,12 @@ public class BroadcastNotificationJob : IJob
             foreach (var mes in messages)
             {
                 if (cancellationToken.IsCancellationRequested == true) break;
+
+                if (c % NotificationInterval == 0)
+                {
+                    var res = await _botNotificationService.SendNextNotification();
+                }
+                
                 try
                 {
                     await botClient.CopyMessageAsync(mes.ChatId, broadcastTask.FromChatId, broadcastTask.FromMessageId, replyMarkup: reply);
@@ -94,6 +112,7 @@ public class BroadcastNotificationJob : IJob
                 finally
                 {
                     _db.BroadcastMessages.Update(mes);
+                    c++;
                     await Task.Delay(_config.MessageDelayMilliseconds);
                 }
             }
@@ -105,6 +124,19 @@ public class BroadcastNotificationJob : IJob
         await botClient.SendMessageAsync(broadcastTask.FromChatId, $"Бот заканчивает рассылку [{broadcastTask.Id}]");
     }
 
+    private async Task SendMultipleNotifications()
+    {
+        int i = 0;
+        while (i < NotificationCountIfNoBroadcast)
+        {
+            var res = await _botNotificationService.SendNextNotification();
+            if(res == BotNotificationService.SendNotificationResult.InternalException) continue;
+            if (res == BotNotificationService.SendNotificationResult.Nothing) break;
+            i++;
+            await Task.Delay(_config.MessageDelayMilliseconds);
+        }
+    }
+    
     /// <summary>
     /// Обработка ошибки.
     /// </summary>

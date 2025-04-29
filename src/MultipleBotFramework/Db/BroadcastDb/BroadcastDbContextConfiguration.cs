@@ -26,6 +26,7 @@ public class BroadcastDbContextConfiguration
     {
         builder.Entity<BroadcastTask>().ToTable("broadcast_tasks", schema);
         builder.Entity<BroadcastMessage>().ToTable("broadcast_messages", schema);
+        builder.Entity<BotNotification>().ToTable("notifications", schema);
     }
     
     private static void SetOtherConfigs(ModelBuilder modelBuilder)

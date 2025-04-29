@@ -73,6 +73,7 @@ public static class IServiceCollectionExtension
         services.AddTransient<IBotUpdateRepository, BotUpdateRepository>();
         services.AddTransient<SaveUpdateService>();
         services.AddTransient<ISavedMessageService, SavedMessageService>();
+        services.AddTransient<IBotNotificationService, BotNotificationService>();
         services.AddTransient<BotChatHistoryService>();
         services.AddHttpContextAccessor();
         
