@@ -25,10 +25,20 @@
         <value>Необходимо указать параметры команды.
 Например [/block {@user|user_id} {@user|user_id} ...]</value>
     </data>
-    <data name="NotFoundUser" xml:space="preserve">
+    <data name="ErrNotFoundUser" xml:space="preserve">
         <value>Не найден пользователь [{0}]</value>
     </data>
     <data name="BlockCommandDescription" xml:space="preserve">
         <value>(адм) Заблокировать пользователя</value>
+    </data>
+    <data name="MsgReferralCommand" xml:space="preserve">
+        <value>Ссылка для приглашения:
+{0}
+
+Кол-во приглашенных:
+{1}</value>
+    </data>
+    <data name="ErrNotFoundChat" xml:space="preserve">
+        <value>Не найден чат [{0}]</value>
     </data>
 </root>

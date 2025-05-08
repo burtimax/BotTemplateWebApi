@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MultipleBotFramework.Db.BroadcastDb;
+using MultipleBotFramework.Db.ReferralDb;
 using MultipleBotFramework.Middleware;
 using MultipleBotFramework.Options;
 
@@ -43,6 +44,7 @@ public static class IApplicationBuilderExtension
         });
         
         UseBroadcast(builder);
+        UseReferral(builder);
         
         return builder;
     }
@@ -55,6 +57,20 @@ public static class IApplicationBuilderExtension
             if (config == null || config.IsEnabled == false) return builder;
             
             var context = scope.ServiceProvider.GetRequiredService<BroadcastDbContext>();
+            context.Database.Migrate();
+        }
+
+        return builder;
+    }
+    
+    public static IApplicationBuilder UseReferral(this IApplicationBuilder builder)
+    {
+        using (var scope = builder.ApplicationServices.CreateScope())
+        {
+            var config = scope.ServiceProvider.GetService<BotReferralConfiguration>();
+            if (config == null || config.IsEnabled == false) return builder;
+            
+            var context = scope.ServiceProvider.GetRequiredService<ReferralDbContext>();
             context.Database.Migrate();
         }
 

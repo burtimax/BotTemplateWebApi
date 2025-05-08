@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <Folder Include="Db\BroadcastDb\" />
+    <Folder Include="Db\ReferralDb\Migrations\" />
     <Folder Include="Extensions\ITelegramApiClient\Messages\" />
   </ItemGroup>
 

@@ -64,7 +64,7 @@ public class BlockChatCommand: BaseBotHandler
 
             if (chat == null)
             {
-                await BotClient.SendMessageAsync(Chat.ChatId, NotFoundChat.F(chatId) + "\n" + BlockCommandTutorial);
+                await BotClient.SendMessageAsync(Chat.ChatId, ErrNotFoundChat.F(chatId) + "\n" + BlockCommandTutorial);
                 return;
             }
             

@@ -37,7 +37,7 @@ namespace MultipleBotFramework.Repository
         /// <summary>
         /// Получить пользователя по @username или по ИД.
         /// </summary>
-        /// <param name="userIdentity">Строковое представление @username или по ИД.</param>
+        /// <param name="userIdentity">Строковое представление @username или по telegram ИД.</param>
         /// <returns>Пользователь.</returns>
         Task<BotUserEntity?> GetUserByIdentity(long botId, string userIdentity);
 

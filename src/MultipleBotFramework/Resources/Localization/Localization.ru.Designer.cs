@@ -88,11 +88,33 @@ namespace MultipleBotFramework.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Не найден чат [{0}].
+        /// </summary>
+        internal static string ErrNotFoundChat {
+            get {
+                return ResourceManager.GetString("ErrNotFoundChat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Не найден пользователь [{0}].
         /// </summary>
-        internal static string NotFoundUser {
+        internal static string ErrNotFoundUser {
             get {
-                return ResourceManager.GetString("NotFoundUser", resourceCulture);
+                return ResourceManager.GetString("ErrNotFoundUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ссылка для приглашения:
+        ///{0}
+        ///
+        ///Кол-во приглашенных:
+        ///{1}.
+        /// </summary>
+        internal static string MsgReferralCommand {
+            get {
+                return ResourceManager.GetString("MsgReferralCommand", resourceCulture);
             }
         }
     }

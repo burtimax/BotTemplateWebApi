@@ -25,10 +25,20 @@
         <value>You must specify command parameters.
 For example [/block {@user|user_id} {@user|user_id} ...]</value>
     </data>
-    <data name="NotFoundUser" xml:space="preserve">
+    <data name="ErrNotFoundUser" xml:space="preserve">
         <value>Not found user [{0}]</value>
     </data>
     <data name="BlockCommandDescription" xml:space="preserve">
         <value>(adm) Block user</value>
+    </data>
+    <data name="MsgReferralCommand" xml:space="preserve">
+        <value>Invite link:
+{0}
+
+Number of invitees:
+{1}</value>
+    </data>
+    <data name="ErrNotFoundChat" xml:space="preserve">
+        <value>Not found chat [{0}]</value>
     </data>
 </root>

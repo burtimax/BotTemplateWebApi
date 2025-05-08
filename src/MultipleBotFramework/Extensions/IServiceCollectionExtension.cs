@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.BroadcastDb;
+using MultipleBotFramework.Db.ReferralDb;
 using MultipleBotFramework.Dispatcher;
 using MultipleBotFramework.Dto;
 using MultipleBotFramework.Options;
@@ -14,6 +15,7 @@ using MultipleBotFramework.Quartz.Jobs.BroadcastNotification;
 using MultipleBotFramework.Repository;
 using MultipleBotFramework.Services;
 using MultipleBotFramework.Services.Interfaces;
+using MultipleBotFramework.Services.Referral;
 using MultipleBotFramework.Utils;
 using Quartz;
 
@@ -63,6 +65,7 @@ public static class IServiceCollectionExtension
         services.AddTransient<BotUpdateDispatcher>();
         services.AddMultipleBotServices();
         services.AddBroadcast(configuration);
+        services.AddReferrals(configuration);
         return services;
     }
     
@@ -96,16 +99,35 @@ public static class IServiceCollectionExtension
 
         if (settings == default || settings.IsEnabled == false) return;
 
+        string dbConnection = configuration.GetSection(BotConfiguration.Section).Get<BotConfiguration>()!.DbConnection;
         services.AddSingleton<BroadcastConfiguration>(settings);
 
         services.AddDbContext<BroadcastDbContext>(options =>
         {
-            options.UseNpgsql(settings.BroadcastDbConnection);
+            options.UseNpgsql(dbConnection);
         });
         
         services.AddTransient<IBroadcastTaskService, BroadcastTaskService>();
 
         AddQuartzBroadcast(services);
+    }
+    
+    public static void AddReferrals(this IServiceCollection services, IConfiguration configuration)
+    {
+        var settings = configuration.GetSection(BotReferralConfiguration.Section).Get<BotReferralConfiguration>();
+
+        if (settings == default || settings.IsEnabled == false) return;
+
+        string dbConnection = configuration.GetSection(BotConfiguration.Section).Get<BotConfiguration>()!.DbConnection;
+        services.AddSingleton<BotReferralConfiguration>(settings);
+
+        services.AddDbContext<ReferralDbContext>(options =>
+        {
+            options.UseNpgsql(dbConnection);
+        });
+        
+        services.AddTransient<IReferralService, ReferralService>();
+        services.AddTransient<IReferralCodeService, ReferralCodeService>();
     }
     
     private static void AddQuartzBroadcast(IServiceCollection services)

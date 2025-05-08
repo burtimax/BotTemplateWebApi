@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
 using MultipleBotFramework.Services;
 using MultipleBotFramework.Services.Interfaces;
+using MultipleBotFramework.Services.Referral;
 using MultipleBotFramework.Utils;
 using MultipleBotFramework.Utils.ExceptionHandler;
 using Telegram.BotAPI;
@@ -84,6 +86,25 @@ public class BotUpdateDispatcher
             
             // Сохраняем или обновляем информацию о пользователе.
             user = await _botRepository.UpsertUser(botId, telegramUser, botClient);
+            
+            // Ловим реферала.
+            if ((update.Type() == UpdateType.Message || update.Type() == UpdateType.Command)
+                && string.IsNullOrEmpty(update.Message.Text) == false && update.Message.Text.StartsWith("/start"))
+            {
+                var refConfig = _serviceProvider.GetService<BotReferralConfiguration>();
+                if (refConfig is not null && refConfig.IsEnabled)
+                {
+                    var referralService = _serviceProvider.GetRequiredService<IReferralService>();
+                    bool hasRefCode = update.Message.Text.Split(" ")?.Length > 1;
+                    string? refCode = hasRefCode ? update.Message.Text.Split(" ")[1] : null;
+                    var refHandleRes = await referralService.HandleReferralCode(botId, telegramUser.Id, refCode);
+                    if (refHandleRes == ReferralProgramStatus.Succeeded)
+                    {
+                        // TODO вызвать событие нового реферала.
+                    }  
+                } 
+            }
+            
             userClaims = (await _botRepository.GetUserClaims(botId, user?.Id ?? -1))?.Select(c => new ClaimValue(c.Id, c.Name, c?.Description ?? ""));
             bool isOwner = await _botRepository.IsUserOwner(botId, user?.TelegramId ?? -1);
 
