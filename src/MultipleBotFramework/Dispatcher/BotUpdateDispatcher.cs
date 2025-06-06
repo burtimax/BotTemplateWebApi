@@ -85,7 +85,13 @@ public class BotUpdateDispatcher
             Chat? telegramChat = update.GetChat();
             
             // Сохраняем или обновляем информацию о пользователе.
-            user = await _botRepository.UpsertUser(botId, telegramUser, botClient);
+            var upsertUserResult = await _botRepository.UpsertUser(botId, telegramUser, botClient);
+            user = upsertUserResult.user;
+
+            if (upsertUserResult.userCreated)
+            {
+                await AddReferralDataIfNeed(botId, telegramUser.Id);
+            }
             
             // Ловим реферала.
             if ((update.Type() == UpdateType.Message || update.Type() == UpdateType.Command)
@@ -200,6 +206,18 @@ public class BotUpdateDispatcher
         // Отправляем ответ пользователю
     }
 
+    private async Task AddReferralDataIfNeed(long botId, long userTelegramId)
+    {
+        // Если активна реферальная система, тогда для пользователя создаем запись о реферале.
+        BotReferralConfiguration? RefConfig = _serviceProvider.GetService<BotReferralConfiguration>();
+        if (RefConfig != null && RefConfig.IsEnabled)
+        {
+            var refService = _serviceProvider.GetService<IReferralService>();
+            // Добавляем дефолтную реф. кампанию.
+            await refService!.GetParticipantWithCampaigns(botId, userTelegramId);
+        }
+    }
+    
     /// <summary>
     /// Отправить необработанный запрос модератору.
     /// </summary>

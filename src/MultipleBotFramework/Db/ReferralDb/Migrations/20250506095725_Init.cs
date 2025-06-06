@@ -40,7 +40,7 @@ namespace MultipleBotFramework.Db.ReferralDb.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "companies",
+                name: "campaigns",
                 schema: "referral",
                 columns: table => new
                 {
@@ -57,9 +57,9 @@ namespace MultipleBotFramework.Db.ReferralDb.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_companies", x => x.id);
+                    table.PrimaryKey("pk_campaigns", x => x.id);
                     table.ForeignKey(
-                        name: "fk_companies_participants_participant_id",
+                        name: "fk_campaigns_participants_participant_id",
                         column: x => x.participant_id,
                         principalSchema: "referral",
                         principalTable: "participants",
@@ -68,9 +68,9 @@ namespace MultipleBotFramework.Db.ReferralDb.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_companies_participant_id",
+                name: "ix_campaigns_participant_id",
                 schema: "referral",
-                table: "companies",
+                table: "campaigns",
                 column: "participant_id");
         }
 
@@ -78,7 +78,7 @@ namespace MultipleBotFramework.Db.ReferralDb.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "companies",
+                name: "campaigns",
                 schema: "referral");
 
             migrationBuilder.DropTable(

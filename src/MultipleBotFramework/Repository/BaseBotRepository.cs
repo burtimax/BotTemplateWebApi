@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dto;
 using MultipleBotFramework.Exceptions;
 using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Models;
+using MultipleBotFramework.Options;
+using MultipleBotFramework.Services.Referral;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
@@ -126,9 +129,9 @@ namespace MultipleBotFramework.Repository
         }
 
         /// <inheritdoc />
-        public async Task<BotUserEntity?> UpsertUser(long botId, User user, ITelegramBotClient botClient)
+        public async Task<(BotUserEntity? user, bool userCreated)> UpsertUser(long botId, User user, ITelegramBotClient botClient)
         {
-            if (user == null) return null;
+            if (user == null) return (null, false);
             
             bool isUserExisted = await IsUserExists(botId, user.Id);
 
@@ -138,7 +141,7 @@ namespace MultipleBotFramework.Repository
                 newUserEntity.CreatedAt = DateTimeOffset.Now;
                 _db.Users.Add(newUserEntity);
                 await _db.SaveChangesAsync();
-                return newUserEntity;
+                return (newUserEntity, true);
             }
 
             var existedUser = (await GetUser(botId, user.Id))!;
@@ -150,7 +153,7 @@ namespace MultipleBotFramework.Repository
             existedUser.LanguageCode = user.LanguageCode;
             await _db.SaveChangesAsync();
 
-            return existedUser;
+            return (existedUser, false);
         }
 
         public async Task<BotChatEntity?> UpsertChat(long botId, Chat chat, User? user)

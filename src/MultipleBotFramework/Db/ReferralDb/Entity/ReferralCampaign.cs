@@ -4,7 +4,10 @@ namespace MultipleBotFramework.Db.ReferralDb.Entity;
 
 public class ReferralCampaign : BaseEntity<long>
 {
-    public const string DefaultName = "Referral";
+    /// <summary>
+    /// НЕ МЕНЯТЬ ЗНАЧЕНИЕ!!!
+    /// </summary>
+    public const string DefaultName = "_default_";
     
     public long BotId { get; set; }
     public long ParticipantId { get; set; }

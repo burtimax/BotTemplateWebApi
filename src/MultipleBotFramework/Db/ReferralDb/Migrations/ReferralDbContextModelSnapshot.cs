@@ -69,12 +69,12 @@ namespace MultipleBotFramework.Db.ReferralDb.Migrations
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
-                        .HasName("pk_companies");
+                        .HasName("pk_campaigns");
 
                     b.HasIndex("ParticipantId")
-                        .HasDatabaseName("ix_companies_participant_id");
+                        .HasDatabaseName("ix_campaigns_participant_id");
 
-                    b.ToTable("companies", "referral");
+                    b.ToTable("campaigns", "referral");
                 });
 
             modelBuilder.Entity("MultipleBotFramework.Db.ReferralDb.Entity.ReferralParticipant", b =>
@@ -129,7 +129,7 @@ namespace MultipleBotFramework.Db.ReferralDb.Migrations
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_companies_participants_participant_id");
+                        .HasConstraintName("fk_campaigns_participants_participant_id");
 
                     b.Navigation("Participant");
                 });

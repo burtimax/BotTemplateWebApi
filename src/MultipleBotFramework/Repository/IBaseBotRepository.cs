@@ -70,13 +70,14 @@ namespace MultipleBotFramework.Repository
         /// <param name="role"></param>
         /// <returns></returns>
         Task<IEnumerable<BotUserEntity>> GetUsersByRole(string role);
-        
+
         /// <summary>
         /// Добавить пользователя или обновить информацию по нему.
         /// Обновляет информацию (Firstname, Lastname, Username)
         /// Потому что с прошествием времени может поменяться эта информация.
         /// </summary>
-        Task<BotUserEntity?> UpsertUser(long botId, User user, ITelegramBotClient botClient);
+        public Task<(BotUserEntity user, bool userCreated)> UpsertUser(long botId, User user,
+            ITelegramBotClient botClient);
 
         /// <summary>
         /// Добавить чат или обновить информацию по нему.

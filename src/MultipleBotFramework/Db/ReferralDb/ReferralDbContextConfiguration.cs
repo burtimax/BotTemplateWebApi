@@ -25,7 +25,7 @@ public class ReferralDbContextConfiguration
     private static void SetTableAndSchema(ModelBuilder builder)
     {
         builder.Entity<ReferralParticipant>().ToTable("participants", schema);
-        builder.Entity<ReferralCampaign>().ToTable("companies", schema);
+        builder.Entity<ReferralCampaign>().ToTable("campaigns", schema);
     }
     
     private static void SetOtherConfigs(ModelBuilder modelBuilder)

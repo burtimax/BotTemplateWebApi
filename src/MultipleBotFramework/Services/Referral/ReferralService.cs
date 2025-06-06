@@ -24,7 +24,8 @@ public class ReferralService : IReferralService
     
     public async Task<ReferralProgramStatus> HandleReferralCode(long botId, long userTelegramId, string? code)
     {
-        var participant = await _db.Participants.FirstOrDefaultAsync(x => x.BotId == botId && x.UserTelegramId == userTelegramId && x.ReferrerCode != null);
+        var participant = await _db.Participants.FirstOrDefaultAsync(x => x.BotId == botId 
+                                                                          && x.UserTelegramId == userTelegramId && x.ReferrerCode != null);
 
         if (participant != null)
         {
@@ -66,6 +67,7 @@ public class ReferralService : IReferralService
             .Include(p => p.Campaigns)
             .FirstOrDefaultAsync(x => x.BotId == botId && x.UserTelegramId == userTelegramId);
 
+        // Если у пользователя нет реферальных кампаний, создаем ему по умолчанию.
         if (participant == null)
         {
             participant = new ReferralParticipant()
@@ -82,6 +84,7 @@ public class ReferralService : IReferralService
                     BotId = botId,
                     Code = await _referralCodeService.GetUniqueReferralCodeAsync(),
                     ParticipantId = participant.Id,
+                    Name = ReferralCampaign.DefaultName,
                 };
 
             _db.Campaigns.Add(campaign);
