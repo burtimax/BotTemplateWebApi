@@ -56,9 +56,29 @@ public class ReferralService : IReferralService
         return ReferralProgramStatus.Succeeded;
     }
 
-    private async Task<ReferralCampaign?> GetCampaignByCode(long botId, string? code)
+    public async Task<ReferralCampaign?> GetCampaignByCode(long botId, string? code)
     {
-        return await _db.Campaigns.FirstOrDefaultAsync(x => x.BotId == botId && x.Code == code);
+        return await _db.Campaigns
+            .Include(c => c.Participant)
+            .FirstOrDefaultAsync(x => x.BotId == botId && x.Code == code);
+    }
+
+    public async Task<ReferralCampaign> CreateCampaign(long botId, long userTelegramId, string name)
+    {
+        var participant = await GetParticipantWithCampaigns(botId, userTelegramId);
+        
+        ReferralCampaign campaign =
+            new ReferralCampaign()
+            {
+                BotId = botId,
+                Code = await _referralCodeService.GetUniqueReferralCodeAsync(),
+                ParticipantId = participant.Id,
+                Name = name,
+            };
+
+        _db.Campaigns.Add(campaign);
+        await _db.SaveChangesAsync();
+        return campaign;
     }
     
     public async Task<ReferralParticipant> GetParticipantWithCampaigns(long botId, long userTelegramId)

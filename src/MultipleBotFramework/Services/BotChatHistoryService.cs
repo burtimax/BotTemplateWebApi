@@ -16,15 +16,31 @@ using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Services;
 
+/// <summary>
+/// Сервис для сохранения истории чатов и сообщений бота.
+/// </summary>
 public class BotChatHistoryService
 {
     protected readonly BotDbContext _db;
     
+    /// <summary>
+    /// Конструктор сервиса истории чатов.
+    /// </summary>
+    /// <param name="db">Контекст базы данных бота</param>
     public BotChatHistoryService(BotDbContext db)
     {
         _db = db;
     }
 
+    /// <summary>
+    /// Сохраняет событие или сообщение в истории чата, если это необходимо.
+    /// </summary>
+    /// <param name="botId">ID бота</param>
+    /// <param name="telegramChatId">ID чата</param>
+    /// <param name="isBot">Признак, что сообщение от бота</param>
+    /// <param name="data">Данные для сохранения</param>
+    /// <param name="args">Дополнительные аргументы</param>
+    /// <returns>Сущность истории чата или null</returns>
     public async Task<BotChatHistoryEntity?> SaveInChatHistoryIfNeed(long botId, long telegramChatId, bool isBot, object data, object? args = null)
     {
         var inline = GetInlineKeyboardFromResult(data);
@@ -88,6 +104,9 @@ public class BotChatHistoryService
         return null;
     }
 
+    /// <summary>
+    /// Получить reply-клавиатуру из аргументов.
+    /// </summary>
     private IEnumerable<IEnumerable<KeyboardButton>>? GetReplyKeyboardFromArgs(object? args)
     {
         if (args is not null 
@@ -103,6 +122,9 @@ public class BotChatHistoryService
         return null;
     }
 
+    /// <summary>
+    /// Получить ID сообщения, на которое был ответ.
+    /// </summary>
     private int? GetReplyToMessageIdFromData(object data)
     {
         if (data is not null && data is Update update
@@ -115,6 +137,9 @@ public class BotChatHistoryService
         return null;
     }
     
+    /// <summary>
+    /// Получить inline-клавиатуру из результата.
+    /// </summary>
     private IEnumerable<IEnumerable<InlineKeyboardButton>>? GetInlineKeyboardFromResult(object? result)
     {
         if (result is not null 

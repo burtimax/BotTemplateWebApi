@@ -21,8 +21,18 @@ using Quartz;
 
 namespace MultipleBotFramework.Extensions;
 
+/// <summary>
+/// Расширения для IServiceCollection, добавляющие сервисы бота.
+/// </summary>
 public static class IServiceCollectionExtension
 {
+    /// <summary>
+    /// Добавляет сервисы бота в коллекцию сервисов.
+    /// </summary>
+    /// <param name="services">Коллекция сервисов</param>
+    /// <param name="configuration">Конфигурация приложения</param>
+    /// <param name="claims">Дополнительные утверждения</param>
+    /// <returns>Коллекция сервисов</returns>
     public static IServiceCollection AddBot(this IServiceCollection services, IConfiguration configuration,
         IEnumerable<ClaimValue>? claims = null)
     {
@@ -69,6 +79,11 @@ public static class IServiceCollectionExtension
         return services;
     }
     
+    /// <summary>
+    /// Добавляет сервисы для работы с несколькими ботами.
+    /// </summary>
+    /// <param name="services">Коллекция сервисов</param>
+    /// <returns>Коллекция сервисов</returns>
     public static IServiceCollection AddMultipleBotServices(this IServiceCollection services)
     {
         // Регистрируем сервисы.
@@ -83,6 +98,12 @@ public static class IServiceCollectionExtension
         return services;
     }
     
+    /// <summary>
+    /// Добавляет контекст базы данных для нескольких ботов.
+    /// </summary>
+    /// <param name="services">Коллекция сервисов</param>
+    /// <param name="dbConnection">Строка подключения к базе данных</param>
+    /// <returns>Коллекция сервисов</returns>
     public static IServiceCollection AddMultipleBotDb(this IServiceCollection services, string dbConnection)
     {
         /// Регистрируем контекст
@@ -93,6 +114,11 @@ public static class IServiceCollectionExtension
         return services;
     }
     
+    /// <summary>
+    /// Добавляет сервисы для работы с рассылками.
+    /// </summary>
+    /// <param name="services">Коллекция сервисов</param>
+    /// <param name="configuration">Конфигурация приложения</param>
     public static void AddBroadcast(this IServiceCollection services, IConfiguration configuration)
     {
         var settings = configuration.GetSection(BroadcastConfiguration.Section).Get<BroadcastConfiguration>();
@@ -112,6 +138,11 @@ public static class IServiceCollectionExtension
         AddQuartzBroadcast(services);
     }
     
+    /// <summary>
+    /// Добавляет сервисы для работы с реферальной программой.
+    /// </summary>
+    /// <param name="services">Коллекция сервисов</param>
+    /// <param name="configuration">Конфигурация приложения</param>
     public static void AddReferrals(this IServiceCollection services, IConfiguration configuration)
     {
         var settings = configuration.GetSection(BotReferralConfiguration.Section).Get<BotReferralConfiguration>();
@@ -130,6 +161,10 @@ public static class IServiceCollectionExtension
         services.AddTransient<IReferralCodeService, ReferralCodeService>();
     }
     
+    /// <summary>
+    /// Добавляет планировщик задач Quartz для рассылок.
+    /// </summary>
+    /// <param name="services">Коллекция сервисов</param>
     private static void AddQuartzBroadcast(IServiceCollection services)
     {
         services.AddQuartz(quartzConfigurator =>

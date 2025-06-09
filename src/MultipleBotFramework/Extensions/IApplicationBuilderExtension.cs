@@ -12,8 +12,18 @@ using MultipleBotFramework.Options;
 
 namespace MultipleBotFramework.Extensions;
 
+/// <summary>
+/// Расширения для IApplicationBuilder, добавляющие функциональность бота.
+/// </summary>
 public static class IApplicationBuilderExtension
 {
+    /// <summary>
+    /// Настраивает приложение для работы с ботом, включая локализацию, рассылки и реферальную программу.
+    /// </summary>
+    /// <param name="builder">Построитель приложения</param>
+    /// <param name="defaultCulture">Культура по умолчанию</param>
+    /// <param name="supportedCultures">Поддерживаемые культуры</param>
+    /// <returns>Построитель приложения</returns>
     public static IApplicationBuilder UseBot(this IApplicationBuilder builder, CultureInfo defaultCulture = null, CultureInfo[] supportedCultures = null)
     {
         builder.UseMiddleware<LocalizationMiddleware>();
@@ -49,6 +59,11 @@ public static class IApplicationBuilderExtension
         return builder;
     }
     
+    /// <summary>
+    /// Настраивает приложение для работы с рассылками.
+    /// </summary>
+    /// <param name="builder">Построитель приложения</param>
+    /// <returns>Построитель приложения</returns>
     public static IApplicationBuilder UseBroadcast(this IApplicationBuilder builder)
     {
         using (var scope = builder.ApplicationServices.CreateScope())
@@ -63,6 +78,11 @@ public static class IApplicationBuilderExtension
         return builder;
     }
     
+    /// <summary>
+    /// Настраивает приложение для работы с реферальной программой.
+    /// </summary>
+    /// <param name="builder">Построитель приложения</param>
+    /// <returns>Построитель приложения</returns>
     public static IApplicationBuilder UseReferral(this IApplicationBuilder builder)
     {
         using (var scope = builder.ApplicationServices.CreateScope())

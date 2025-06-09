@@ -16,17 +16,32 @@ using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Services;
 
+/// <summary>
+/// Сервис для управления и отправки уведомлений ботом.
+/// </summary>
 public class BotNotificationService : IBotNotificationService
 {
     private readonly BroadcastDbContext _db;
     private readonly BotDbContext _botDb;
 
+    /// <summary>
+    /// Конструктор сервиса уведомлений.
+    /// </summary>
+    /// <param name="db">Контекст базы данных рассылок</param>
+    /// <param name="botDb">Контекст основной базы данных бота</param>
     public BotNotificationService(BroadcastDbContext db, BotDbContext botDb)
     {
         _db = db;
         _botDb = botDb;
     }
 
+    /// <summary>
+    /// Добавляет уведомление для отправки сохранённого сообщения.
+    /// </summary>
+    /// <param name="botId">ID бота</param>
+    /// <param name="chatId">ID чата для отправки</param>
+    /// <param name="savedMessageId">ID сохранённого сообщения</param>
+    /// <param name="type">Тип уведомления</param>
     public async Task AddNotification(long botId, long chatId, long savedMessageId, string? type = null)
     {
         BotNotification notification = new()
@@ -42,6 +57,15 @@ public class BotNotificationService : IBotNotificationService
         return;
     }
     
+    /// <summary>
+    /// Добавляет уведомление для копирования сообщения из другого чата.
+    /// </summary>
+    /// <param name="botId">ID бота</param>
+    /// <param name="chatId">ID чата для отправки</param>
+    /// <param name="fromChatId">ID исходного чата</param>
+    /// <param name="fromMessageId">ID исходного сообщения</param>
+    /// <param name="replyMarkup">Клавиатура для сообщения</param>
+    /// <param name="type">Тип уведомления</param>
     public async Task AddNotification(long botId, long chatId, long fromChatId, int fromMessageId, ReplyMarkup? replyMarkup = null, string? type = null)
     {
         BotNotification notification = new()
@@ -58,6 +82,15 @@ public class BotNotificationService : IBotNotificationService
         return;
     }
     
+    /// <summary>
+    /// Добавляет уведомление с текстом и (опционально) фото.
+    /// </summary>
+    /// <param name="botId">ID бота</param>
+    /// <param name="chatId">ID чата для отправки</param>
+    /// <param name="text">Текст сообщения</param>
+    /// <param name="photoFileId">ID файла фото</param>
+    /// <param name="replyMarkup">Клавиатура для сообщения</param>
+    /// <param name="type">Тип уведомления</param>
     public async Task AddNotification(long botId, long chatId, string text, string? photoFileId = null, ReplyMarkup? replyMarkup = null, string? type = null)
     {
         BotNotification notification = new()
@@ -75,18 +108,31 @@ public class BotNotificationService : IBotNotificationService
         return;
     }
 
+    /// <summary>
+    /// Получает токен бота по его ID.
+    /// </summary>
+    /// <param name="botId">ID бота</param>
+    /// <returns>Токен бота</returns>
     private async Task<string> GetBotToken(long botId)
     {
         var bot = await _botDb.Bots.FirstAsync(b => b.Id == botId);
         return bot.Token;
     }
     
+    /// <summary>
+    /// Добавляет уведомление в базу данных.
+    /// </summary>
+    /// <param name="notification">Уведомление</param>
     public async Task AddNotification(BotNotification notification)
     {
         _db.BotNotifications.Add(notification);
         await _db.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Получает следующее новое уведомление для отправки.
+    /// </summary>
+    /// <returns>Следующее уведомление или null</returns>
     public async Task<BotNotification?> GetNextNotification()
     {
         return await _db.BotNotifications.Where(n => n.Status == BotNotificationStatus.New)
@@ -95,13 +141,10 @@ public class BotNotificationService : IBotNotificationService
     }
 
     /// <summary>
-    /// Используется для отправки следующего в очереди уведомления.
+    /// Отправляет следующее уведомление из очереди.
     /// </summary>
-    /// <remarks>
-    /// Этот метод использует <see cref="BroadcastNotificationJob"/>
-    /// </remarks>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
+    /// <returns>Результат отправки</returns>
+    /// <exception cref="Exception">В случае внутренних ошибок</exception>
     public async Task<SendNotificationResult> SendNextNotification()
     {
         bool success = false;
@@ -190,6 +233,9 @@ public class BotNotificationService : IBotNotificationService
         return success ? SendNotificationResult.Success : SendNotificationResult.Failed;
     }
 
+    /// <summary>
+    /// Возможные результаты отправки уведомления.
+    /// </summary>
     public enum SendNotificationResult
     {
         Nothing = 0,
