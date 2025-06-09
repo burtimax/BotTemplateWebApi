@@ -1,10 +1,23 @@
-﻿using System.Linq.Expressions;
+﻿/// <summary>
+/// Расширения для работы с IQueryable.
+/// Предоставляет методы для условной фильтрации и сортировки запросов.
+/// </summary>
+
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 namespace MultipleBotFrameworkEndpoints.Extensions;
 
 public static class IQueryableExtensions
 {
+    /// <summary>
+    /// Применяет условие фильтрации к запросу только если указанное условие истинно
+    /// </summary>
+    /// <typeparam name="TSource">Тип элементов в запросе</typeparam>
+    /// <param name="source">Исходный запрос</param>
+    /// <param name="condition">Условие применения фильтра</param>
+    /// <param name="predicate">Предикат фильтрации</param>
+    /// <returns>Отфильтрованный запрос или исходный запрос, если условие ложно</returns>
     public static IQueryable<TSource> WhereIf<TSource>(
         this IQueryable<TSource> source,
         bool condition,
@@ -16,6 +29,15 @@ public static class IQueryableExtensions
             return source;
     }
     
+    /// <summary>
+    /// Применяет условную трансформацию к запросу
+    /// </summary>
+    /// <typeparam name="T">Тип элементов в запросе</typeparam>
+    /// <param name="query">Исходный запрос</param>
+    /// <param name="condition">Условие применения трансформации</param>
+    /// <param name="whenTrue">Функция трансформации при истинном условии</param>
+    /// <param name="whenFalse">Опциональная функция трансформации при ложном условии</param>
+    /// <returns>Трансформированный запрос</returns>
     public static IQueryable<T> When<T>(this IQueryable<T> query, bool condition,
         Func<IQueryable<T>, IQueryable<T>> whenTrue, 
         Func<IQueryable<T>, IQueryable<T>>? whenFalse = null)
@@ -33,12 +55,13 @@ public static class IQueryableExtensions
     }
 
     /// <summary>
-    /// Сортировка елементов.
+    /// Применяет сортировку к запросу на основе строки с параметрами сортировки
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="order">Строка "+PropertyName1,-PropertyName2,+PropertyName3"</param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="T">Тип элементов в запросе</typeparam>
+    /// <param name="source">Исходный запрос</param>
+    /// <param name="order">Строка с параметрами сортировки в формате "+PropertyName1,-PropertyName2,+PropertyName3"</param>
+    /// <returns>Отсортированный запрос</returns>
+    /// <exception cref="Exception">Выбрасывается при неверном формате строки сортировки</exception>
     public static IQueryable<T> Order<T>(this IQueryable<T> source, string? order)
     {
         if (string.IsNullOrEmpty(order)) return source;
@@ -75,6 +98,15 @@ public static class IQueryableExtensions
         return Order(source, sortParams);
     }
     
+    /// <summary>
+    /// Применяет сортировку к запросу на основе списка параметров сортировки
+    /// </summary>
+    /// <typeparam name="T">Тип элементов в запросе</typeparam>
+    /// <param name="source">Исходный запрос</param>
+    /// <param name="sorting">Список параметров сортировки</param>
+    /// <returns>Отсортированный запрос</returns>
+    /// <exception cref="ArgumentNullException">Выбрасывается при null запросе</exception>
+    /// <exception cref="ArgumentException">Выбрасывается при пустом списке параметров сортировки</exception>
     public static IQueryable<T> Order<T>(this IQueryable<T> source, List<SortParam> sorting)
     {
         if (source == null)
@@ -102,6 +134,9 @@ public static class IQueryableExtensions
         return source;
     }
     
+    /// <summary>
+    /// Параметры сортировки для запроса
+    /// </summary>
     public class SortParam
     {
         /// <summary>

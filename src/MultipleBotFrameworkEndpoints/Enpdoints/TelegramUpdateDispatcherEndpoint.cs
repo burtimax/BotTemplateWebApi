@@ -1,4 +1,9 @@
-﻿using FastEndpoints;
+﻿/// <summary>
+/// Основной эндпоинт для обработки входящих обновлений от Telegram API.
+/// Отвечает за маршрутизацию и обработку всех входящих сообщений и событий.
+/// </summary>
+
+using FastEndpoints;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dispatcher;
 using MultipleBotFramework.Enums;
@@ -10,19 +15,39 @@ using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.GettingUpdates;
 
+/// <summary>
+/// Модель запроса для диспетчера обновлений Telegram
+/// </summary>
 sealed class TelegramUpdateDispatcherRequest
 {
+    /// <summary>
+    /// Идентификатор бота, для которого предназначено обновление
+    /// </summary>
     public long BotId { get; set; }
     
+    /// <summary>
+    /// Объект обновления от Telegram API
+    /// </summary>
     [FromBody]
     public Update Update { get; set; }
 }
 
+/// <summary>
+/// Модель ответа для диспетчера обновлений Telegram
+/// </summary>
 sealed class TelegramUpdateDispatcherResponse
 {
 
 }
 
+/// <summary>
+/// Эндпоинт для обработки входящих обновлений от Telegram API.
+/// Обеспечивает:
+/// - Маршрутизацию обновлений к соответствующему боту
+/// - Проверку статуса бота
+/// - Обработку технических работ
+/// - Передачу обновлений в диспетчер для дальнейшей обработки
+/// </summary>
 sealed class TelegramUpdateDispatcherEndpoint : Endpoint<TelegramUpdateDispatcherRequest>
 {
     private BotUpdateDispatcher _updateDispatcher;

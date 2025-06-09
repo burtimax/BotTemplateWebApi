@@ -1,4 +1,8 @@
-﻿using FastEndpoints;
+﻿/// <summary>
+/// Эндпоинт для получения медиа-файлов из Telegram.
+/// </summary>
+
+using FastEndpoints;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.StaticFiles;
@@ -10,23 +14,45 @@ using MultipleBotFramework.Services.Interfaces;
 
 namespace MultipleBotFrameworkEndpoints.Enpdoints.Media.GetMedia;
 
+/// <summary>
+/// Модель запроса для получения медиа-файла
+/// </summary>
 sealed class GetMediaRequest 
 {
+    /// <summary>
+    /// Идентификатор бота
+    /// </summary>
     public long BotId { get; set; }
+    
+    /// <summary>
+    /// Идентификатор файла в Telegram
+    /// </summary>
     public string FileId { get; set; }
 }
 
+/// <summary>
+/// Эндпоинт для получения медиа-файлов из Telegram.
+/// Скачивает файл из Telegram и отправляет его клиенту с правильными заголовками.
+/// </summary>
 sealed class GetMediaEndpoint : Endpoint<GetMediaRequest, List<BotUserEntity>>
 {
     private BotDbContext _db;
     private IBotsManagerService _botsManagerService;
 
+    /// <summary>
+    /// Инициализирует эндпоинт получения медиа-файла
+    /// </summary>
+    /// <param name="db">Контекст базы данных</param>
+    /// <param name="botsManagerService">Сервис управления ботами</param>
     public GetMediaEndpoint(BotDbContext db, IBotsManagerService botsManagerService)
     {
         _db = db;
         _botsManagerService = botsManagerService;
     }
 
+    /// <summary>
+    /// Настраивает параметры эндпоинта
+    /// </summary>
     public override void Configure()
     {
         Get("/media/{BotId}/{FileId}");
@@ -39,6 +65,12 @@ sealed class GetMediaEndpoint : Endpoint<GetMediaRequest, List<BotUserEntity>>
         });
     }
 
+    /// <summary>
+    /// Обрабатывает запрос на получение медиа-файла
+    /// </summary>
+    /// <param name="r">Данные запроса</param>
+    /// <param name="c">Токен отмены</param>
+    /// <exception cref="Exception">Выбрасывается при отсутствии бота или невозможности получить клиент бота</exception>
     public override async Task HandleAsync(GetMediaRequest r, CancellationToken c)
     {
         BotEntity? bot = await _botsManagerService.GetBotById(r.BotId);

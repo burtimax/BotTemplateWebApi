@@ -1,4 +1,8 @@
-﻿using System.ComponentModel;
+﻿/// <summary>
+/// Эндпоинт для отправки текстового сообщения через бота.
+/// </summary>
+
+using System.ComponentModel;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Constants;
@@ -14,30 +18,46 @@ using MultipleTestBot.Endpoints.Bot;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 
+/// <summary>
+/// Модель запроса для отправки текстового сообщения
+/// </summary>
 public class SendTextMessageRequest
 {
     /// <summary>
-    /// ИД сущности чата.
+    /// ID чата для отправки сообщения
     /// </summary>
     public long ChatId { get; set; }
     
     /// <summary>
-    /// HTML текст сообщения.
+    /// Текст сообщения в формате HTML
     /// </summary>
     public string Text { get; set; }
 }
 
+/// <summary>
+/// Эндпоинт для отправки текстового сообщения через бота.
+/// Позволяет отправить сообщение от имени бота в указанный чат.
+/// Сообщение сохраняется в истории чата.
+/// </summary>
 public class SendTextMessageEndpoint : Endpoint<SendTextMessageRequest, BotChatHistoryEntity>
 {
     private IBotsManagerService _botsManagerService;
     private BotDbContext _db;
 
+    /// <summary>
+    /// Инициализирует эндпоинт отправки текстового сообщения
+    /// </summary>
+    /// <param name="botsManagerService">Сервис управления ботами</param>
+    /// <param name="db">Контекст базы данных</param>
     public SendTextMessageEndpoint(IBotsManagerService botsManagerService, BotDbContext db)
     {
         _botsManagerService = botsManagerService;
         _db = db;
     }
 
+    /// <summary>
+    /// Настраивает параметры эндпоинта
+    /// </summary>
     public override void Configure()
     {
         Post("/send-text-message");
@@ -50,6 +70,12 @@ public class SendTextMessageEndpoint : Endpoint<SendTextMessageRequest, BotChatH
         });
     }
 
+    /// <summary>
+    /// Обрабатывает запрос на отправку текстового сообщения
+    /// </summary>
+    /// <param name="r">Данные запроса</param>
+    /// <param name="c">Токен отмены</param>
+    /// <exception cref="Exception">Выбрасывается при пустом тексте сообщения, если чат не найден или бот не зарегистрирован</exception>
     public override async Task HandleAsync(SendTextMessageRequest r, CancellationToken c)
     {
         if (string.IsNullOrEmpty(r.Text.Trim(' '))) throw new Exception("Текст сообщения не должен быть пустой");
