@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,8 @@ public class BroadcastTaskService : IBroadcastTaskService
     public async Task<BroadcastTask?> GetNextBroadcastTask()
     {
         return await _db.BroadcastTasks.Where(t => t.Status == BroadcastTaskStatus.New ||
-                                             t.Status == BroadcastTaskStatus.InProcess)
+                                             t.Status == BroadcastTaskStatus.InProcess && 
+                                             t.StartAt >= DateTimeOffset.Now)
             .OrderBy(t => t.CreatedAt)
             .FirstOrDefaultAsync();
     }
@@ -60,7 +62,7 @@ public class BroadcastTaskService : IBroadcastTaskService
     }
 
     public async Task<BroadcastTask?> NewBroadcastTask(string botToken, long botId, Message message,
-        List<long> chatIds, ReplyMarkup? replyMarkup)
+        List<long> chatIds, ReplyMarkup? replyMarkup, DateTimeOffset? startAt = null)
     {
         if (chatIds == null || chatIds.Any() == false) return null;
         List<BroadcastMessage> messages = chatIds.Distinct().Select(c => new BroadcastMessage()
@@ -80,6 +82,7 @@ public class BroadcastTaskService : IBroadcastTaskService
                 message.Voice?.FileId ?? message.VideoNote?.FileId ?? message.Document?.FileId,
             ReplyMarkupJson = replyMarkup?.ToJson(),
             Messages = messages,
+            StartAt = startAt ?? DateTimeOffset.Now,
         };
         
         _db.BroadcastTasks.Add(brTask);

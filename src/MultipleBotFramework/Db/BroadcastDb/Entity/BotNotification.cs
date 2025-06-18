@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using MultipleBotFramework.Db.Entity;
 
 namespace MultipleBotFramework.Db.BroadcastDb.Entity;
@@ -16,6 +18,10 @@ public class BotNotification : BaseEntity<long>
     /// </summary>
     public string? Type { get; set; }
     /// <summary>
+    /// Ключ уведомления (альтернативный идентификатор).
+    /// </summary>
+    public string? Key { get; set; }
+    /// <summary>
     /// Если это пересылаемое сообщение.
     /// </summary>
     public long? FromChatId { get; set; }
@@ -30,9 +36,16 @@ public class BotNotification : BaseEntity<long>
     public string? PhotoFileId { get; set; }
     public string? Text { get; set; }
     public string? ReplyMarkupJson { get; set; }
-    
+    /// <summary>
+    /// Ошибки при отправке уведомлений.
+    /// </summary>
     public string? ErrorLog { get; set; }
     public BotNotificationStatus Status { get; set; }
+    
+    /// <summary>
+    /// Когда нужно отправить уведомление?
+    /// </summary>
+    public DateTimeOffset SendAt { get; set; }
 }
 
 public enum BotNotificationStatus

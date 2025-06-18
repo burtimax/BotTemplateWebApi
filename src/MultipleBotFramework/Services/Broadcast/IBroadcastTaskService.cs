@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MultipleBotFramework.Db.BroadcastDb.Entity;
 using Telegram.BotAPI.AvailableTypes;
@@ -14,5 +15,5 @@ public interface IBroadcastTaskService
     public Task TerminateBroadcastTask(long broadcastTaskId);
 
     public Task<BroadcastTask?> NewBroadcastTask(string botToken, long botId, Message message,
-        List<long> chatIds, ReplyMarkup? replyMarkup);
+        List<long> chatIds, ReplyMarkup? replyMarkup, DateTimeOffset? startAt = null);
 }

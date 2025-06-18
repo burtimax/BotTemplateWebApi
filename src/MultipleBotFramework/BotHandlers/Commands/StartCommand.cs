@@ -33,6 +33,12 @@ public class StartCommand : BaseBotHandler
 
     public override async Task HandleBotRequest(Update update)
     {
-        await BotClient.SendMessageAsync(Chat.ChatId, "Default framework handler", parseMode:ParseMode.Html);
+#if DEBUG
+        try
+        {
+            await BotClient.SendMessageAsync(Chat.ChatId, "Default framework handler", parseMode:ParseMode.Html);
+        }
+        catch (Exception e) { }
+#endif
     }
 }

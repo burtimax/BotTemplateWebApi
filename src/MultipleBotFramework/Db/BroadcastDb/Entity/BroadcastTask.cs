@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using MultipleBotFramework.Db.Entity;
 
 namespace MultipleBotFramework.Db.BroadcastDb.Entity;
@@ -13,6 +15,10 @@ public class BroadcastTask : BaseEntity<long>
     public string? Text { get; set; }
     public string? ReplyMarkupJson { get; set; }
     public BroadcastTaskStatus Status { get; set; }
+    /// <summary>
+    /// Когда можно начать рассылку.
+    /// </summary>
+    public DateTimeOffset StartAt { get; set; }
     
     public List<BroadcastMessage>? Messages { get; set; }
 }

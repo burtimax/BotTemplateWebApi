@@ -42,15 +42,18 @@ public class BotNotificationService : IBotNotificationService
     /// <param name="chatId">ID чата для отправки</param>
     /// <param name="savedMessageId">ID сохранённого сообщения</param>
     /// <param name="type">Тип уведомления</param>
-    public async Task AddNotification(long botId, long chatId, long savedMessageId, string? type = null)
+    public async Task AddNotification(long botId, long chatId, long savedMessageId, 
+        DateTimeOffset? sendAt = null, string? type = null, string? key = null)
     {
         BotNotification notification = new()
         {
             BotId = botId,
             BotToken = await GetBotToken(botId),
             SendToChatId = chatId,
+            SendAt = sendAt ?? DateTimeOffset.MinValue,
             SavedMessageId = savedMessageId,
             Type = type,
+            Key = key,
             Status = BotNotificationStatus.New
         };
         await AddNotification(notification);
@@ -66,16 +69,19 @@ public class BotNotificationService : IBotNotificationService
     /// <param name="fromMessageId">ID исходного сообщения</param>
     /// <param name="replyMarkup">Клавиатура для сообщения</param>
     /// <param name="type">Тип уведомления</param>
-    public async Task AddNotification(long botId, long chatId, long fromChatId, int fromMessageId, ReplyMarkup? replyMarkup = null, string? type = null)
+    public async Task AddNotification(long botId, long chatId, long fromChatId, int fromMessageId, ReplyMarkup? replyMarkup = null, 
+        DateTimeOffset? sendAt = null, string? type = null, string? key = null)
     {
         BotNotification notification = new()
         {
             BotId = botId,
             BotToken = await GetBotToken(botId),
             SendToChatId = chatId,
+            SendAt = sendAt ?? DateTimeOffset.MinValue,
             FromChatId = fromChatId,
             FromMessageId = fromMessageId,
             Type = type,
+            Key = key,
             Status = BotNotificationStatus.New
         };
         await AddNotification(notification);
@@ -91,17 +97,20 @@ public class BotNotificationService : IBotNotificationService
     /// <param name="photoFileId">ID файла фото</param>
     /// <param name="replyMarkup">Клавиатура для сообщения</param>
     /// <param name="type">Тип уведомления</param>
-    public async Task AddNotification(long botId, long chatId, string text, string? photoFileId = null, ReplyMarkup? replyMarkup = null, string? type = null)
+    public async Task AddNotification(long botId, long chatId, string text, string? photoFileId = null, ReplyMarkup? replyMarkup = null, 
+        DateTimeOffset? sendAt = null, string? type = null, string? key = null)
     {
         BotNotification notification = new()
         {
             BotId = botId,
             BotToken = await GetBotToken(botId),
             SendToChatId = chatId,
+            SendAt = sendAt ?? DateTimeOffset.MinValue,
             Text = text,
             PhotoFileId = photoFileId,
             ReplyMarkupJson = replyMarkup?.ToJson() ?? null,
             Type = type,
+            Key = key,
             Status = BotNotificationStatus.New
         };
         await AddNotification(notification);
@@ -135,7 +144,8 @@ public class BotNotificationService : IBotNotificationService
     /// <returns>Следующее уведомление или null</returns>
     public async Task<BotNotification?> GetNextNotification()
     {
-        return await _db.BotNotifications.Where(n => n.Status == BotNotificationStatus.New)
+        return await _db.BotNotifications.Where(n => n.Status == BotNotificationStatus.New
+            && n.SendAt <= DateTimeOffset.Now)
             .OrderBy(n => n.Id)
             .FirstOrDefaultAsync();
     }

@@ -34,14 +34,20 @@ public class BroadcastNotificationJob : IJob
     private readonly IBotNotificationService _botNotificationService;
     private readonly BroadcastDbContext _db;
     private readonly BotDbContext _botDb;
+    private readonly IBotsManagerService _botsManagerService;
     
     public BroadcastNotificationJob(BroadcastConfiguration configuration,
-        IBroadcastTaskService broadcastTaskService, BroadcastDbContext db, BotDbContext botDb, IBotNotificationService botNotificationService)
+        IBroadcastTaskService broadcastTaskService, 
+        BroadcastDbContext db, 
+        BotDbContext botDb, 
+        IBotNotificationService botNotificationService, 
+        IBotsManagerService botsManagerService)
     {
         _broadcastTaskService = broadcastTaskService;
         _db = db;
         _botDb = botDb;
         _botNotificationService = botNotificationService;
+        _botsManagerService = botsManagerService;
         _config = configuration;
     }
     
@@ -75,7 +81,10 @@ public class BroadcastNotificationJob : IJob
         
         await _broadcastTaskService.StartBroadcastTask(broadcastTask.Id);
         
-        ITelegramBotClient botClient = new TelegramBotClient(broadcastTask.BotToken);
+        ITelegramBotClient? botClient = await _botsManagerService.GetBotClientById(broadcastTask.BotId);
+        
+        if (botClient == null)
+            botClient = new TelegramBotClient(broadcastTask.BotToken);
         
         InlineKeyboardMarkup? reply = string.IsNullOrEmpty(broadcastTask.ReplyMarkupJson) ? null : broadcastTask.ReplyMarkupJson.FromJson<InlineKeyboardMarkup>(); 
         
