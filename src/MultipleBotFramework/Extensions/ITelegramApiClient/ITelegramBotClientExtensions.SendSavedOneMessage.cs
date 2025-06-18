@@ -62,7 +62,7 @@ public static partial class ITelegramBotClientExtensions
             document: mes.Document!.FileId,
             caption:mes.Caption,
             captionEntities: mes.CaptionEntities,
-            replyMarkup: replyMarkup
+            replyMarkup: replyMarkup ?? mes.ReplyMarkup
         );
     }
     
@@ -78,7 +78,7 @@ public static partial class ITelegramBotClientExtensions
         await client.SendVideoNoteAsync(
             chatId:chatId,
             videoNote:mes.VideoNote!.FileId,
-            replyMarkup: replyMarkup
+            replyMarkup: replyMarkup ?? mes.ReplyMarkup
         );
     }
     
@@ -95,7 +95,7 @@ public static partial class ITelegramBotClientExtensions
             video: mes.Video!.FileId,
             caption: mes.Caption,
             captionEntities:mes.CaptionEntities,
-            replyMarkup: replyMarkup
+            replyMarkup: replyMarkup ?? mes.ReplyMarkup
             );
     }
     
@@ -111,7 +111,7 @@ public static partial class ITelegramBotClientExtensions
             chatId:chatId,
             sticker:mes.Sticker!.FileId,
             emoji:mes.Sticker.Emoji,
-            replyMarkup: replyMarkup
+            replyMarkup: replyMarkup ?? mes.ReplyMarkup
             );
     }
     
@@ -129,7 +129,7 @@ public static partial class ITelegramBotClientExtensions
             duration: mes.Voice.Duration,
             caption: mes.Caption,
             captionEntities: mes.CaptionEntities,
-            replyMarkup: replyMarkup
+            replyMarkup: replyMarkup ?? mes.ReplyMarkup
             );
     }
     
@@ -147,7 +147,7 @@ public static partial class ITelegramBotClientExtensions
             caption: mes.Caption,
             captionEntities: mes.CaptionEntities,
             hasSpoiler: mes.HasMediaSpoiler,
-            replyMarkup: replyMarkup
+            replyMarkup: replyMarkup ?? mes.ReplyMarkup
             );
     }
     
@@ -164,7 +164,7 @@ public static partial class ITelegramBotClientExtensions
             text: mes.Text!,
             entities: mes.Entities,
             linkPreviewOptions: new LinkPreviewOptions(){IsDisabled = true},
-            replyMarkup: replyMarkup
+            replyMarkup: replyMarkup ?? mes.ReplyMarkup
             );
     }
 
@@ -182,7 +182,7 @@ public static partial class ITelegramBotClientExtensions
             caption:mes.Caption,
             captionEntities:mes.CaptionEntities,
             duration: mes.Audio.Duration,
-            replyMarkup: replyMarkup
+            replyMarkup: replyMarkup ?? mes.ReplyMarkup
             );
     }
     
@@ -199,7 +199,7 @@ public static partial class ITelegramBotClientExtensions
             animation:mes.Animation!.FileId, 
             caption:mes.Caption,
             captionEntities:mes.CaptionEntities,
-            replyMarkup: replyMarkup
+            replyMarkup: replyMarkup ?? mes.ReplyMarkup
             );
     }
 }

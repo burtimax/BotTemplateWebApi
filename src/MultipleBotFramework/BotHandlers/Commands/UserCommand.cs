@@ -31,7 +31,7 @@ public class UserCommand : BaseBotHandler
 
     public UserCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        _botConfiguration = serviceProvider.GetRequiredService<BotConfiguration>();
         _baseBotRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
     }
 
@@ -69,7 +69,7 @@ public class UserCommand : BaseBotHandler
     /// </summary>
     public static string GetUserDataString(BotUserEntity userEntity, BotChatEntity chatEntity, IEnumerable<BotClaimEntity>? claims)
     {
-        string blocked = userEntity.IsBlocked ? "заблокирован" : "активен";
+        string blocked = chatEntity.IsBlocked ? "заблокирован" : "активен";
 
         StringBuilder sb = new();
         sb.AppendLine($"<b>Пользователь</b>: <code>{userEntity.TelegramId}</code>");

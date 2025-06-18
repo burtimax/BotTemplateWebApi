@@ -27,7 +27,7 @@ public class GetMessageInfoCommand : BaseBotHandler
     
     public GetMessageInfoCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        _dbConnection = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value.DbConnection;
+        _dbConnection = serviceProvider.GetRequiredService<BotConfiguration>().DbConnection;
     }
 
     public override async Task HandleBotRequest(Update update)

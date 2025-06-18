@@ -1,4 +1,8 @@
-﻿using FastEndpoints;
+﻿/// <summary>
+/// Эндпоинт для получения списка чатов с поддержкой пагинации, фильтрации и сортировки.
+/// </summary>
+
+using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
@@ -8,22 +12,50 @@ using MultipleTestBot.Endpoints.Bot;
 
 namespace MultipleBotFrameworkEndpoints.Enpdoints.Chat.GetChats;
 
+/// <summary>
+/// Модель запроса для получения списка чатов
+/// </summary>
 public class GetChatsRequest : Pagination, IOrdered
 {
+    /// <summary>
+    /// Список ID ботов для фильтрации
+    /// </summary>
     public List<long>? BotIds { get; set; }
+    
+    /// <summary>
+    /// Список ID чатов для фильтрации
+    /// </summary>
     public List<long>? Ids { get; set; }
+    
+    /// <summary>
+    /// Параметр сортировки
+    /// </summary>
     public string? Order { get; set; }
 }
 
+/// <summary>
+/// Эндпоинт для получения списка чатов.
+/// Поддерживает:
+/// - Пагинацию результатов
+/// - Фильтрацию по ботам и ID чатов
+/// - Сортировку результатов
+/// </summary>
 public class GetChatsEndpoint : Endpoint<GetChatsRequest, PagedList<BotChatEntity>>
 {
     private BotDbContext _db;
 
+    /// <summary>
+    /// Инициализирует эндпоинт получения списка чатов
+    /// </summary>
+    /// <param name="db">Контекст базы данных</param>
     public GetChatsEndpoint(BotDbContext db)
     {
         _db = db;
     }
 
+    /// <summary>
+    /// Настраивает параметры эндпоинта
+    /// </summary>
     public override void Configure()
     {
         Get("/get");
@@ -36,6 +68,11 @@ public class GetChatsEndpoint : Endpoint<GetChatsRequest, PagedList<BotChatEntit
         });
     }
 
+    /// <summary>
+    /// Обрабатывает запрос на получение списка чатов
+    /// </summary>
+    /// <param name="r">Данные запроса</param>
+    /// <param name="c">Токен отмены</param>
     public override async Task HandleAsync(GetChatsRequest r, CancellationToken c)
     {
         var query = _db.Chats

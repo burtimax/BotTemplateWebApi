@@ -8,6 +8,7 @@ using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Base;
 using MultipleBotFramework.Db.Entity;
 using MultipleBotFramework.Dispatcher.HandlerResolvers;
+using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
 using Telegram.BotAPI.AvailableMethods;
@@ -21,37 +22,38 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// </summary>
 [BotHandler(command:Name, version:1f, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserBlock})]
 [BotCommand(command:Name, version: 1.0f, RequiredUserClaims = new []{BotConstants.BaseBotClaims.BotUserBlock})]
-public class BlockUserCommand: BaseBotHandler
+public class BlockChatCommand: BaseBotHandler
 {
     internal const string Name = "/block";
 
     private readonly BotConfiguration _botConfiguration;
     private readonly IBaseBotRepository _baseBotRepository;
     
-    public BlockUserCommand(IServiceProvider serviceProvider) : base(serviceProvider)
+    public BlockChatCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        HandlerDescription = BlockCommandDescription;
+        _botConfiguration = serviceProvider.GetRequiredService<BotConfiguration>();
         _baseBotRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
     }
 
     public override async Task HandleBotRequest(Update update)
     {
         string command = update.Message.Text?.Trim(' ', '.');
-        string[] users = command.Split(' ', ',', '.')[1..];
+        string[] chats = command.Split(' ', ',', '.')[1..];
 
-        if (users == null || users.Any() == false)
+        if (chats == null || chats.Any() == false)
         {
-            await BotClient.SendMessageAsync(Chat.ChatId, "Необходимо указать параметры команды.\n" +
-                                                        "Например [/block {@user|user_id} {@user|user_id} ...]");
+            await BotClient.SendMessageAsync(Chat.ChatId, BlockCommandTutorial);
             return;
         }
 
-        List<BotUserEntity> usersToBlock = new ();
+        List<BotChatEntity> chatsToBlock = new ();
 
-        foreach (string userIdentity in users)
+        foreach (string chatIdStr in chats)
         {
-            BotUserEntity? user = await _baseBotRepository.GetUserByIdentity(BotId, userIdentity);
-            IEnumerable<BotClaimEntity> userClaims = await _baseBotRepository.GetUserClaims(BotId, user.Id);
+            long chatId = long.Parse(chatIdStr);
+            BotChatEntity? chat = await _baseBotRepository.GetChatById(BotId, chatId);
+            IEnumerable<BotClaimEntity> userClaims = await _baseBotRepository.GetUserClaims(BotId, chat.Id);
             
             // Админов нельзя блокировать.
             if (userClaims!= null && 
@@ -60,22 +62,18 @@ public class BlockUserCommand: BaseBotHandler
                 continue;
             }
 
-            if (user == null)
+            if (chat == null)
             {
-                await BotClient.SendMessageAsync(Chat.ChatId, $"Не найден пользователь [{userIdentity}].\n" + 
-                                                                  "Необходимо указать параметры команды.\n" +
-                                                                  "Например [/block {@user|user_id} {@user|user_id} ...]");
+                await BotClient.SendMessageAsync(Chat.ChatId, ErrNotFoundChat.F(chatId) + "\n" + BlockCommandTutorial);
                 return;
             }
             
-            usersToBlock.Add(user);
+            chatsToBlock.Add(chat);
         }
-
         
-        
-        await _baseBotRepository.BlockUsers(BotId, usersToBlock.Select(u => u.Id).ToArray());
+        await _baseBotRepository.BlockChats(BotId, chatsToBlock.Select(u => u.Id).ToArray());
 
-        await BotClient.SendMessageAsync(Chat.ChatId, "Пользователи заблокированы.");
+        await BotClient.SendMessageAsync(Chat.ChatId, "Чаты заблокированы.");
     }
     
 }

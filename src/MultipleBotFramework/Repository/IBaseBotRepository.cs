@@ -37,7 +37,7 @@ namespace MultipleBotFramework.Repository
         /// <summary>
         /// Получить пользователя по @username или по ИД.
         /// </summary>
-        /// <param name="userIdentity">Строковое представление @username или по ИД.</param>
+        /// <param name="userIdentity">Строковое представление @username или по telegram ИД.</param>
         /// <returns>Пользователь.</returns>
         Task<BotUserEntity?> GetUserByIdentity(long botId, string userIdentity);
 
@@ -45,17 +45,17 @@ namespace MultipleBotFramework.Repository
         /// Заблокировать пользователей.
         /// Установить значение параметра <see cref="BotUserEntity.IsBlocked"/> true.
         /// </summary>
-        /// <param name="userIds">Список ИД пользователей.</param>
+        /// <param name="chatIds">Список ИД пользователей.</param>
         /// <returns></returns>
-        Task BlockUsers(long botId, params long[] userIds);
+        Task BlockChats(long botId, params long[] chatIds);
         
         /// <summary>
         /// Разблокировать пользователей.
         /// Установить значение параметра <see cref="BotUserEntity.IsBlocked"/> false.
         /// </summary>
-        /// <param name="userIds">Список ИД пользователей.</param>
+        /// <param name="chatIds">Список ИД пользователей.</param>
         /// <returns></returns>
-        Task UnblockUsers(long botId, params long[] userIds);
+        Task UnblockChats(long botId, params long[] chatIds);
 
         /// <summary>
         /// Получить пользователей, у которых есть разрешение.
@@ -70,13 +70,14 @@ namespace MultipleBotFramework.Repository
         /// <param name="role"></param>
         /// <returns></returns>
         Task<IEnumerable<BotUserEntity>> GetUsersByRole(string role);
-        
+
         /// <summary>
         /// Добавить пользователя или обновить информацию по нему.
         /// Обновляет информацию (Firstname, Lastname, Username)
         /// Потому что с прошествием времени может поменяться эта информация.
         /// </summary>
-        Task<BotUserEntity?> UpsertUser(long botId, User user, ITelegramBotClient botClient);
+        public Task<(BotUserEntity user, bool userCreated)> UpsertUser(long botId, User user,
+            ITelegramBotClient botClient);
 
         /// <summary>
         /// Добавить чат или обновить информацию по нему.

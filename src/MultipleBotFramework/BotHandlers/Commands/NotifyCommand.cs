@@ -11,7 +11,6 @@ using MultipleBotFramework.Constants;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleBotFramework.Options;
-using MultipleBotFramework.Quartz.Jobs.Notification;
 using MultipleBotFramework.Services.Interfaces;
 using MultipleBotFramework.Utils;
 using Telegram.BotAPI;
@@ -25,17 +24,15 @@ namespace MultipleBotFramework.BotHandlers.Commands;
 /// </summary>
 [BotCommand(Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
 [BotHandler(command:Name, requiredUserClaims: new []{ BotConstants.BaseBotClaims.BotUserNotificationSend })]
-public class NotifyAllCommand : BaseBotHandler
+public class NotifyAllCommand : NotifyTestCommand
 {
     public const string Name = "/notify";
-
-    private readonly string _dbConnection;
-    private readonly IBotNotificationTasksService _notificationTasksService;
+    
+    private readonly IBroadcastTaskService _broadcastTaskService;
     
     public NotifyAllCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        _dbConnection = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value.DbConnection;
-        _notificationTasksService = serviceProvider.GetRequiredService<IBotNotificationTasksService>();
+        _broadcastTaskService = serviceProvider.GetRequiredService<IBroadcastTaskService>();
     }
 
     public override async Task HandleBotRequest(Update update)
@@ -46,20 +43,26 @@ public class NotifyAllCommand : BaseBotHandler
             return;
         }
 
-        var users = await BotDbContext.Users
-            .Where(u => u.IsBlocked == false && u.Status != BotUserStatus.Banned)
-            .Select(u => u.TelegramId)
-            .ToListAsync();
+        string text = update.Message.Text!.Replace(Name, "").Trim(' ');
+        bool parsed = TryParseInlineKeyboard(text, out string error, out var kb);
 
-        BotNotificationTask botTask = new()
+        if (error != null)
         {
-            BotId = BotId,
-            ChatIds = users,
-            Action = async (client, chatId) => await BotClient.CopyMessageAsync(chatId, Chat.ChatId,
-                update.Message.ReplyToMessage.MessageId)
-        };
-
-        await _notificationTasksService.AddNotificationTask(botTask);
-
+            await Answer(error);
+            return;
+        }
+        
+        var users = await BotDbContext.Chats
+            .Where(c => c.IsBlocked == false && c.Status != BotChatStatus.Banned
+              && c.Type == ChatTypes.Private && c.BotId == BotId)
+            .Select(c => c.ChatId)
+            .ToListAsync();
+        
+        await BotClient.CopyMessageAsync(Chat.ChatId, Chat.ChatId,
+            update.Message.ReplyToMessage.MessageId, replyMarkup: kb?.Build());
+        
+        await _broadcastTaskService.NewBroadcastTask(BotClient.Options.BotToken, BotId, message: update.Message.ReplyToMessage,
+            users, kb?.Build());
+        
     }
 }

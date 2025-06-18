@@ -19,18 +19,22 @@ using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Services;
 
+/// <summary>
+/// Сервис для управления ботами, их созданием, обновлением, удалением и кэшированием.
+/// </summary>
 public class BotsManagerService : IBotsManagerService
 {
     private static Dictionary<long,MyTelegramBotClient> botCache = new();
     private static bool cacheInitialized = false;
     private BotDbContext _db;
     private BotOptions _botOptions;
-    
-    public BotsManagerService(BotDbContext db, IOptions<BotOptions> botOptions,
-        IOptions<BotConfiguration> config) : this(db, botOptions.Value, config.Value)
-    {
-    }
 
+    /// <summary>
+    /// Конструктор сервиса управления ботами.
+    /// </summary>
+    /// <param name="db">Контекст базы данных бота</param>
+    /// <param name="botOptions">Опции бота</param>
+    /// <param name="config">Конфигурация бота</param>
     public BotsManagerService(BotDbContext db, BotOptions botOptions,
         BotConfiguration config)
     {
@@ -42,19 +46,29 @@ public class BotsManagerService : IBotsManagerService
             throw new Exception("Required webhook address in configuratin");
         BotWebhook.BaseAddress = c.Webhook;
         MyTelegramBotClient.BotDbConnection = c.DbConnection;
+        MyTelegramBotClient.SaveBotMessages = botOptions.SaveBotMessagesInDatabase;
     }
 
+    /// <summary>
+    /// Получить TelegramBotClient по ID бота.
+    /// </summary>
     public async Task<MyTelegramBotClient?> GetBotClientById(long botId)
     {
         if (botId == default) return null;
         return await GetFromCacheSafe(botId);
     }
 
+    /// <summary>
+    /// Получить сущность бота по ID.
+    /// </summary>
     public async Task<BotEntity?> GetBotById(long botId)
     {
         return await _db.Bots.FirstOrDefaultAsync(b => b.Id == botId);
     }
 
+    /// <summary>
+    /// Создать нового бота по токену.
+    /// </summary>
     public async Task<BotEntity> CreateBot(string token, string? comment = null, BotStatus? status = null)
     {
         token = token.Trim(' ');
@@ -86,6 +100,9 @@ public class BotsManagerService : IBotsManagerService
         return bot;
     }
     
+    /// <summary>
+    /// Обновить данные бота.
+    /// </summary>
     public async Task<BotEntity> UpdateBot(long id, string? token, string? comment = null, BotStatus? status = null)
     {
         BotEntity bot = (await _db.Bots.FirstOrDefaultAsync(b => b.Id == id)) ?? throw new Exception($"Не найден бот [{id}]");
@@ -119,6 +136,9 @@ public class BotsManagerService : IBotsManagerService
         return bot;
     }
 
+    /// <summary>
+    /// Удалить бота по ID.
+    /// </summary>
     public async Task DeleteBot(long id)
     {
         var bot = await GetBotById(id);
@@ -130,6 +150,9 @@ public class BotsManagerService : IBotsManagerService
         }
     }
     
+    /// <summary>
+    /// Обновить информацию о боте (username, описание и т.д.).
+    /// </summary>
     public async Task<BotEntity> RenewBotInfo(long botId)
     {
         BotEntity bot = (await GetBotById(botId)) ?? throw new Exception($"Не найден бот [{botId}]");
@@ -153,6 +176,9 @@ public class BotsManagerService : IBotsManagerService
         return bot;
     }
 
+    /// <summary>
+    /// Получить TelegramBotClient из кэша или обновить кэш.
+    /// </summary>
     private async Task<MyTelegramBotClient> GetFromCacheSafe(long botId)
     {
         await InitializeBotsIfNeed();
@@ -163,6 +189,9 @@ public class BotsManagerService : IBotsManagerService
         return botCache[botId];
     }
 
+    /// <summary>
+    /// Инициализировать кэш ботов, если требуется.
+    /// </summary>
     public async Task InitializeBotsIfNeed()
     {
         if(cacheInitialized) return;
@@ -177,6 +206,9 @@ public class BotsManagerService : IBotsManagerService
         cacheInitialized = true;
     }
 
+    /// <summary>
+    /// Обновить кэш для конкретного бота.
+    /// </summary>
     private async Task UpdateInCache(BotEntity bot)
     {
         if (botCache.ContainsKey(bot.Id))
@@ -214,6 +246,10 @@ public class BotsManagerService : IBotsManagerService
         {
         }
     }
+
+    /// <summary>
+    /// Обновить кэш по ID бота.
+    /// </summary>
     private async Task UpdateInCache(long botId)
     {
         var bot = await GetBotById(botId);

@@ -20,6 +20,6 @@ public class StartState : BaseMultipleTestBotState
 
     public override async Task HandleBotRequest(Update update)
     {
-        await Answer("Hello world");
+        await Answer($"STATE:{Hello}");
     }
 }

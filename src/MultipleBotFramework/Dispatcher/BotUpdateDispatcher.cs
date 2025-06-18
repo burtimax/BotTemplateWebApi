@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ using MultipleBotFramework.Options;
 using MultipleBotFramework.Repository;
 using MultipleBotFramework.Services;
 using MultipleBotFramework.Services.Interfaces;
+using MultipleBotFramework.Services.Referral;
 using MultipleBotFramework.Utils;
 using MultipleBotFramework.Utils.ExceptionHandler;
 using Telegram.BotAPI;
@@ -53,11 +55,11 @@ public class BotUpdateDispatcher
         _serviceProvider = serviceProvider;
         _botRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
         _saveUpdateService = _serviceProvider.GetRequiredService<SaveUpdateService>();
-        _botConfiguration = _serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        _botConfiguration = _serviceProvider.GetRequiredService<BotConfiguration>();
         _db = _serviceProvider.GetRequiredService<BotDbContext>();
         _chatHistoryService = serviceProvider.GetRequiredService<BotChatHistoryService>();
         var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
-        _botOptions = (_serviceProvider.GetRequiredService<IOptions<BotOptions>>())?.Value ?? new();
+        _botOptions = serviceProvider.GetRequiredService<BotOptions>();
         _savedMessageService = _serviceProvider.GetRequiredService<ISavedMessageService>();
         _logger = loggerFactory.CreateLogger("Bot");
     }
@@ -83,7 +85,32 @@ public class BotUpdateDispatcher
             Chat? telegramChat = update.GetChat();
             
             // Сохраняем или обновляем информацию о пользователе.
-            user = await _botRepository.UpsertUser(botId, telegramUser, botClient);
+            var upsertUserResult = await _botRepository.UpsertUser(botId, telegramUser, botClient);
+            user = upsertUserResult.user;
+
+            if (upsertUserResult.userCreated)
+            {
+                await AddReferralDataIfNeed(botId, telegramUser.Id);
+            }
+            
+            // Ловим реферала.
+            if ((update.Type() == UpdateType.Message || update.Type() == UpdateType.Command)
+                && string.IsNullOrEmpty(update.Message.Text) == false && update.Message.Text.StartsWith("/start"))
+            {
+                var refConfig = _serviceProvider.GetService<BotReferralConfiguration>();
+                if (refConfig is not null && refConfig.IsEnabled)
+                {
+                    var referralService = _serviceProvider.GetRequiredService<IReferralService>();
+                    bool hasRefCode = update.Message.Text.Split(" ")?.Length > 1;
+                    string? refCode = hasRefCode ? update.Message.Text.Split(" ")[1] : null;
+                    var refHandleRes = await referralService.HandleReferralCode(botId, telegramUser.Id, refCode);
+                    if (refHandleRes == ReferralProgramStatus.Succeeded)
+                    {
+                        // TODO вызвать событие нового реферала.
+                    }  
+                } 
+            }
+            
             userClaims = (await _botRepository.GetUserClaims(botId, user?.Id ?? -1))?.Select(c => new ClaimValue(c.Id, c.Name, c?.Description ?? ""));
             bool isOwner = await _botRepository.IsUserOwner(botId, user?.TelegramId ?? -1);
 
@@ -91,14 +118,18 @@ public class BotUpdateDispatcher
             if (telegramChat is not null)
             {
                 chat = existedChat ?? await _botRepository.UpsertChat(botId, telegramChat, telegramUser);
-                await _chatHistoryService.SaveInChatHistoryIfNeed(botId, chat.TelegramId, false, data:update);
+                // Сохраняем сообщение пользователя в БД.
+                if (_botOptions.SaveUserMessagesInDatabase)
+                {
+                    await _chatHistoryService.SaveInChatHistoryIfNeed(botId, chat.TelegramId, false, data:update);
+                }
             }
 
             // Если поменялся статус пользователя в боте.
-            await UserStatusUpdateIfNeeded(update, user);
+            await ChatStatusUpdateIfNeeded(update, chat);
             
             // Если пользователь заблокирован, тогда ему не отвечаем!!!
-            if (user != null && user.IsBlocked)
+            if (chat != null && chat.IsBlocked)
             {
                 // ToDo перенаправить на состояние блокированного пользователя!!!
                 if(chat != null)
@@ -175,6 +206,18 @@ public class BotUpdateDispatcher
         // Отправляем ответ пользователю
     }
 
+    private async Task AddReferralDataIfNeed(long botId, long userTelegramId)
+    {
+        // Если активна реферальная система, тогда для пользователя создаем запись о реферале.
+        BotReferralConfiguration? RefConfig = _serviceProvider.GetService<BotReferralConfiguration>();
+        if (RefConfig != null && RefConfig.IsEnabled)
+        {
+            var refService = _serviceProvider.GetService<IReferralService>();
+            // Добавляем дефолтную реф. кампанию.
+            await refService!.GetParticipantWithCampaigns(botId, userTelegramId);
+        }
+    }
+    
     /// <summary>
     /// Отправить необработанный запрос модератору.
     /// </summary>
@@ -248,7 +291,7 @@ public class BotUpdateDispatcher
         return result;
     }
 
-    private async Task UserStatusUpdateIfNeeded(Update update, BotUserEntity? user)
+    private async Task ChatStatusUpdateIfNeeded(Update update, BotChatEntity chat)
     {
         if (update.Type() != UpdateType.MyChatMember) return;
         
@@ -257,8 +300,8 @@ public class BotUpdateDispatcher
         // Пользователь зашел в бота.
         if (data.NewChatMember is not null)
         {
-            user.Status = data.NewChatMember.Status;
-            _db.Users.Update(user);
+            chat.Status = data.NewChatMember.Status;
+            _db.Chats.Update(chat);
             await _db.SaveChangesAsync();
         }
 

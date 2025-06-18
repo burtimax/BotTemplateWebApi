@@ -27,12 +27,18 @@ public class StartCommand : BaseBotHandler
 
     public StartCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        _botConfiguration = serviceProvider.GetRequiredService<BotConfiguration>();
         _baseBotRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
     }
 
     public override async Task HandleBotRequest(Update update)
     {
-        await BotClient.SendMessageAsync(Chat.ChatId, "Default framework handler", parseMode:ParseMode.Html);
+#if DEBUG
+        try
+        {
+            await BotClient.SendMessageAsync(Chat.ChatId, "Default framework handler", parseMode:ParseMode.Html);
+        }
+        catch (Exception e) { }
+#endif
     }
 }

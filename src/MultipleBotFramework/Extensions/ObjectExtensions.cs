@@ -29,4 +29,16 @@ public static class ObjectExtensions
 
         return Regex.Unescape(json);
     }
+    
+    public static T? FromJson<T>(this string jsonStr)
+    {
+        T? obj = JsonSerializer.Deserialize<T>(jsonStr, new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+        });
+
+        return obj;
+    }
 }

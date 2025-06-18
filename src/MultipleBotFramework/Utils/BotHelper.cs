@@ -46,15 +46,35 @@ public class BotHelper
     {
         if (users == null) throw new ArgumentNullException(nameof(users));
         
-        var usersIds = users.Select(u => u.Id);
-        var chats = await db.Chats.Where(c => c.BotId == botId && c.BotUserId != null && usersIds.Contains(c.BotUserId.Value)).ToListAsync();
+        var usersTelegramIds = users.Select(u => u.TelegramId);
+        var chats = await db.Chats.Where(c => c.BotId == botId && usersTelegramIds.Contains(c.TelegramId)).ToListAsync();
 
-        if (users.Count() != chats.Count) throw new Exception();
+        //if (users.Count() != chats.Count) throw new Exception();
 
         foreach (var user in users)
         {
-            var chat = chats.First(c => c.BotUserId == user.Id);
+            var chat = chats.First(c => c.TelegramId == user.TelegramId);
             await action.Invoke((user, chat));
+        }
+    }
+    
+    public static async Task ExecuteForChats(BotDbContext db, long botId, IEnumerable<long> chatIds, TaskAction<BotChatEntity> action)
+    {
+        var chats = await db.Chats.Where(c => c.BotId == botId && chatIds.Contains(c.TelegramId)).ToListAsync();
+        
+        foreach (var chat in chats)
+        {
+            await action.Invoke(chat);
+        }
+    }
+    
+    public static async Task ExecuteForChats(BotDbContext db, long botId, string chatTag, TaskAction<BotChatEntity> action)
+    {
+        var chats = await db.Chats.Where(c => c.BotId == botId && c.Tags.Contains(chatTag)).ToListAsync();
+        
+        foreach (var chat in chats)
+        {
+            await action.Invoke(chat);
         }
     }
     

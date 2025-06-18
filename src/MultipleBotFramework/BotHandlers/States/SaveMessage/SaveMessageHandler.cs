@@ -12,6 +12,7 @@ using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Services;
 using MultipleBotFramework.Services.Interfaces;
 using Telegram.BotAPI.AvailableMethods;
+using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.BotHandlers.States.SaveMessage;
@@ -57,6 +58,13 @@ internal class SaveMessageHandler : BaseBotHandler
         Chat.States.GoBack(ChatStateGoBackType.GoToPrevious);
         await _db.SaveChangesAsync();
         return;
+    }
+
+    public async Task<BotSavedMessageEntity> SaveMessage(Message message)
+    {
+        BotSavedMessageEntity savedMessageEntity = await _savedMessageService.SaveMessageFromUpdate(BotId, Chat, User, message!);
+        await BotClient.SendMessageAsync(Chat.ChatId, $"Сообщение сохранено.\nИД = [{savedMessageEntity.Id}]");
+        return savedMessageEntity;
     }
 
     private List<MessageType> GetSupportedMessageTypes() => new List<MessageType>()

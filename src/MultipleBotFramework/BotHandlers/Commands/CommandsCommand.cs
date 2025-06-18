@@ -30,7 +30,7 @@ public class CommandsCommand: BaseBotHandler
     
     public CommandsCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        _botConfiguration = serviceProvider.GetRequiredService<BotConfiguration>();
         _baseBotRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
     }
 
@@ -66,12 +66,12 @@ public class CommandsCommand: BaseBotHandler
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserBlock))
         {
             sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserBlock}</code>");
-            sb.AppendLine($"{BlockUserCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Заблокировать пользователей.</i>");
+            sb.AppendLine($"{BlockChatCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Заблокировать пользователей.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserUnblock))
         {
             sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserUnblock}</code>");
-            sb.AppendLine($"{UnblockUserCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Разблокировать пользователей.</i>");
+            sb.AppendLine($"{UnblockChatCommand.Name} <code>{{@user|user_id}} {{@user|user_id}}</code> - <i>Разблокировать пользователей.</i>");
         }
         if (HasUserClaim(BotConstants.BaseBotClaims.BotUserGet))
         {
@@ -79,12 +79,12 @@ public class CommandsCommand: BaseBotHandler
             sb.AppendLine($"{FindUserCommand.Name} <code>{{string}}</code> - <i>Искать пользователей.</i>");
             sb.AppendLine($"{MeCommand.Name} - <i>Получить информацию обо мне.</i>");
         }
-        if (HasUserClaim(BotConstants.BaseBotClaims.BotUserNotificationSend))
-        {
-            sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserNotificationSend}</code>");
-            sb.AppendLine($"{NotifyAllCommand.Name} - <i>Отправить уведомление всем пользователям (в ответ на сообщение).</i>");
-            sb.AppendLine($"{NotifyTestCommand.Name} - <i>Тестовое уведомление для меня (в ответ на сообщение).</i>");
-        }
+        // if (HasUserClaim(BotConstants.BaseBotClaims.BotUserNotificationSend))
+        // {
+        //     sb.AppendLine($"<code>{BotConstants.BaseBotClaims.BotUserNotificationSend}</code>");
+        //     sb.AppendLine($"{NotifyAllCommand.Name} - <i>Отправить уведомление всем пользователям (в ответ на сообщение).</i>");
+        //     sb.AppendLine($"{NotifyTestCommand.Name} - <i>Тестовое уведомление для меня (в ответ на сообщение).</i>");
+        // }
         
 
         await BotClient.SendMessageAsync(Chat.ChatId, sb.ToString(), parseMode:ParseMode.Html);

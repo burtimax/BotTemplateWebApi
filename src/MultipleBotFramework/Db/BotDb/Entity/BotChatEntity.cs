@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using MultipleBotFramework.Constants;
 using MultipleBotFramework.Enums;
 using MultipleBotFramework.Models;
 using Telegram.BotAPI;
@@ -26,6 +27,24 @@ namespace MultipleBotFramework.Db.Entity
         public string? Type { get; set; }
         
         /// <summary>
+        /// Флаг заблокированного пользователя.
+        /// </summary>
+        [Comment("Флаг заблокированного пользователя.")]
+        public bool IsBlocked { get; set; } = false;
+
+        /// <summary>
+        /// Статус чата. kicked, member, administrator и т.д.
+        /// </summary>
+        [Comment("Статус пользователя")]
+        public string? Status { get; set; }
+
+        /// <summary>
+        /// Теги чата. Для пометки чата, как модераторский и прочее.
+        /// </summary>
+        [Comment("Теги чата, роли чата. Системное поле.")] 
+        public List<string>? Tags { get; set; } = new();
+        
+        /// <summary>
         /// Идентификатор чата в телеграм.
         /// </summary>
         /// <remarks>Некоторые чаты вместо long идентификатора имеют username идентификатор</remarks>
@@ -35,12 +54,12 @@ namespace MultipleBotFramework.Db.Entity
         [Comment("Заголовок чата")]
         public string? Title { get; set; }
 
-        /// <summary>
-        /// Внешний ключ на пользователя.
-        /// </summary>
-        [Comment("Внешний ключ на пользователя.")]
-        public long? BotUserId { get; set; }
-        public BotUserEntity? BotUser { get; set; }
+        // /// <summary>
+        // /// Внешний ключ на пользователя.
+        // /// </summary>
+        // [Comment("Внешний ключ на пользователя.")]
+        // public long? BotUserId { get; set; }
+        // public BotUserEntity? BotUser { get; set; }
 
         /// <summary>
         /// Состояние чата.
@@ -72,6 +91,9 @@ namespace MultipleBotFramework.Db.Entity
         [Comment("Бот не отвечает/не реагирует чату до определенного времени.")]
         public DateTimeOffset? DisabledUntil { get; set; }
         
+        [Comment("Кол-во запросов в бота")]
+        public long RequestCount { get; set; }
+        
         #region NotMappedData
         
         private ComplexDictionary? _chatData = null;
@@ -87,7 +109,6 @@ namespace MultipleBotFramework.Db.Entity
         /// Свойство для работы с состояниями чата.
         /// </summary>
         [NotMapped] public ChatStates States => _chatStates ??= new ChatStates(_states);
-
 
         /// <summary>
         /// Получить Telegram идентификатор чата (Id или Username)
@@ -111,6 +132,17 @@ namespace MultipleBotFramework.Db.Entity
                 ChatTypes.Channel => ChatType.Channel,
                 _ => ChatType.Unknown
             };
+        }
+        
+        /// <summary>
+        /// Можно ли писать пользователю. Заблокировал ли пользователь бота.
+        /// </summary>
+        public bool IsLeftOrBanned
+        {
+            get
+            {
+                return Status == BotChatStatus.Banned || Status == BotChatStatus.Left;
+            }
         }
         
         #endregion

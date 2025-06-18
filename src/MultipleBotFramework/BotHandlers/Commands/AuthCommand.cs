@@ -28,7 +28,8 @@ public class AuthCommand: BaseBotHandler
     
     public AuthCommand(IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        _botConfiguration = serviceProvider.GetRequiredService<IOptions<BotConfiguration>>().Value;
+        HideHandler = true;
+        _botConfiguration = serviceProvider.GetRequiredService<BotConfiguration>();
         _botRepository = serviceProvider.GetRequiredService<IBaseBotRepository>();
     }
 

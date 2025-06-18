@@ -22,7 +22,7 @@ public class DefaultMyChatMemberHandler : BaseBotHandler
 
         if (data.NewChatMember is not null)
         {
-            await UpdateUserStatus(data.NewChatMember.Status);
+            await UpdateChatStatus(data.NewChatMember.Status);
         }
 
         // Если пользователь заблокировал бота.
@@ -32,11 +32,11 @@ public class DefaultMyChatMemberHandler : BaseBotHandler
         }
     }
 
-    private async Task UpdateUserStatus(string status)
+    private async Task UpdateChatStatus(string status)
     {
-        if (User is null) return;
-        User.Status = status;
-        BotDbContext.Users.Update(User);
+        if (Chat is null) return;
+        Chat.Status = status;
+        BotDbContext.Chats.Update(Chat);
         await BotDbContext.SaveChangesAsync();
     }
 }

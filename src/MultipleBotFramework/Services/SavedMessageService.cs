@@ -8,15 +8,30 @@ using Telegram.BotAPI.AvailableTypes;
 
 namespace MultipleBotFramework.Services;
 
+/// <summary>
+/// Сервис для сохранения и проверки сохранённых сообщений.
+/// </summary>
 public class SavedMessageService : ISavedMessageService
 {
     private readonly BotDbContext _db;
     
+    /// <summary>
+    /// Конструктор сервиса сохранённых сообщений.
+    /// </summary>
+    /// <param name="db">Контекст базы данных бота</param>
     public SavedMessageService(BotDbContext db)
     {
         _db = db;
     }
 
+    /// <summary>
+    /// Сохраняет сообщение из Telegram-обновления.
+    /// </summary>
+    /// <param name="botId">ID бота</param>
+    /// <param name="chat">Сущность чата</param>
+    /// <param name="user">Сущность пользователя</param>
+    /// <param name="message">Сообщение Telegram</param>
+    /// <returns>Сущность сохранённого сообщения</returns>
     public async Task<BotSavedMessageEntity> SaveMessageFromUpdate(long botId, BotChatEntity? chat, BotUserEntity? user, Message message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
@@ -38,6 +53,14 @@ public class SavedMessageService : ISavedMessageService
         return savedMessageEntity;
     }
 
+    /// <summary>
+    /// Проверяет, есть ли сохранённое сообщение с определённым типом медиа.
+    /// </summary>
+    /// <param name="botId">ID бота</param>
+    /// <param name="telegramChatId">ID чата</param>
+    /// <param name="telegramUserId">ID пользователя</param>
+    /// <param name="mediaGroupId">ID группы медиа</param>
+    /// <returns>true, если есть такое сообщение</returns>
     public async Task<bool> HasSavedMessageWithMediaType(long botId, long? telegramChatId, long? telegramUserId, string? mediaGroupId)
     {
         return 0 < ( await _db.SavedMessages.CountAsync(sm => sm.BotId == botId &&

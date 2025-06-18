@@ -7,7 +7,7 @@ using MultipleBotFramework.Constants;
 using MultipleBotFramework.Enums;
 using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Utils;
-using MultipleTestBot.Resources;
+using MultipleTestBot.ResourceClasses;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;

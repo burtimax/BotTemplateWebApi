@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Attributes;
 using MultipleBotFramework.Dispatcher.HandlerResolvers;
 using MultipleTestBot.BotHandlers.State;
+using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleTestBot.BotHandlers.Command;
@@ -15,6 +17,7 @@ public class StartCommand : BaseMultipleTestBotCommand
 
     public override async Task HandleBotRequest(Update update)
     {
-        await Answer("Start world!");
+        await Answer(Hello);
+        //throw new Exception("Не знаю, ошибка какая-то");
     }
 }

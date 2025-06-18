@@ -3,18 +3,21 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MultipleBotFramework.Db;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MultipleBotFramework.Db.Migrations
+namespace MultipleBotFramework.Db.BotDb.Migrations
 {
     [DbContext(typeof(BotDbContext))]
-    partial class BotDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250327171642_ReplaceChatFields")]
+    partial class ReplaceChatFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,11 +42,6 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnName("bot_id")
                         .HasComment("Внешний ключ на бота.");
 
-                    b.Property<long?>("BotUserId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("bot_user_id")
-                        .HasComment("Внешний ключ на пользователя.");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -56,6 +54,26 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("disabled_until")
                         .HasComment("Бот не отвечает/не реагирует чату до определенного времени.");
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_blocked")
+                        .HasComment("Флаг заблокированного пользователя.");
+
+                    b.Property<long>("RequestCount")
+                        .HasColumnType("bigint")
+                        .HasColumnName("request_count")
+                        .HasComment("Кол-во запросов в бота");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text")
+                        .HasColumnName("status")
+                        .HasComment("Статус пользователя");
+
+                    b.Property<List<string>>("Tags")
+                        .HasColumnType("text[]")
+                        .HasColumnName("tags")
+                        .HasComment("Теги чата, роли чата. Системное поле.");
 
                     b.Property<long>("TelegramId")
                         .HasColumnType("bigint")
@@ -96,9 +114,6 @@ namespace MultipleBotFramework.Db.Migrations
 
                     b.HasIndex("BotId")
                         .HasDatabaseName("ix_chats_bot_id");
-
-                    b.HasIndex("BotUserId")
-                        .HasDatabaseName("ix_chats_bot_user_id");
 
                     b.ToTable("chats", "bot", t =>
                         {
@@ -667,10 +682,15 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
-                    b.Property<bool>("IsBlocked")
+                    b.Property<bool>("IsBot")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_blocked")
-                        .HasComment("Флаг заблокированного пользователя.");
+                        .HasColumnName("is_bot")
+                        .HasComment("Является ли Telegram пользователь ботом.");
+
+                    b.Property<bool>("IsPremium")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_premium")
+                        .HasComment("Является ли аккаунт премиумом.");
 
                     b.Property<string>("LanguageCode")
                         .HasColumnType("text")
@@ -689,11 +709,6 @@ namespace MultipleBotFramework.Db.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("role")
                         .HasComment("Роль пользователя в боте. Например [user, moderator, admin].");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("text")
-                        .HasColumnName("status")
-                        .HasComment("Статус пользователя");
 
                     b.Property<string>("TelegramFirstname")
                         .HasColumnType("text")
@@ -749,14 +764,7 @@ namespace MultipleBotFramework.Db.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_chats_bots_bot_id");
 
-                    b.HasOne("MultipleBotFramework.Db.Entity.BotUserEntity", "BotUser")
-                        .WithMany()
-                        .HasForeignKey("BotUserId")
-                        .HasConstraintName("fk_chats_users_bot_user_id");
-
                     b.Navigation("Bot");
-
-                    b.Navigation("BotUser");
                 });
 
             modelBuilder.Entity("MultipleBotFramework.Db.Entity.BotChatHistoryEntity", b =>

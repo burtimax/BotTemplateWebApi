@@ -17,7 +17,8 @@ namespace MultipleBotFramework.Models;
 public class MyTelegramBotClient : TelegramBotClient, ITelegramBotClient
 {
     public static string? BotDbConnection;
-    private static BotDbContext? _db;
+    public static bool? SaveBotMessages = true;
+    //private static BotDbContext? _db;
     private const int _dbMaxGetCount = 2000;
     private static int _dbGetCount = 0;
     
@@ -82,37 +83,38 @@ public class MyTelegramBotClient : TelegramBotClient, ITelegramBotClient
 
     private async Task SaveResultIfNeed<TResult>(string method, object? args, TResult result)
     {
+        if(SaveBotMessages == false) return;
         if(args is null) return;
         if(BotId is null) return;
         if(TryGetChatIdFromArgs(args, out long chatId) == false) return;
         
-        BotDbContext? db = GetDb();
-        if(db is null) return;
-        
-        BotChatHistoryService chatHistoryService = new(db);
-        await chatHistoryService.SaveInChatHistoryIfNeed(BotId.Value, chatId, true, result, args);
+        // BotDbContext? db = GetDb();
+        // if(db is null) return;
+        //
+        // BotChatHistoryService chatHistoryService = new(db);
+        // await chatHistoryService.SaveInChatHistoryIfNeed(BotId.Value, chatId, true, result, args);
     }
     
-    private BotDbContext? GetDb()
-    {
-        if (string.IsNullOrEmpty(BotDbConnection)) return null;
-
-        if (_dbGetCount > _dbMaxGetCount)
-        {
-            _db.Dispose();
-            _db = null;
-        }
-        
-        if (_db is null)
-        {
-            var ob = new DbContextOptionsBuilder<BotDbContext>();
-            ob.UseNpgsql(BotDbConnection);
-            _db = new BotDbContext(ob.Options);
-        }
-
-        _dbGetCount++;
-        return _db;
-    }
+    // private BotDbContext? GetDb()
+    // {
+    //     if (string.IsNullOrEmpty(BotDbConnection)) return null;
+    //
+    //     if (_dbGetCount > _dbMaxGetCount)
+    //     {
+    //         _db.Dispose();
+    //         _db = null;
+    //     }
+    //     
+    //     if (_db is null)
+    //     {
+    //         var ob = new DbContextOptionsBuilder<BotDbContext>();
+    //         ob.UseNpgsql(BotDbConnection);
+    //         _db = new BotDbContext(ob.Options);
+    //     }
+    //
+    //     _dbGetCount++;
+    //     return _db;
+    // }
     
     
     private bool TryGetChatIdFromArgs(object args, out long chatId)

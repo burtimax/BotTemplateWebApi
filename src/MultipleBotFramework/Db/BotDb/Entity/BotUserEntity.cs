@@ -50,14 +50,26 @@ namespace MultipleBotFramework.Db.Entity
         [Comment("Код языка пользователя. Ссылка на коды [https://en.wikipedia.org/wiki/IETF_language_tag]")]
         public string? LanguageCode { get; set; }
 
+        // /// <summary>
+        // /// Флаг заблокированного пользователя.
+        // /// </summary>
+        // [Comment("Флаг заблокированного пользователя.")]
+        // public bool IsBlocked { get; set; } = false;
+        //
+        // [Comment("Статус пользователя")]
+        // public string? Status { get; set; }
+        
         /// <summary>
-        /// Флаг заблокированного пользователя.
+        /// Является ли пользователь ботом.
         /// </summary>
-        [Comment("Флаг заблокированного пользователя.")]
-        public bool IsBlocked { get; set; } = false;
-
-        [Comment("Статус пользователя")]
-        public string? Status { get; set; }
+        [Comment("Является ли Telegram пользователь ботом.")]
+        public bool IsBot { get; set; } = false;
+        
+        /// <summary>
+        /// Является ли аккаунт пользователя Премиумом.
+        /// </summary>
+        [Comment("Является ли аккаунт премиумом.")]
+        public bool IsPremium { get; set; } = false;
         
         /// <summary>
         /// Имя пользователя в Telegram.
@@ -118,15 +130,6 @@ namespace MultipleBotFramework.Db.Entity
                 : null;
         }
 
-        /// <summary>
-        /// Можно ли писать пользователю. Заблокировал ли пользователь бота.
-        /// </summary>
-        public bool IsLeftOrBanned
-        {
-            get
-            {
-                return Status == BotUserStatus.Banned || Status == BotUserStatus.Left;
-            }
-        }
+        
     }
 }

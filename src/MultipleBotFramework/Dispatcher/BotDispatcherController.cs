@@ -29,16 +29,29 @@ using Telegram.BotAPI.GettingUpdates;
 
 namespace MultipleBotFramework.Dispatcher;
 
+/// <summary>
+/// Контроллер для обработки запросов от Telegram-бота.
+/// </summary>
 [Controller]
 public class BotDispatcherController : BaseBotController
 {
     private readonly BotUpdateDispatcher _dispatcher;
 
+    /// <summary>
+    /// Конструктор контроллера диспетчера бота.
+    /// </summary>
+    /// <param name="dispatcher">Диспетчер обновлений бота</param>
     public BotDispatcherController(BotUpdateDispatcher dispatcher)
     {
         _dispatcher = dispatcher;
     }
 
+    /// <summary>
+    /// Обрабатывает запрос от бота.
+    /// </summary>
+    /// <param name="botId">ID бота</param>
+    /// <param name="update">Обновление Telegram</param>
+    /// <returns>Результат обработки запроса</returns>
     public override async Task<IActionResult> HandleBotRequest(long botId, Update update)
     {
         await _dispatcher.HandleBotRequest(botId, update);

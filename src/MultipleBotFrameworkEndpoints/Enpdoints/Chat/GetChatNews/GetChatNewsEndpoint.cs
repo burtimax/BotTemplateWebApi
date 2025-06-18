@@ -1,4 +1,8 @@
-﻿using FastEndpoints;
+﻿/// <summary>
+/// Эндпоинт для получения количества непрочитанных сообщений в чатах.
+/// </summary>
+
+using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Db;
 using MultipleBotFramework.Db.Entity;
@@ -8,28 +12,63 @@ using MultipleTestBot.Endpoints.Bot;
 
 namespace MultipleBotFrameworkEndpoints.Enpdoints.Chat.GetChats;
 
+/// <summary>
+/// Модель запроса для получения новостей чата
+/// </summary>
 public class GetChatNewsRequest
 {
+    /// <summary>
+    /// Список ID чатов для проверки
+    /// </summary>
     public List<long> ChatIds { get; set; }
 }
 
+/// <summary>
+/// Модель элемента ответа с информацией о непрочитанных сообщениях
+/// </summary>
 public class GetChatNewsResponseItem
 {
+    /// <summary>
+    /// ID чата
+    /// </summary>
     public long Id { get; set; }
+    
+    /// <summary>
+    /// ID бота
+    /// </summary>
     public long BotId { get; set; }
+    
+    /// <summary>
+    /// Telegram ID чата
+    /// </summary>
     public long TelegramId { get; set; }
+    
+    /// <summary>
+    /// Количество непрочитанных сообщений
+    /// </summary>
     public long CountNews { get; set; }
 }
 
+/// <summary>
+/// Эндпоинт для получения количества непрочитанных сообщений в чатах.
+/// Возвращает информацию о количестве непрочитанных модератором сообщений для каждого указанного чата.
+/// </summary>
 public class GetChatNewsEndpoint : Endpoint<GetChatNewsRequest, List<GetChatNewsResponseItem>>
 {
     private BotDbContext _db;
 
+    /// <summary>
+    /// Инициализирует эндпоинт получения новостей чата
+    /// </summary>
+    /// <param name="db">Контекст базы данных</param>
     public GetChatNewsEndpoint(BotDbContext db)
     {
         _db = db;
     }
 
+    /// <summary>
+    /// Настраивает параметры эндпоинта
+    /// </summary>
     public override void Configure()
     {
         Get("/news");
@@ -42,6 +81,11 @@ public class GetChatNewsEndpoint : Endpoint<GetChatNewsRequest, List<GetChatNews
         });
     }
 
+    /// <summary>
+    /// Обрабатывает запрос на получение новостей чата
+    /// </summary>
+    /// <param name="r">Данные запроса</param>
+    /// <param name="c">Токен отмены</param>
     public override async Task HandleAsync(GetChatNewsRequest r, CancellationToken c)
     {
         List<BotChatEntity> chats = await _db.Chats

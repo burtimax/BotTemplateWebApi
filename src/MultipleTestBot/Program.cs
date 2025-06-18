@@ -1,6 +1,8 @@
+using System.Globalization;
 using System.Reflection;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using MultipleBotFramework.Extensions;
 using MultipleBotFramework.Models;
@@ -9,7 +11,7 @@ using MultipleTestBot.App.Options;
 using MultipleTestBot.Db.AppDb;
 using MultipleTestBot.Endpoints.Bot.GetBots;
 using MultipleTestBot.Extensions;
-using MultipleTestBot.Resources;
+using MultipleTestBot.ResourceClasses;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -51,12 +53,7 @@ services.AddDbContext<AppDbContext>(options =>
 );
 
 // Регистрируем конфигурации.
-services.Configure<BotConfiguration>(builder.Configuration.GetSection("Bot"));
-services.Configure<BotOptions>(builder.Configuration.GetSection("BotOptions"));
-var botConfig = builder.Configuration.GetSection("Bot").Get<BotConfiguration>();
-BotOptions botOptions = builder.Configuration.GetSection("BotOptions").Get<BotOptions>();
-BotResources botResources = services.ConfigureBotResources(botConfig.ResourcesFilePath);
-services.AddBot(botConfig, botOptions: botOptions); // Подключаем бота
+services.AddBot(builder.Configuration); // Подключаем бота
 services.AddControllers();//.AddNewtonsoftJson(); //Обязательно подключаем NewtonsoftJson
 services.AddHttpContextAccessor();
 services.AddCors();
@@ -68,6 +65,8 @@ services.AddMapster();
 // Регистрируем контексты к базам данных.
 
 var app = builder.Build();
+
+app.UseBot();
 
 app.UseFastEndpoints().UseSwaggerGen();
 

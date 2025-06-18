@@ -1,4 +1,4 @@
-﻿namespace MultipleTestBot.Resources;
+﻿namespace MultipleTestBot.ResourceClasses;
 
 public partial class BotResources
 {
