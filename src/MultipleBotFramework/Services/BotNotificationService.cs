@@ -173,20 +173,20 @@ public class BotNotificationService : IBotNotificationService
         var chat = await _botDb.Chats.FirstOrDefaultAsync(c =>
             c.BotId == n.BotId && c.TelegramId == n.SendToChatId);
 
-        if (chat == null)
-        {
-            internalException = true;
-            throw new Exception($"Не найден чат [{n.SendToChatId}]");
-        }
-
-        if (chat.Status == BotChatStatus.Banned || chat.Status == BotChatStatus.Left)
-        {
-            internalException = true;
-            throw new Exception($"Чат [{chat.TelegramId}] заблокирован для отправки уведомлений");
-        }
-
         try
         {
+            if (chat == null)
+            {
+                internalException = true;
+                throw new Exception($"Не найден чат [{n.SendToChatId}]");
+            }
+
+            if (chat.Status == BotChatStatus.Banned || chat.Status == BotChatStatus.Left)
+            {
+                internalException = true;
+                throw new Exception($"Чат [{chat.TelegramId}] заблокирован для отправки уведомлений");
+            }
+            
             if (n.SavedMessageId.HasValue)
             {
                 await client.SendSavedMessage(n.SendToChatId, _botDb, n.SavedMessageId.Value,

@@ -97,7 +97,10 @@ public class ReferralService : IReferralService
             };
             _db.Participants.Add(participant);
             await _db.SaveChangesAsync();
+        };
 
+        if (participant.Campaigns.Any(c => c.Name == ReferralCampaign.DefaultName) == false)
+        {
             ReferralCampaign campaign =
                 new ReferralCampaign()
                 {
@@ -109,7 +112,8 @@ public class ReferralService : IReferralService
 
             _db.Campaigns.Add(campaign);
             await _db.SaveChangesAsync();
-        };
+        }
+        
         return participant;
     }
     

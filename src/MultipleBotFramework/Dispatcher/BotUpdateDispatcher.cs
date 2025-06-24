@@ -88,9 +88,18 @@ public class BotUpdateDispatcher
             var upsertUserResult = await _botRepository.UpsertUser(botId, telegramUser, botClient);
             user = upsertUserResult.user;
 
+            userClaims = (await _botRepository.GetUserClaims(botId, user?.Id ?? -1))?.Select(c => new ClaimValue(c.Id, c.Name, c?.Description ?? ""));
+            bool isOwner = await _botRepository.IsUserOwner(botId, user?.TelegramId ?? -1);
+            
             if (upsertUserResult.userCreated)
             {
                 await AddReferralDataIfNeed(botId, telegramUser.Id);
+            }
+            
+            // Метод для вызова обработчиков событий.
+            async Task ActivateHandler(Type handlerType)
+            {
+                await ProcessRequestByHandler<IBaseBotHandler>(handlerType, botId, isOwner, botClient, update, chat, user, savedUpdateEntity, userClaims);
             }
             
             // Ловим реферала.
@@ -107,12 +116,11 @@ public class BotUpdateDispatcher
                     if (refHandleRes == ReferralProgramStatus.Succeeded)
                     {
                         // TODO вызвать событие нового реферала.
+                        if (BotEvents.NewReferralEventHandler != null)
+                            await ActivateHandler(BotEvents.NewReferralEventHandler);
                     }  
                 } 
             }
-            
-            userClaims = (await _botRepository.GetUserClaims(botId, user?.Id ?? -1))?.Select(c => new ClaimValue(c.Id, c.Name, c?.Description ?? ""));
-            bool isOwner = await _botRepository.IsUserOwner(botId, user?.TelegramId ?? -1);
 
             BotChatEntity? existedChat = null;
             if (telegramChat is not null)
@@ -205,7 +213,7 @@ public class BotUpdateDispatcher
 
         // Отправляем ответ пользователю
     }
-
+    
     private async Task AddReferralDataIfNeed(long botId, long userTelegramId)
     {
         // Если активна реферальная система, тогда для пользователя создаем запись о реферале.
