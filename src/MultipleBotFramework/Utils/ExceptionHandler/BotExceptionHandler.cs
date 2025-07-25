@@ -151,6 +151,7 @@ public class BotExceptionHandler
             {
                 BotExceptionEntity botExceptionEntity = new BotExceptionEntity()
                 {
+                    BotId = args.BotId,
                     ChatEntityId = chat?.Id,
                     UserEntityId = user?.Id,
                     UpdateEntityId = botUpdate?.Id,
