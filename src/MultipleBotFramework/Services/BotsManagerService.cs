@@ -24,6 +24,7 @@ namespace MultipleBotFramework.Services;
 /// </summary>
 public class BotsManagerService : IBotsManagerService
 {
+    public static IEnumerable<string> AllowedUpdates = BotConfiguration.AllAllowedUpdates;
     private static Dictionary<long,MyTelegramBotClient> botCache = new();
     private static bool cacheInitialized = false;
     private BotDbContext _db;
@@ -225,7 +226,7 @@ public class BotsManagerService : IBotsManagerService
         
             MyTelegramBotClient botClient = new(bot.Id, bot.Token);
         
-            await botClient.SetWebhookAsync(BotWebhook.GetWebhookForBot(bot.Id), allowedUpdates: BotConfiguration.AllAllowedUpdates);
+            await botClient.SetWebhookAsync(BotWebhook.GetWebhookForBot(bot.Id), allowedUpdates: AllowedUpdates);
 
             if (bot.Webhook != BotWebhook.GetWebhookForBot(bot.Id))
             {

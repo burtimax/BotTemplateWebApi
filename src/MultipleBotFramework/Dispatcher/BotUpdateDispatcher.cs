@@ -95,6 +95,29 @@ public class BotUpdateDispatcher
             {
                 await AddReferralDataIfNeed(botId, telegramUser.Id);
             }
+
+            BotChatEntity? existedChat = null;
+            if (telegramChat is not null)
+            {
+                chat = existedChat ?? await _botRepository.UpsertChat(botId, telegramChat, telegramUser);
+                // Сохраняем сообщение пользователя в БД.
+                if (_botOptions.SaveUserMessagesInDatabase)
+                {
+                    await _chatHistoryService.SaveInChatHistoryIfNeed(botId, chat.TelegramId, false, data:update);
+                }
+            }
+
+            // Если поменялся статус пользователя в боте.
+            await ChatStatusUpdateIfNeeded(update, chat);
+            
+            // Если пользователь заблокирован, тогда ему не отвечаем!!!
+            if (chat != null && chat.IsBlocked)
+            {
+                // ToDo перенаправить на состояние блокированного пользователя!!!
+                if(chat != null)
+                    await botClient.SendMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
+                return;
+            }
             
             // Метод для вызова обработчиков событий.
             async Task ActivateHandler(Type handlerType)
@@ -120,29 +143,6 @@ public class BotUpdateDispatcher
                             await ActivateHandler(BotEvents.NewReferralEventHandler);
                     }  
                 } 
-            }
-
-            BotChatEntity? existedChat = null;
-            if (telegramChat is not null)
-            {
-                chat = existedChat ?? await _botRepository.UpsertChat(botId, telegramChat, telegramUser);
-                // Сохраняем сообщение пользователя в БД.
-                if (_botOptions.SaveUserMessagesInDatabase)
-                {
-                    await _chatHistoryService.SaveInChatHistoryIfNeed(botId, chat.TelegramId, false, data:update);
-                }
-            }
-
-            // Если поменялся статус пользователя в боте.
-            await ChatStatusUpdateIfNeeded(update, chat);
-            
-            // Если пользователь заблокирован, тогда ему не отвечаем!!!
-            if (chat != null && chat.IsBlocked)
-            {
-                // ToDo перенаправить на состояние блокированного пользователя!!!
-                if(chat != null)
-                    await botClient.SendMessageAsync(chat.ChatId, "Вы были заблокированы модератором");
-                return;
             }
             
             // Сохраняем запрос в истории бота.

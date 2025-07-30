@@ -34,7 +34,8 @@ public static class IServiceCollectionExtension
     /// <param name="claims">Дополнительные утверждения</param>
     /// <returns>Коллекция сервисов</returns>
     public static IServiceCollection AddBot(this IServiceCollection services, IConfiguration configuration,
-        IEnumerable<ClaimValue>? claims = null)
+        IEnumerable<ClaimValue>? claims = null,
+        IEnumerable<string>? allowedUpdates = null)
     {
         var botConf = configuration.GetSection(BotConfiguration.Section);
         if(!botConf.Exists()) throw new NullReferenceException($"Missing configuration {BotConfiguration.Section}");
@@ -65,6 +66,11 @@ public static class IServiceCollectionExtension
                 .GetAwaiter()
                 .GetResult();
 
+            if (allowedUpdates is not null && allowedUpdates?.Any() == true)
+            {
+                BotsManagerService.AllowedUpdates = allowedUpdates;
+            }
+            
             var botsManager = new BotsManagerService(botDbContext, botOptions, botConfiguration);
             botsManager.InitializeBotsIfNeed().GetAwaiter().GetResult();
         }
